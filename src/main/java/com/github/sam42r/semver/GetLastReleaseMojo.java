@@ -3,6 +3,7 @@ package com.github.sam42r.semver;
 import org.apache.maven.plugin.MojoExecutionException;
 import org.apache.maven.plugin.MojoFailureException;
 import org.apache.maven.plugins.annotations.Mojo;
+import org.apache.maven.plugins.annotations.Parameter;
 import org.eclipse.jgit.api.Git;
 import org.eclipse.jgit.api.errors.GitAPIException;
 import org.eclipse.jgit.lib.Ref;
@@ -22,10 +23,14 @@ import java.util.stream.StreamSupport;
 @Mojo(name = "get-latest-release")
 public class GetLastReleaseMojo extends AbstractSemverMojo {
 
+    @Parameter(name = "option", property = "semver.option", defaultValue = "test")
+    private String option;
+
     @SuppressWarnings("unchecked")
     @Override
     public void execute() throws MojoExecutionException, MojoFailureException {
         getLog().info("Get latest release");
+        getLog().info("Option: %s".formatted(option));
 
         try (var repository = getRepository()) {
             var git = new Git(repository);
