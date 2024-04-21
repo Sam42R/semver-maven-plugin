@@ -4,15 +4,12 @@ import org.apache.maven.plugin.MojoExecutionException;
 import org.apache.maven.plugin.MojoFailureException;
 import org.apache.maven.plugin.logging.Log;
 import org.apache.maven.project.MavenProject;
-import org.assertj.core.api.Assertions;
 import org.eclipse.jgit.api.Git;
 import org.eclipse.jgit.api.errors.GitAPIException;
 import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.io.TempDir;
 
-import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -21,23 +18,25 @@ import java.util.HashMap;
 import java.util.Map;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
-class GetLatestReleaseMojoTest {
+class SemanticReleaseMojoTest {
 
-    private AbstractSemverMojo uut;
+    private SemanticReleaseMojo uut;
     private MavenProject mavenProjectMock;
 
     @BeforeEach
     void setup(@TempDir Path tmp) {
-        uut = new GetLastReleaseMojo();
+        uut = new SemanticReleaseMojo();
 
         var logMock = mock(Log.class);
         uut.setLog(logMock);
 
         var pluginContext = new HashMap<>();
         uut.setPluginContext(pluginContext);
+        uut.setScmProviderName("Git");
 
         mavenProjectMock = mock(MavenProject.class);
         uut.setProject(mavenProjectMock);
@@ -56,7 +55,7 @@ class GetLatestReleaseMojoTest {
             uut.execute();
 
             assertThat((Map<SemverContextVariable, String>) uut.getPluginContext()).contains(
-                    new AbstractMap.SimpleEntry<>(SemverContextVariable.LATEST_TAG, "none"),
+                    new AbstractMap.SimpleEntry<>(SemverContextVariable.LATEST_TAG, "None"),
                     new AbstractMap.SimpleEntry<>(SemverContextVariable.LATEST_COMMIT, commit.getName())
             );
         }
@@ -70,33 +69,28 @@ class GetLatestReleaseMojoTest {
 
         try (var git = initializeGitRepository(tmp)) {
             git.add().addFilepattern("pom.xml").call();
-            var commit = git.commit().setMessage("Initial commit").call();
-
-            var tag = git.tag()
-                    .setName("v1.0.0")
-                    .setForceUpdate(true)
-                    .call();
+            var expected = git.commit().setMessage("Initial commit").call();
+            git.tag().setName("v1.0.0").call();
 
             uut.execute();
 
             assertThat((Map<SemverContextVariable, String>) uut.getPluginContext()).contains(
-                    new AbstractMap.SimpleEntry<>(SemverContextVariable.LATEST_TAG, tag.getName()),
-                    new AbstractMap.SimpleEntry<>(SemverContextVariable.LATEST_COMMIT, commit.getName())
+                    new AbstractMap.SimpleEntry<>(SemverContextVariable.LATEST_TAG, "v1.0.0"),
+                    new AbstractMap.SimpleEntry<>(SemverContextVariable.LATEST_COMMIT, expected.getName())
             );
         }
     }
 
     @Test
-    @Disabled("used for local testing")
-    @SuppressWarnings("unchecked")
-    void shouldFindLatestReleaseLocal() throws MojoExecutionException, MojoFailureException {
-        when(mavenProjectMock.getFile()).thenReturn(new File("C:\\Users\\r_ric\\IdeaProjects\\SimpleTestProject\\pom.xml"));
+    void shouldThrowWithEmptyGitRepository(@TempDir Path tmp) throws IOException, GitAPIException, MojoExecutionException, MojoFailureException {
+        var pomXml = createFile(tmp, "pom.xml", "<project/>");
+        when(mavenProjectMock.getFile()).thenReturn(pomXml.toFile());
 
-        uut.execute();
-
-        uut.getPluginContext().forEach((key, value) -> {
-            System.out.printf("%s: %s%n", key, value);
-        });
+        try (var ignored = initializeGitRepository(tmp)) {
+            assertThatThrownBy(() -> uut.execute())
+                    .isInstanceOf(MojoExecutionException.class)
+                    .hasMessageStartingWith("No HEAD exists");
+        }
     }
 
     @Test
@@ -104,7 +98,7 @@ class GetLatestReleaseMojoTest {
         var pomXml = createFile(tmp, "pom.xml", "<project/>");
         when(mavenProjectMock.getFile()).thenReturn(pomXml.toFile());
 
-        Assertions.assertThatThrownBy(() -> uut.execute())
+        assertThatThrownBy(() -> uut.execute())
                 .isInstanceOf(MojoExecutionException.class)
                 .hasMessageStartingWith("Could not find git repository");
     }

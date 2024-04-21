@@ -1,5 +1,6 @@
 package com.github.sam42r.semver.scm.impl;
 
+import com.github.sam42r.semver.scm.SCMException;
 import com.github.sam42r.semver.scm.SCMProvider;
 import com.github.sam42r.semver.scm.model.Commit;
 import com.github.sam42r.semver.scm.model.Tag;
@@ -25,12 +26,12 @@ public class HgProvider implements SCMProvider {
     }
 
     @Override
-    public @NonNull Stream<Commit> readCommits(@NonNull Path path) {
+    public @NonNull Stream<Commit> readCommits(@NonNull Path path) throws SCMException {
         throw new NotImplementedException();
     }
 
     @Override
-    public @NonNull Stream<Tag> readTags(@NonNull Path path) {
+    public @NonNull Stream<Tag> readTags(@NonNull Path path) throws SCMException {
         throw new NotImplementedException();
     }
 }

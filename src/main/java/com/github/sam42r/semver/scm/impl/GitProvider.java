@@ -1,5 +1,6 @@
 package com.github.sam42r.semver.scm.impl;
 
+import com.github.sam42r.semver.scm.SCMException;
 import com.github.sam42r.semver.scm.SCMProvider;
 import com.github.sam42r.semver.scm.model.Commit;
 import com.github.sam42r.semver.scm.model.Tag;
@@ -37,7 +38,7 @@ public class GitProvider implements SCMProvider {
     }
 
     @Override
-    public @NonNull Stream<Commit> readCommits(@NonNull Path path) {
+    public @NonNull Stream<Commit> readCommits(@NonNull Path path) throws SCMException {
         var repository = getRepository(path);
         try (var git = new Git(repository)) {
             return StreamSupport.stream(git.log().call().spliterator(), false)
@@ -48,12 +49,12 @@ public class GitProvider implements SCMProvider {
                             .message(v.getFullMessage())
                             .build());
         } catch (GitAPIException e) {
-            throw new RuntimeException(e);
+            throw new SCMException(e.getMessage(), e);
         }
     }
 
     @Override
-    public @NonNull Stream<Tag> readTags(@NonNull Path path) {
+    public @NonNull Stream<Tag> readTags(@NonNull Path path) throws SCMException {
         var repository = getRepository(path);
         try (var git = new Git(repository)) {
             return git.tagList().call().stream()
@@ -62,19 +63,19 @@ public class GitProvider implements SCMProvider {
                             .commitId(getObjectId(repository, v).getName())
                             .build());
         } catch (GitAPIException e) {
-            throw new RuntimeException(e);
+            throw new SCMException(e);
         }
     }
 
-    private Repository getRepository(Path path) {
+    private Repository getRepository(Path path) throws SCMException {
         try {
             var gitDirectory = path.resolve(".git");
             if (Files.notExists(gitDirectory) || !Files.isDirectory(gitDirectory) || !Files.isReadable(gitDirectory)) {
-                throw new IllegalArgumentException("Could not access git directory on path '%s'".formatted(gitDirectory));
+                throw new SCMException("Could not find git repository");
             }
             return FileRepositoryBuilder.create(gitDirectory.toFile());
         } catch (IOException e) {
-            throw new UncheckedIOException(e);
+            throw new SCMException(e);
         }
     }
 

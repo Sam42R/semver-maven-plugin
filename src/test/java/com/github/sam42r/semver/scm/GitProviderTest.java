@@ -28,7 +28,7 @@ class GitProviderTest {
     }
 
     @Test
-    void shouldReadCommits(@TempDir Path tempDirectory) throws GitAPIException, IOException {
+    void shouldReadCommits(@TempDir Path tempDirectory) throws GitAPIException, IOException, SCMException {
         try (var git = Git.init().setDirectory(tempDirectory.toFile()).call()) {
             Files.writeString(tempDirectory.resolve("README.md"), "#JUnit");
             git.add().addFilepattern("README.md").call();
@@ -47,7 +47,7 @@ class GitProviderTest {
     }
 
     @Test
-    void shouldReadTags(@TempDir Path tempDirectory) throws GitAPIException, IOException {
+    void shouldReadTags(@TempDir Path tempDirectory) throws GitAPIException, IOException, SCMException {
         try (var git = Git.init().setDirectory(tempDirectory.toFile()).call()) {
             Files.writeString(tempDirectory.resolve("README.md"), "#JUnit");
             git.add().addFilepattern("README.md").call();
