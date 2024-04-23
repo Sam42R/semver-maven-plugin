@@ -18,5 +18,7 @@ public interface SCMProvider {
 
     @NonNull Stream<Commit> readCommits(@NonNull Path path) throws SCMException;
 
+    @NonNull Stream<Commit> readCommits(@NonNull Path path, @NonNull String fromCommitId) throws SCMException;
+
     @NonNull Stream<Tag> readTags(@NonNull Path path) throws SCMException;
 }

@@ -31,6 +31,11 @@ public class SvnProvider implements SCMProvider {
     }
 
     @Override
+    public @NonNull Stream<Commit> readCommits(@NonNull Path path, @NonNull String fromCommitId) throws SCMException {
+        throw new NotImplementedException();
+    }
+
+    @Override
     public @NonNull Stream<Tag> readTags(@NonNull Path path) throws SCMException {
         throw new NotImplementedException();
     }
