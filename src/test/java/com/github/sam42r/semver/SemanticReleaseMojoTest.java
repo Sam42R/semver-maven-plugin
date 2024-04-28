@@ -70,8 +70,12 @@ class SemanticReleaseMojoTest {
 
         try (var git = initializeGitRepository(tmp)) {
             git.add().addFilepattern("pom.xml").call();
-            var expected = git.commit().setMessage("Initial commit").call();
+            git.commit().setMessage("Initial commit").call();
             git.tag().setName("v1.0.0").call();
+
+            var file = createFile(tmp, "README.md", "# Project");
+            git.add().addFilepattern(file.getFileName().toString()).call();
+            git.commit().setMessage("feat: add some feature").call();
 
             uut.execute();
 

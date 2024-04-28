@@ -1,6 +1,8 @@
 package com.github.sam42r.semver;
 
 import com.github.sam42r.semver.analyzer.CommitAnalyzer;
+import com.github.sam42r.semver.changelog.ChangelogRenderer;
+import com.github.sam42r.semver.changelog.impl.MustacheRenderer;
 import com.github.sam42r.semver.scm.SCMException;
 import com.github.sam42r.semver.scm.SCMProvider;
 import com.github.sam42r.semver.scm.model.Commit;
@@ -13,6 +15,8 @@ import org.apache.maven.plugins.annotations.Mojo;
 import org.apache.maven.plugins.annotations.Parameter;
 import org.apache.maven.project.MavenProject;
 
+import java.io.IOException;
+import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.Comparator;
 import java.util.List;
@@ -61,6 +65,12 @@ public class SemanticReleaseMojo extends AbstractMojo {
         var analyzedCommits = analyzeCommits(projectBaseDirectory, scmProvider, commitAnalyzer, latestCommit);
         getLog().debug("Found %d major, %d minor and %d patch commits".formatted(
                 analyzedCommits.major().size(), analyzedCommits.minor().size(), analyzedCommits.patch().size()));
+
+        var notes = generateNotes(projectBaseDirectory, new MustacheRenderer(), "v1.1.0",
+                analyzedCommits.major(), analyzedCommits.minor(), analyzedCommits.patch());
+        // TODO add notes to scm and commit
+
+        createTag();
     }
 
     private VerifiedConditions verifyConditions() {
@@ -121,8 +131,23 @@ public class SemanticReleaseMojo extends AbstractMojo {
 
     }
 
-    private void generateNotes() {
+    private Path generateNotes(
+            Path projectBaseDirectory,
+            ChangelogRenderer renderer,
+            String version,
+            List<Commit> major,
+            List<Commit> minor,
+            List<Commit> patch
+    ) throws MojoExecutionException {
+        var changelog = projectBaseDirectory.resolve("Changelog.md");
 
+        try (var inputStream = renderer.renderChangelog(version, major, minor, patch)) {
+            Files.write(changelog, inputStream.readAllBytes());
+        } catch (IOException e) {
+            throw new MojoExecutionException(e.getMessage(), e.getCause());
+        }
+
+        return changelog;
     }
 
     private void createTag() {
