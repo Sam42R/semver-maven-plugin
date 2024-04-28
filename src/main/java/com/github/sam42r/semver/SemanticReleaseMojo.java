@@ -15,10 +15,9 @@ import org.apache.maven.project.MavenProject;
 
 import java.nio.file.Path;
 import java.util.Comparator;
+import java.util.List;
+import java.util.Optional;
 import java.util.ServiceLoader;
-
-import static com.github.sam42r.semver.SemverContextVariable.LATEST_COMMIT;
-import static com.github.sam42r.semver.SemverContextVariable.LATEST_TAG;
 
 /**
  * @author Sam42R
@@ -41,65 +40,101 @@ public class SemanticReleaseMojo extends AbstractMojo {
     @Parameter(name = "commit-analyzer-name", defaultValue = "Angular")
     private String commitAnalyzerName;
 
-    private SCMProvider scmProvider;
-    private CommitAnalyzer commitAnalyzer;
-
     @Override
     public void execute() throws MojoExecutionException, MojoFailureException {
         var projectBaseDirectory = project.getFile().getParentFile().toPath();
-        verifyConditions();
-        getLatestRelease(projectBaseDirectory);
-        analyzeCommits(projectBaseDirectory, null);
-    }
 
-    private void verifyConditions() {
-        scmProvider = scmProviders.stream()
-                .map(ServiceLoader.Provider::get)
-                .filter(v -> scmProviderName.equalsIgnoreCase(v.getName()))
-                .findAny()
+        var verifiedConditions = verifyConditions();
+        var scmProvider = verifiedConditions.scmProvider()
                 .orElseThrow(() -> new IllegalArgumentException("Could not find SCM provider with name '%s'".formatted(scmProviderName)));
-        getLog().info("Running semantic-release with SCM provider '%s'".formatted(scmProvider.getClass().getSimpleName()));
-
-        commitAnalyzer = commitAnalyzers.stream()
-                .map(ServiceLoader.Provider::get)
-                .filter(v -> commitAnalyzerName.equalsIgnoreCase(v.getName()))
-                .findAny()
+        var commitAnalyzer = verifiedConditions.commitAnalyzer()
                 .orElseThrow(() -> new IllegalArgumentException("Could not find commit analyzer with name '%s'".formatted(commitAnalyzerName)));
+        getLog().info("Running semantic-release with SCM provider '%s'".formatted(scmProvider.getClass().getSimpleName()));
         getLog().info("Running semantic-release with commit analyzer '%s'".formatted(commitAnalyzer.getClass().getSimpleName()));
+
+        var latestRelease = getLatestRelease(projectBaseDirectory, scmProvider);
+        var latestTag = latestRelease.latestTag().orElse("None");
+        var latestCommit = latestRelease.latestCommit().orElse("None");
+        getLog().debug("Latest tag: '%s'".formatted(latestTag));
+        getLog().debug("Latest commit: '%s'".formatted(latestCommit));
+
+        var analyzedCommits = analyzeCommits(projectBaseDirectory, scmProvider, commitAnalyzer, latestCommit);
+        getLog().debug("Found %d major, %d minor and %d patch commits".formatted(
+                analyzedCommits.major().size(), analyzedCommits.minor().size(), analyzedCommits.patch().size()));
     }
 
-    @SuppressWarnings("unchecked")
-    private void getLatestRelease(Path projectBaseDirectory) throws MojoExecutionException {
+    private VerifiedConditions verifyConditions() {
+        return new VerifiedConditions(
+                scmProviders.stream()
+                        .map(ServiceLoader.Provider::get)
+                        .filter(v -> scmProviderName.equalsIgnoreCase(v.getName()))
+                        .findAny(),
+                commitAnalyzers.stream()
+                        .map(ServiceLoader.Provider::get)
+                        .filter(v -> commitAnalyzerName.equalsIgnoreCase(v.getName()))
+                        .findAny()
+        );
+    }
+
+    private LatestRelease getLatestRelease(Path projectBaseDirectory, SCMProvider scmProvider) throws MojoExecutionException {
         try {
-            var commits = scmProvider.readCommits(projectBaseDirectory);
             var tags = scmProvider.readTags(projectBaseDirectory);
+            var commits = scmProvider.readCommits(projectBaseDirectory);
 
             var latestTagOpt = tags.max(Comparator.comparing(Tag::getName));
             var latestCommitOpt = latestTagOpt.map(Tag::getCommitId)
                     .or(() -> commits.min(Comparator.comparing(Commit::getTimestamp)).map(Commit::getId));
 
-            // TODO refactor to method response
-            getPluginContext().put(LATEST_TAG, latestTagOpt.map(Tag::getName).orElse("None"));
-            getPluginContext().put(LATEST_COMMIT, latestCommitOpt.orElse("None"));
-
-            getLog().debug("Latest tag: '%s'".formatted(getPluginContext().get(LATEST_TAG)));
-            getLog().debug("Latest commit: '%s'".formatted(getPluginContext().get(LATEST_COMMIT)));
+            return new LatestRelease(
+                    latestTagOpt.map(Tag::getName),
+                    latestCommitOpt
+            );
         } catch (SCMException e) {
             throw new MojoExecutionException(e.getMessage(), e.getCause());
         }
     }
 
-    private void analyzeCommits(Path projectBaseDirectory, String latestCommit) throws MojoExecutionException {
+    private AnalyzedCommits analyzeCommits(
+            Path projectBaseDirectory,
+            SCMProvider scmProvider,
+            CommitAnalyzer commitAnalyzer,
+            String latestCommit
+    ) throws MojoExecutionException {
         try {
-            // TODO always use 2 params method and add check in method
+            // TODO always use 2 params method and add check in method!?
             var commits = latestCommit != null ?
                     scmProvider.readCommits(projectBaseDirectory, latestCommit) :
                     scmProvider.readCommits(projectBaseDirectory);
 
             var response = commitAnalyzer.analyzeCommits(commits.toList());
+            return new AnalyzedCommits(
+                    response.getBreaking(),
+                    response.getFeatures(),
+                    response.getFixes()
+            );
         } catch (SCMException e) {
             throw new MojoExecutionException(e.getMessage(), e.getCause());
         }
     }
 
+    private void verifyRelease() {
+
+    }
+
+    private void generateNotes() {
+
+    }
+
+    private void createTag() {
+
+    }
+
+    private record VerifiedConditions(Optional<SCMProvider> scmProvider, Optional<CommitAnalyzer> commitAnalyzer) {
+    }
+
+    private record LatestRelease(Optional<String> latestTag, Optional<String> latestCommit) {
+    }
+
+    private record AnalyzedCommits(List<Commit> major, List<Commit> minor, List<Commit> patch) {
+    }
 }
