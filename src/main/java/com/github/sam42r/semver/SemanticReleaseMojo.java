@@ -3,6 +3,7 @@ package com.github.sam42r.semver;
 import com.github.sam42r.semver.analyzer.CommitAnalyzer;
 import com.github.sam42r.semver.changelog.ChangelogRenderer;
 import com.github.sam42r.semver.changelog.impl.MustacheRenderer;
+import com.github.sam42r.semver.model.Version;
 import com.github.sam42r.semver.scm.SCMException;
 import com.github.sam42r.semver.scm.SCMProvider;
 import com.github.sam42r.semver.scm.model.Commit;
@@ -36,6 +37,11 @@ public class SemanticReleaseMojo extends AbstractMojo {
     @Parameter(defaultValue = "${project}", required = true, readonly = true)
     private MavenProject project;
 
+    // FIXME we can not use html markup in pom.xml configuration (e.g. named groups)
+    @Setter
+    @Parameter(name = "version-number-pattern", defaultValue = "v(?<MAJOR>[0-9]*).(?<MINOR>[0-9]*).(?<PATCH>[0-9]*)")
+    private String versionNumberPattern;
+
     @Setter
     @Parameter(name = "scm-provider-name", defaultValue = "Git")
     private String scmProviderName;
@@ -62,15 +68,31 @@ public class SemanticReleaseMojo extends AbstractMojo {
         getLog().debug("Latest tag: '%s'".formatted(latestTag));
         getLog().debug("Latest commit: '%s'".formatted(latestCommit));
 
+        var latestVersion = latestRelease.latestTag()
+                .map(t -> Version.of(t, versionNumberPattern))
+                .orElse(Version.of(0, 0, 0, versionNumberPattern));
+        getLog().debug("Actual version: '%s'".formatted(latestVersion.toString()));
+
         var analyzedCommits = analyzeCommits(projectBaseDirectory, scmProvider, commitAnalyzer, latestCommit);
         getLog().debug("Found %d major, %d minor and %d patch commits".formatted(
                 analyzedCommits.major().size(), analyzedCommits.minor().size(), analyzedCommits.patch().size()));
 
-        var notes = generateNotes(projectBaseDirectory, new MustacheRenderer(), "v1.1.0",
-                analyzedCommits.major(), analyzedCommits.minor(), analyzedCommits.patch());
-        // TODO add notes to scm and commit
+        var nextVersionType = verifyRelease(analyzedCommits);
 
-        createTag();
+        if (nextVersionType == null) {
+            getLog().info("No commits found to release");
+        } else {
+            getLog().info("Continue with '%s' release".formatted(nextVersionType.name()));
+
+            latestVersion.increment(nextVersionType);
+            getLog().debug("Release version: '%s'".formatted(latestVersion.toString()));
+
+            var notes = generateNotes(projectBaseDirectory, new MustacheRenderer(), latestVersion.toString(),
+                    analyzedCommits.major(), analyzedCommits.minor(), analyzedCommits.patch());
+            // TODO add notes to scm and commit
+
+            createTag(scmProvider, latestVersion);
+        }
     }
 
     private VerifiedConditions verifyConditions() {
@@ -127,8 +149,18 @@ public class SemanticReleaseMojo extends AbstractMojo {
         }
     }
 
-    private void verifyRelease() {
+    private Version.Type verifyRelease(AnalyzedCommits analyzedCommits) {
+        Version.Type nextVersionType = null;
 
+        if (!analyzedCommits.major().isEmpty()) {
+            nextVersionType = Version.Type.MAJOR;
+        } else if (!analyzedCommits.minor().isEmpty()) {
+            nextVersionType = Version.Type.MINOR;
+        } else if (!analyzedCommits.patch().isEmpty()) {
+            nextVersionType = Version.Type.PATCH;
+        }
+
+        return nextVersionType;
     }
 
     private Path generateNotes(
@@ -150,8 +182,12 @@ public class SemanticReleaseMojo extends AbstractMojo {
         return changelog;
     }
 
-    private void createTag() {
+    private void createTag(SCMProvider scmProvider, Version version) {
+        // TODO use scmProvider to create Tag
 
+        getLog().debug("Setting project version in pom.xml to '%s'".formatted(version.toString()));
+        project.setVersion(version.toString()); // TODO does not work (readonly)
+        // TODO use SAX or something else to manipulate XML tree path project->version
     }
 
     private record VerifiedConditions(Optional<SCMProvider> scmProvider, Optional<CommitAnalyzer> commitAnalyzer) {
