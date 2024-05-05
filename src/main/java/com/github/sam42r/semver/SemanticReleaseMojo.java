@@ -8,6 +8,7 @@ import com.github.sam42r.semver.scm.SCMException;
 import com.github.sam42r.semver.scm.SCMProvider;
 import com.github.sam42r.semver.scm.model.Commit;
 import com.github.sam42r.semver.scm.model.Tag;
+import com.github.sam42r.semver.util.PomHelper;
 import lombok.Setter;
 import org.apache.maven.plugin.AbstractMojo;
 import org.apache.maven.plugin.MojoExecutionException;
@@ -91,7 +92,7 @@ public class SemanticReleaseMojo extends AbstractMojo {
                     analyzedCommits.major(), analyzedCommits.minor(), analyzedCommits.patch());
             // TODO add notes to scm and commit
 
-            createTag(scmProvider, latestVersion);
+            createTag(projectBaseDirectory, scmProvider, latestVersion);
         }
     }
 
@@ -182,12 +183,11 @@ public class SemanticReleaseMojo extends AbstractMojo {
         return changelog;
     }
 
-    private void createTag(SCMProvider scmProvider, Version version) {
+    private void createTag(Path projectBaseDirectory, SCMProvider scmProvider, Version version) {
         // TODO use scmProvider to create Tag
 
         getLog().debug("Setting project version in pom.xml to '%s'".formatted(version.toString()));
-        project.setVersion(version.toString()); // TODO does not work (readonly)
-        // TODO use SAX or something else to manipulate XML tree path project->version
+        PomHelper.changeVersion(projectBaseDirectory.resolve("pom.xml"), version.toString());
     }
 
     private record VerifiedConditions(Optional<SCMProvider> scmProvider, Optional<CommitAnalyzer> commitAnalyzer) {
