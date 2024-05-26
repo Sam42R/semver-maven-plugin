@@ -4,8 +4,9 @@ import com.github.sam42r.semver.scm.SCMException;
 import com.github.sam42r.semver.scm.SCMProvider;
 import com.github.sam42r.semver.scm.model.Commit;
 import com.github.sam42r.semver.scm.model.Tag;
-import lombok.NoArgsConstructor;
+import lombok.AccessLevel;
 import lombok.NonNull;
+import lombok.RequiredArgsConstructor;
 import org.eclipse.jgit.api.Git;
 import org.eclipse.jgit.api.errors.GitAPIException;
 import org.eclipse.jgit.lib.ObjectId;
@@ -27,19 +28,15 @@ import java.util.stream.StreamSupport;
  *
  * @author Sam42R
  */
-@NoArgsConstructor
+@RequiredArgsConstructor(access = AccessLevel.PROTECTED)
 public class GitProvider implements SCMProvider {
 
-    private static final String PROVIDER_NAME = "Git";
+    private final Path repositoryPath;
+    private Repository repository;
 
     @Override
-    public @NonNull String getName() {
-        return PROVIDER_NAME;
-    }
-
-    @Override
-    public @NonNull Stream<Commit> readCommits(@NonNull Path path, String fromCommitId) throws SCMException {
-        var repository = getRepository(path);
+    public @NonNull Stream<Commit> readCommits(String fromCommitId) throws SCMException {
+        var repository = getRepository();
         try (var git = new Git(repository)) {
             var logCommand = git.log();
 
@@ -62,8 +59,8 @@ public class GitProvider implements SCMProvider {
     }
 
     @Override
-    public @NonNull Stream<Tag> readTags(@NonNull Path path) throws SCMException {
-        var repository = getRepository(path);
+    public @NonNull Stream<Tag> readTags() throws SCMException {
+        var repository = getRepository();
         try (var git = new Git(repository)) {
             return git.tagList().call().stream()
                     .map(v -> Tag.builder()
@@ -75,16 +72,59 @@ public class GitProvider implements SCMProvider {
         }
     }
 
-    private Repository getRepository(Path path) throws SCMException {
-        try {
-            var gitDirectory = path.resolve(".git");
-            if (Files.notExists(gitDirectory) || !Files.isDirectory(gitDirectory) || !Files.isReadable(gitDirectory)) {
-                throw new SCMException("Could not find git repository");
-            }
-            return FileRepositoryBuilder.create(gitDirectory.toFile());
-        } catch (IOException e) {
+    @Override
+    public void addFile(@NonNull Path file) throws SCMException {
+        var repository = getRepository();
+        try (var git = new Git(repository)) {
+            git.add().addFilepattern(repositoryPath.relativize(file).toString()).call();
+        } catch (GitAPIException e) {
             throw new SCMException(e);
         }
+    }
+
+    @Override
+    public @NonNull Commit commit(@NonNull String message) throws SCMException {
+        var repository = getRepository();
+        try (var git = new Git(repository)) {
+            var commit = git.commit().setMessage(message).call();
+            return Commit.builder()
+                    .id(commit.getId().getName())
+                    .timestamp(Instant.ofEpochSecond(commit.getCommitTime()))
+                    .author(commit.getAuthorIdent().getName())
+                    .message(commit.getFullMessage())
+                    .build();
+        } catch (GitAPIException e) {
+            throw new SCMException(e);
+        }
+    }
+
+    @Override
+    public @NonNull Tag tag(@NonNull String name) throws SCMException {
+        var repository = getRepository();
+        try (var git = new Git(repository)) {
+            var tag = git.tag().setName(name).call();
+            return Tag.builder()
+                    .name(tag.getName().replace("refs/tags/", ""))
+                    .commitId(getObjectId(repository, tag).getName())
+                    .build();
+        } catch (GitAPIException e) {
+            throw new SCMException(e);
+        }
+    }
+
+    private Repository getRepository() throws SCMException {
+        if (repository == null) {
+            try {
+                var gitDirectory = repositoryPath.resolve(".git");
+                if (Files.notExists(gitDirectory) || !Files.isDirectory(gitDirectory) || !Files.isReadable(gitDirectory)) {
+                    throw new SCMException("Could not find git repository");
+                }
+                repository = FileRepositoryBuilder.create(gitDirectory.toFile());
+            } catch (IOException e) {
+                throw new SCMException(e);
+            }
+        }
+        return repository;
     }
 
     private ObjectId getObjectId(Repository repository, Ref ref) {

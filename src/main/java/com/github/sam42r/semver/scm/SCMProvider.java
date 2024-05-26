@@ -14,9 +14,13 @@ import java.util.stream.Stream;
  */
 public interface SCMProvider {
 
-    @NonNull String getName();
+    @NonNull Stream<Commit> readCommits(String fromCommitId) throws SCMException;
 
-    @NonNull Stream<Commit> readCommits(@NonNull Path path, String fromCommitId) throws SCMException;
+    @NonNull Stream<Tag> readTags() throws SCMException;
 
-    @NonNull Stream<Tag> readTags(@NonNull Path path) throws SCMException;
+    void addFile(@NonNull Path file) throws SCMException;
+
+    @NonNull Commit commit(@NonNull String message) throws SCMException;
+
+    @NonNull Tag tag(@NonNull String name) throws SCMException;
 }

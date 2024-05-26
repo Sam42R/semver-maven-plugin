@@ -6,6 +6,7 @@ import com.github.sam42r.semver.changelog.impl.MustacheRenderer;
 import com.github.sam42r.semver.model.Version;
 import com.github.sam42r.semver.scm.SCMException;
 import com.github.sam42r.semver.scm.SCMProvider;
+import com.github.sam42r.semver.scm.SCMProviderFactory;
 import com.github.sam42r.semver.scm.model.Commit;
 import com.github.sam42r.semver.scm.model.Tag;
 import com.github.sam42r.semver.util.PomHelper;
@@ -34,7 +35,8 @@ public class SemanticReleaseMojo extends AbstractMojo {
     // TODO we can not use html markup in pom.xml configuration (e.g. named groups)
     protected static final String VERSION_NUMBER_PATTERN_DEFAULT = "v(?<MAJOR>[0-9]*).(?<MINOR>[0-9]*).(?<PATCH>[0-9]*)";
 
-    private final ServiceLoader<SCMProvider> scmProviders = ServiceLoader.load(SCMProvider.class);
+    @SuppressWarnings("rawtypes")
+    private final ServiceLoader<SCMProviderFactory> scmProviderFactories = ServiceLoader.load(SCMProviderFactory.class);
     private final ServiceLoader<CommitAnalyzer> commitAnalyzers = ServiceLoader.load(CommitAnalyzer.class);
 
     @Setter
@@ -57,7 +59,7 @@ public class SemanticReleaseMojo extends AbstractMojo {
     public void execute() throws MojoExecutionException, MojoFailureException {
         var projectBaseDirectory = project.getFile().getParentFile().toPath();
 
-        var verifiedConditions = verifyConditions();
+        var verifiedConditions = verifyConditions(projectBaseDirectory);
         var scmProvider = verifiedConditions.scmProvider()
                 .orElseThrow(() -> new IllegalArgumentException("Could not find SCM provider with name '%s'".formatted(scmProviderName)));
         var commitAnalyzer = verifiedConditions.commitAnalyzer()
@@ -65,7 +67,7 @@ public class SemanticReleaseMojo extends AbstractMojo {
         getLog().info("Running semantic-release with SCM provider '%s'".formatted(scmProvider.getClass().getSimpleName()));
         getLog().info("Running semantic-release with commit analyzer '%s'".formatted(commitAnalyzer.getClass().getSimpleName()));
 
-        var latestRelease = getLatestRelease(projectBaseDirectory, scmProvider);
+        var latestRelease = getLatestRelease(scmProvider);
         var latestTag = latestRelease.latestTag().orElse("None");
         var latestCommit = latestRelease.latestCommit().orElse("None");
         getLog().debug("Latest tag: '%s'".formatted(latestTag));
@@ -76,7 +78,7 @@ public class SemanticReleaseMojo extends AbstractMojo {
                 .orElse(Version.of(0, 0, 0, versionNumberPattern));
         getLog().debug("Actual version: '%s'".formatted(latestVersion.toString()));
 
-        var analyzedCommits = analyzeCommits(projectBaseDirectory, scmProvider, commitAnalyzer, latestCommit);
+        var analyzedCommits = analyzeCommits(scmProvider, commitAnalyzer, latestCommit);
         getLog().debug("Found %d major, %d minor and %d patch commits".formatted(
                 analyzedCommits.major().size(), analyzedCommits.minor().size(), analyzedCommits.patch().size()));
 
@@ -90,19 +92,33 @@ public class SemanticReleaseMojo extends AbstractMojo {
             latestVersion.increment(nextVersionType);
             getLog().debug("Release version: '%s'".formatted(latestVersion.toString()));
 
+            getLog().debug("Writing release notes to 'Changelog.md' for version '%s'".formatted(latestVersion.toString()));
             var notes = generateNotes(projectBaseDirectory, new MustacheRenderer(), latestVersion.toString(),
                     analyzedCommits.major(), analyzedCommits.minor(), analyzedCommits.patch());
-            // TODO add notes to scm and commit
 
-            createTag(projectBaseDirectory, scmProvider, latestVersion);
+            getLog().debug("Setting project version in 'pom.xml' to '%s'".formatted(latestVersion.toString()));
+            var pomXml = projectBaseDirectory.resolve("pom.xml");
+            PomHelper.changeVersion(pomXml, latestVersion.toString());
+
+            try {
+                scmProvider.addFile(notes);
+                scmProvider.addFile(pomXml);
+
+                scmProvider.commit("chore(release): release version %s".formatted(latestVersion.toString())); // TODO
+
+                createTag(scmProvider, latestVersion);
+            } catch (SCMException e) {
+                throw new RuntimeException(e); // FIXME
+            }
         }
     }
 
-    private VerifiedConditions verifyConditions() {
+    private VerifiedConditions verifyConditions(Path projectBaseDirectory) {
         return new VerifiedConditions(
-                scmProviders.stream()
+                scmProviderFactories.stream()
                         .map(ServiceLoader.Provider::get)
-                        .filter(v -> scmProviderName.equalsIgnoreCase(v.getName()))
+                        .filter(v -> scmProviderName.equalsIgnoreCase(v.getProviderName()))
+                        .map(v -> v.getInstance(projectBaseDirectory))
                         .findAny(),
                 commitAnalyzers.stream()
                         .map(ServiceLoader.Provider::get)
@@ -111,10 +127,10 @@ public class SemanticReleaseMojo extends AbstractMojo {
         );
     }
 
-    private LatestRelease getLatestRelease(Path projectBaseDirectory, SCMProvider scmProvider) throws MojoExecutionException {
+    private LatestRelease getLatestRelease(SCMProvider scmProvider) throws MojoExecutionException {
         try {
-            var tags = scmProvider.readTags(projectBaseDirectory);
-            var commits = scmProvider.readCommits(projectBaseDirectory, null);
+            var tags = scmProvider.readTags();
+            var commits = scmProvider.readCommits(null);
 
             var latestTagOpt = tags.max(Comparator.comparing(Tag::getName));
             var latestCommitOpt = latestTagOpt.map(Tag::getCommitId)
@@ -130,13 +146,12 @@ public class SemanticReleaseMojo extends AbstractMojo {
     }
 
     private AnalyzedCommits analyzeCommits(
-            Path projectBaseDirectory,
             SCMProvider scmProvider,
             CommitAnalyzer commitAnalyzer,
             String latestCommit
     ) throws MojoExecutionException {
         try {
-            var commits = scmProvider.readCommits(projectBaseDirectory, latestCommit);
+            var commits = scmProvider.readCommits(latestCommit);
 
             var response = commitAnalyzer.analyzeCommits(commits.toList());
             return new AnalyzedCommits(
@@ -182,11 +197,16 @@ public class SemanticReleaseMojo extends AbstractMojo {
         return changelog;
     }
 
-    private void createTag(Path projectBaseDirectory, SCMProvider scmProvider, Version version) {
+    private void createTag(
+            SCMProvider scmProvider,
+            Version version
+    ) throws MojoExecutionException {
         // TODO use scmProvider to create Tag
-
-        getLog().debug("Setting project version in pom.xml to '%s'".formatted(version.toString()));
-        PomHelper.changeVersion(projectBaseDirectory.resolve("pom.xml"), version.toString());
+        try {
+            scmProvider.tag(version.toString());
+        } catch (SCMException e) {
+            throw new MojoExecutionException(e.getMessage(), e.getCause());
+        }
     }
 
     private record VerifiedConditions(Optional<SCMProvider> scmProvider, Optional<CommitAnalyzer> commitAnalyzer) {
