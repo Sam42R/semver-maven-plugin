@@ -112,7 +112,7 @@ public class SemanticReleaseMojo extends AbstractMojo {
     private LatestRelease getLatestRelease(Path projectBaseDirectory, SCMProvider scmProvider) throws MojoExecutionException {
         try {
             var tags = scmProvider.readTags(projectBaseDirectory);
-            var commits = scmProvider.readCommits(projectBaseDirectory);
+            var commits = scmProvider.readCommits(projectBaseDirectory, null);
 
             var latestTagOpt = tags.max(Comparator.comparing(Tag::getName));
             var latestCommitOpt = latestTagOpt.map(Tag::getCommitId)
@@ -134,10 +134,7 @@ public class SemanticReleaseMojo extends AbstractMojo {
             String latestCommit
     ) throws MojoExecutionException {
         try {
-            // TODO always use 2 params method and add check in method!?
-            var commits = latestCommit != null ?
-                    scmProvider.readCommits(projectBaseDirectory, latestCommit) :
-                    scmProvider.readCommits(projectBaseDirectory);
+            var commits = scmProvider.readCommits(projectBaseDirectory, latestCommit);
 
             var response = commitAnalyzer.analyzeCommits(commits.toList());
             return new AnalyzedCommits(

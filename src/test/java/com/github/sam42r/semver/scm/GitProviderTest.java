@@ -34,7 +34,7 @@ class GitProviderTest {
             git.add().addFilepattern("README.md").call();
             var expected = git.commit().setMessage("Test commit").call();
 
-            var actual = uut.readCommits(tempDirectory);
+            var actual = uut.readCommits(tempDirectory, null);
             assertThat(actual).containsExactly(
                     Commit.builder()
                             .id(expected.getId().getName())

@@ -26,12 +26,7 @@ public class SvnProvider implements SCMProvider {
     }
 
     @Override
-    public @NonNull Stream<Commit> readCommits(@NonNull Path path) throws SCMException {
-        throw new NotImplementedException();
-    }
-
-    @Override
-    public @NonNull Stream<Commit> readCommits(@NonNull Path path, @NonNull String fromCommitId) throws SCMException {
+    public @NonNull Stream<Commit> readCommits(@NonNull Path path, String fromCommitId) throws SCMException {
         throw new NotImplementedException();
     }
 

@@ -38,29 +38,17 @@ public class GitProvider implements SCMProvider {
     }
 
     @Override
-    public @NonNull Stream<Commit> readCommits(@NonNull Path path) throws SCMException {
+    public @NonNull Stream<Commit> readCommits(@NonNull Path path, String fromCommitId) throws SCMException {
         var repository = getRepository(path);
         try (var git = new Git(repository)) {
-            return StreamSupport.stream(git.log().call().spliterator(), false)
-                    .map(v -> Commit.builder()
-                            .id(v.getId().getName())
-                            .timestamp(Instant.ofEpochSecond(v.getCommitTime()))
-                            .author(v.getAuthorIdent().getName())
-                            .message(v.getFullMessage())
-                            .build());
-        } catch (GitAPIException e) {
-            throw new SCMException(e.getMessage(), e);
-        }
-    }
+            var logCommand = git.log();
 
-    @Override
-    public @NonNull Stream<Commit> readCommits(@NonNull Path path, @NonNull String fromCommitId) throws SCMException {
-        var repository = getRepository(path);
-        try (var git = new Git(repository)) {
-            var logCommand = git.log()
-                    .addRange(
-                            ObjectId.fromString(fromCommitId),
-                            git.getRepository().resolve("HEAD"));
+            if (fromCommitId != null) {
+                logCommand = logCommand.addRange(
+                        ObjectId.fromString(fromCommitId),
+                        git.getRepository().resolve("HEAD"));
+            }
+
             return StreamSupport.stream(logCommand.call().spliterator(), false)
                     .map(v -> Commit.builder()
                             .id(v.getId().getName())
@@ -68,9 +56,7 @@ public class GitProvider implements SCMProvider {
                             .author(v.getAuthorIdent().getName())
                             .message(v.getFullMessage())
                             .build());
-        } catch (IOException e) {
-            throw new SCMException(e);
-        } catch (GitAPIException e) {
+        } catch (IOException | GitAPIException e) {
             throw new SCMException(e.getMessage(), e);
         }
     }
