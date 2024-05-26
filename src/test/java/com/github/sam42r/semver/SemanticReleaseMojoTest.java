@@ -13,22 +13,30 @@ import org.junit.jupiter.api.io.TempDir;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.util.AbstractMap;
 import java.util.HashMap;
-import java.util.Map;
 
-import static org.assertj.core.api.Assertions.assertThat;
+import static com.github.sam42r.semver.SemanticReleaseMojo.VERSION_NUMBER_PATTERN_DEFAULT;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
 class SemanticReleaseMojoTest {
 
+    private static final String POM = """
+            <project>
+                <groupId>org.junit</groupId>
+                <artifactId>test</artifactId>
+                <version>0.0.1-SNAPSHOT</version>
+            </project>
+            """;
+
+    @TempDir
+    private Path tmp;
+
     private SemanticReleaseMojo uut;
-    private MavenProject mavenProjectMock;
 
     @BeforeEach
-    void setup(@TempDir Path tmp) {
+    void setup() throws IOException {
         uut = new SemanticReleaseMojo();
 
         var logMock = mock(Log.class);
@@ -38,36 +46,31 @@ class SemanticReleaseMojoTest {
         uut.setPluginContext(pluginContext);
         uut.setScmProviderName("Git");
         uut.setCommitAnalyzerName("Angular");
+        uut.setVersionNumberPattern(VERSION_NUMBER_PATTERN_DEFAULT);
 
-        mavenProjectMock = mock(MavenProject.class);
+        var mavenProjectMock = mock(MavenProject.class);
         uut.setProject(mavenProjectMock);
+
+        var pomXml = createFile(tmp, "pom.xml", POM);
+        when(mavenProjectMock.getFile()).thenReturn(pomXml.toFile());
     }
 
     @Test
     @SuppressWarnings("unchecked")
-    void shouldFindNoLatestRelease(@TempDir Path tmp) throws IOException, GitAPIException, MojoExecutionException, MojoFailureException {
-        var pomXml = createFile(tmp, "pom.xml", "<project/>");
-        when(mavenProjectMock.getFile()).thenReturn(pomXml.toFile());
-
+    void shouldFindNoLatestRelease() throws GitAPIException, MojoExecutionException, MojoFailureException {
         try (var git = initializeGitRepository(tmp)) {
             git.add().addFilepattern("pom.xml").call();
             var commit = git.commit().setMessage("Initial commit").call();
 
             uut.execute();
 
-            /* assertThat((Map<SemverContextVariable, String>) uut.getPluginContext()).contains(
-                    new AbstractMap.SimpleEntry<>(SemverContextVariable.LATEST_TAG, "None"),
-                    new AbstractMap.SimpleEntry<>(SemverContextVariable.LATEST_COMMIT, commit.getName())
-            ); FIXME */
+            // TODO assert something
         }
     }
 
     @Test
     @SuppressWarnings("unchecked")
-    void shouldFindLatestRelease(@TempDir Path tmp) throws IOException, GitAPIException, MojoExecutionException, MojoFailureException {
-        var pomXml = createFile(tmp, "pom.xml", "<project/>");
-        when(mavenProjectMock.getFile()).thenReturn(pomXml.toFile());
-
+    void shouldFindLatestRelease() throws IOException, GitAPIException, MojoExecutionException, MojoFailureException {
         try (var git = initializeGitRepository(tmp)) {
             git.add().addFilepattern("pom.xml").call();
             git.commit().setMessage("Initial commit").call();
@@ -79,18 +82,12 @@ class SemanticReleaseMojoTest {
 
             uut.execute();
 
-            /* assertThat((Map<SemverContextVariable, String>) uut.getPluginContext()).contains(
-                    new AbstractMap.SimpleEntry<>(SemverContextVariable.LATEST_TAG, "v1.0.0"),
-                    new AbstractMap.SimpleEntry<>(SemverContextVariable.LATEST_COMMIT, expected.getName())
-            ); FIXME */
+            // TODO assert something
         }
     }
 
     @Test
-    void shouldThrowWithEmptyGitRepository(@TempDir Path tmp) throws IOException, GitAPIException, MojoExecutionException, MojoFailureException {
-        var pomXml = createFile(tmp, "pom.xml", "<project/>");
-        when(mavenProjectMock.getFile()).thenReturn(pomXml.toFile());
-
+    void shouldThrowWithEmptyGitRepository() throws GitAPIException, MojoExecutionException, MojoFailureException {
         try (var ignored = initializeGitRepository(tmp)) {
             assertThatThrownBy(() -> uut.execute())
                     .isInstanceOf(MojoExecutionException.class)
@@ -99,10 +96,7 @@ class SemanticReleaseMojoTest {
     }
 
     @Test
-    void shouldThrowWithMissingGitRepository(@TempDir Path tmp) throws IOException {
-        var pomXml = createFile(tmp, "pom.xml", "<project/>");
-        when(mavenProjectMock.getFile()).thenReturn(pomXml.toFile());
-
+    void shouldThrowWithMissingGitRepository() {
         assertThatThrownBy(() -> uut.execute())
                 .isInstanceOf(MojoExecutionException.class)
                 .hasMessageStartingWith("Could not find git repository");
@@ -112,8 +106,8 @@ class SemanticReleaseMojoTest {
         return Git.init().setDirectory(path.toFile()).call();
     }
 
-    private Path createFile(Path tmp, String name, String content) throws IOException {
-        var file = Files.createFile(tmp.resolve(name));
+    private Path createFile(Path path, String filename, String content) throws IOException {
+        var file = Files.createFile(path.resolve(filename));
         if (content != null) {
             Files.writeString(file, content);
         }

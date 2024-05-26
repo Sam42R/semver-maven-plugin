@@ -31,6 +31,9 @@ import java.util.ServiceLoader;
 @Mojo(name = "semantic-release")
 public class SemanticReleaseMojo extends AbstractMojo {
 
+    // TODO we can not use html markup in pom.xml configuration (e.g. named groups)
+    protected static final String VERSION_NUMBER_PATTERN_DEFAULT = "v(?<MAJOR>[0-9]*).(?<MINOR>[0-9]*).(?<PATCH>[0-9]*)";
+
     private final ServiceLoader<SCMProvider> scmProviders = ServiceLoader.load(SCMProvider.class);
     private final ServiceLoader<CommitAnalyzer> commitAnalyzers = ServiceLoader.load(CommitAnalyzer.class);
 
@@ -38,9 +41,8 @@ public class SemanticReleaseMojo extends AbstractMojo {
     @Parameter(defaultValue = "${project}", required = true, readonly = true)
     private MavenProject project;
 
-    // FIXME we can not use html markup in pom.xml configuration (e.g. named groups)
     @Setter
-    @Parameter(name = "version-number-pattern", defaultValue = "v(?<MAJOR>[0-9]*).(?<MINOR>[0-9]*).(?<PATCH>[0-9]*)")
+    @Parameter(name = "version-number-pattern", defaultValue = VERSION_NUMBER_PATTERN_DEFAULT)
     private String versionNumberPattern;
 
     @Setter
