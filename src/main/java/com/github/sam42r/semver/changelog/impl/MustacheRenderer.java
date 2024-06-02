@@ -5,13 +5,16 @@ import com.github.sam42r.semver.changelog.ChangelogRenderer;
 import com.github.sam42r.semver.changelog.model.Release;
 import com.github.sam42r.semver.scm.model.Commit;
 import lombok.NonNull;
+import org.apache.commons.codec.digest.DigestUtils;
 
 import java.io.*;
+import java.nio.charset.StandardCharsets;
+import java.nio.file.Files;
+import java.nio.file.Path;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.HashMap;
 import java.util.List;
-import java.util.Objects;
 
 public class MustacheRenderer implements ChangelogRenderer {
 
@@ -19,12 +22,17 @@ public class MustacheRenderer implements ChangelogRenderer {
 
     @Override
     public @NonNull InputStream renderChangelog(
+            @NonNull Path path,
             @NonNull String version,
             @NonNull List<Commit> major,
             @NonNull List<Commit> minor,
             @NonNull List<Commit> patch
     ) {
+        var marker = DigestUtils.sha1Hex("Sam42R");
+
         var release = getRelease(version);
+
+        var alreadyExists = Files.exists(path);
 
         // TODO
         // Changelog -> docs(changelog): ...
@@ -35,12 +43,13 @@ public class MustacheRenderer implements ChangelogRenderer {
         // Fixed -> fix
         // Security -> fix(security): ... OR feat(security): ...
 
-        var mustacheFactory = new DefaultMustacheFactory();
+        var mustacheFactory = new DefaultMustacheFactory("com/github/sam42r/semver/changelog/impl");
         try (
-                var inputStream = MustacheRenderer.class.getResourceAsStream(CHANGELOG_TEMPLATE);
-                var reader = new InputStreamReader(Objects.requireNonNull(inputStream));
+                var reader = mustacheFactory.getReader(CHANGELOG_TEMPLATE);
                 var outputStream = new ByteArrayOutputStream();
-                var writer = new OutputStreamWriter(outputStream)
+                var writer = new OutputStreamWriter(outputStream);
+                var finalOutputStream = new ByteArrayOutputStream();
+                var finalWriter = new BufferedWriter(new OutputStreamWriter(finalOutputStream))
         ) {
             var mustache = mustacheFactory.compile(reader, CHANGELOG_TEMPLATE);
             var context = new HashMap<String, Object>();
@@ -49,8 +58,23 @@ public class MustacheRenderer implements ChangelogRenderer {
             context.put("added", minor);
             context.put("hasPatches", !patch.isEmpty());
             context.put("patches", patch);
+            context.put("renderHeader", !alreadyExists);
+            context.put("renderFooter", !alreadyExists);
             mustache.execute(writer, context).flush();
-            return new ByteArrayInputStream(outputStream.toByteArray());
+
+            if (alreadyExists) {
+                for (var line : Files.readAllLines(path)) {
+                    finalWriter.write(line);
+                    finalWriter.newLine();
+                    if (line.contains(marker)) {
+                        finalWriter.write(outputStream.toString(StandardCharsets.UTF_8));
+                    }
+                }
+            } else {
+                finalWriter.write(outputStream.toString(StandardCharsets.UTF_8));
+            }
+            finalWriter.flush();
+            return new ByteArrayInputStream(finalOutputStream.toByteArray());
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
@@ -60,7 +84,7 @@ public class MustacheRenderer implements ChangelogRenderer {
         return Release.builder()
                 .version(version)
                 .date(LocalDateTime.now().format(DateTimeFormatter.ISO_DATE))
-                .message("TODO read docs(changelog) commits and add as release description")
+                .message("") // TODO read docs(changelog) commits and add as release description
                 .build();
     }
 }

@@ -188,7 +188,7 @@ public class SemanticReleaseMojo extends AbstractMojo {
     ) throws MojoExecutionException {
         var changelog = projectBaseDirectory.resolve("Changelog.md");
 
-        try (var inputStream = renderer.renderChangelog(version, major, minor, patch)) {
+        try (var inputStream = renderer.renderChangelog(changelog, version, major, minor, patch)) {
             Files.write(changelog, inputStream.readAllBytes());
         } catch (IOException e) {
             throw new MojoExecutionException(e.getMessage(), e.getCause());
