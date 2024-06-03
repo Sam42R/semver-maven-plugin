@@ -6,6 +6,7 @@
 ## Commit messages
 - [Conventional Commits](https://www.conventionalcommits.org/en/v1.0.0/)
 - [Angular Commit Message Format](https://github.com/angular/angular/blob/68a6a07/CONTRIBUTING.md#commit)
+- [Gitmoji specification](href="https://gitmoji.dev/specification)
 
 ## Maven-Plugin
 - [Guide to developing Java Plugins](https://maven.apache.org/guides/plugin/guide-java-plugin-development.html)

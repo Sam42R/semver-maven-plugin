@@ -45,7 +45,7 @@ class SemanticReleaseMojoTest {
         var pluginContext = new HashMap<>();
         uut.setPluginContext(pluginContext);
         uut.setScmProviderName("Git");
-        uut.setCommitAnalyzerName("Angular");
+        uut.setCommitAnalyzerName("Conventional");
         uut.setVersionNumberPattern(VERSION_NUMBER_PATTERN_DEFAULT);
 
         var mavenProjectMock = mock(MavenProject.class);

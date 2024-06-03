@@ -1,6 +1,7 @@
 package com.github.sam42r.semver.changelog.impl;
 
 import com.github.mustachejava.DefaultMustacheFactory;
+import com.github.sam42r.semver.analyzer.model.AnalyzedCommit;
 import com.github.sam42r.semver.changelog.ChangelogRenderer;
 import com.github.sam42r.semver.changelog.model.Release;
 import com.github.sam42r.semver.scm.model.Commit;
@@ -24,9 +25,9 @@ public class MustacheRenderer implements ChangelogRenderer {
     public @NonNull InputStream renderChangelog(
             @NonNull Path path,
             @NonNull String version,
-            @NonNull List<Commit> major,
-            @NonNull List<Commit> minor,
-            @NonNull List<Commit> patch
+            @NonNull List<AnalyzedCommit> major,
+            @NonNull List<AnalyzedCommit> minor,
+            @NonNull List<AnalyzedCommit> patch
     ) {
         var marker = DigestUtils.sha1Hex("Sam42R");
 

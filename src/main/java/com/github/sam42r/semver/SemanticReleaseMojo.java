@@ -1,6 +1,7 @@
 package com.github.sam42r.semver;
 
 import com.github.sam42r.semver.analyzer.CommitAnalyzer;
+import com.github.sam42r.semver.analyzer.model.AnalyzedCommit;
 import com.github.sam42r.semver.changelog.ChangelogRenderer;
 import com.github.sam42r.semver.changelog.impl.MustacheRenderer;
 import com.github.sam42r.semver.model.Version;
@@ -52,7 +53,7 @@ public class SemanticReleaseMojo extends AbstractMojo {
     private String scmProviderName;
 
     @Setter
-    @Parameter(name = "commit-analyzer-name", defaultValue = "Angular")
+    @Parameter(name = "commit-analyzer-name", defaultValue = "Conventional")
     private String commitAnalyzerName;
 
     @Override
@@ -104,7 +105,7 @@ public class SemanticReleaseMojo extends AbstractMojo {
                 scmProvider.addFile(notes);
                 scmProvider.addFile(pomXml);
 
-                scmProvider.commit("chore(release): release version %s".formatted(latestVersion.toString()));
+                scmProvider.commit(commitAnalyzer.generateReleaseCommitMessage(latestVersion.toString()));
 
                 createTag(scmProvider, latestVersion);
             } catch (SCMException e) {
@@ -155,9 +156,9 @@ public class SemanticReleaseMojo extends AbstractMojo {
 
             var response = commitAnalyzer.analyzeCommits(commits.toList());
             return new AnalyzedCommits(
-                    response.getBreaking(),
-                    response.getFeatures(),
-                    response.getFixes()
+                    response.stream().filter(AnalyzedCommit.isBreaking).toList(),
+                    response.stream().filter(AnalyzedCommit.isFeature).toList(),
+                    response.stream().filter(AnalyzedCommit.isBugfix).toList()
             );
         } catch (SCMException e) {
             throw new MojoExecutionException(e.getMessage(), e.getCause());
@@ -182,9 +183,9 @@ public class SemanticReleaseMojo extends AbstractMojo {
             Path projectBaseDirectory,
             ChangelogRenderer renderer,
             String version,
-            List<Commit> major,
-            List<Commit> minor,
-            List<Commit> patch
+            List<AnalyzedCommit> major,
+            List<AnalyzedCommit> minor,
+            List<AnalyzedCommit> patch
     ) throws MojoExecutionException {
         var changelog = projectBaseDirectory.resolve("Changelog.md");
 
@@ -214,6 +215,6 @@ public class SemanticReleaseMojo extends AbstractMojo {
     private record LatestRelease(Optional<String> latestTag, Optional<String> latestCommit) {
     }
 
-    private record AnalyzedCommits(List<Commit> major, List<Commit> minor, List<Commit> patch) {
+    private record AnalyzedCommits(List<AnalyzedCommit> major, List<AnalyzedCommit> minor, List<AnalyzedCommit> patch) {
     }
 }

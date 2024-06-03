@@ -1,5 +1,6 @@
 package com.github.sam42r.semver.changelog;
 
+import com.github.sam42r.semver.analyzer.model.AnalyzedCommit;
 import com.github.sam42r.semver.scm.model.Commit;
 import lombok.NonNull;
 
@@ -12,8 +13,8 @@ public interface ChangelogRenderer {
     @NonNull InputStream renderChangelog(
             @NonNull Path path,
             @NonNull String version,
-            @NonNull List<Commit> major,
-            @NonNull List<Commit> minor,
-            @NonNull List<Commit> patch
+            @NonNull List<AnalyzedCommit> major,
+            @NonNull List<AnalyzedCommit> minor,
+            @NonNull List<AnalyzedCommit> patch
     );
 }
