@@ -104,11 +104,11 @@ public class SemanticReleaseMojo extends AbstractMojo {
                 scmProvider.addFile(notes);
                 scmProvider.addFile(pomXml);
 
-                scmProvider.commit("chore(release): release version %s".formatted(latestVersion.toString())); // TODO
+                scmProvider.commit("chore(release): release version %s".formatted(latestVersion.toString()));
 
                 createTag(scmProvider, latestVersion);
             } catch (SCMException e) {
-                throw new RuntimeException(e); // FIXME
+                throw new MojoExecutionException(e);
             }
         }
     }
@@ -201,7 +201,6 @@ public class SemanticReleaseMojo extends AbstractMojo {
             SCMProvider scmProvider,
             Version version
     ) throws MojoExecutionException {
-        // TODO use scmProvider to create Tag
         try {
             scmProvider.tag(version.toString());
         } catch (SCMException e) {
