@@ -1,0 +1,35 @@
+{{#renderHeader}}
+{{> header}}
+{{/renderHeader}}
+
+## {{release.version}} - {{release.date}}
+{{release.message}}
+
+{{#hasAdded}}
+### Added
+{{/hasAdded}}
+{{#added}}
+- {{header}}
+{{/added}}
+{{#hasChanged}}
+### Changed
+{{/hasChanged}}
+{{#hasDeprecated}}
+### Deprecated
+{{/hasDeprecated}}
+{{#hasRemoved}}
+### Removed
+{{/hasRemoved}}
+{{#hasPatches}}
+### Fixed
+{{/hasPatches}}
+{{#patches}}
+- {{header}}
+{{/patches}}
+{{#hasSecurity}}
+### Security
+{{/hasSecurity}}
+
+{{#renderFooter}}
+{{> footer}}
+{{/renderFooter}}

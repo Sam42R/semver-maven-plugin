@@ -10,7 +10,13 @@
 
     <packaging>maven-plugin</packaging>
 
+    <name>${project.groupId}:${project.artifactId}</name>
+    <description>Semantic Versioning Maven-Plugin</description>
+    <url>https://github.com/Sam42R/semver-maven-plugin</url>
+
     <scm>
+        <connection>scm:git:git://github.com/Sam42R/semver-maven-plugin.git</connection>
+        <developerConnection>scm:git:git://github.com/Sam42R/semver-maven-plugin.git</developerConnection>
         <url>https://github.com/Sam42R/semver-maven-plugin</url>
     </scm>
 
@@ -23,7 +29,9 @@
 
     <developers>
         <developer>
-            <name>Sam42R</name>
+            <id>Sam42R</id>
+            <name>Rene</name>
+            <email>sam42r@users.noreply.github.com</email>
             <url>https://github.com/Sam42R/</url>
         </developer>
     </developers>
@@ -39,11 +47,13 @@
             <groupId>org.apache.maven</groupId>
             <artifactId>maven-plugin-api</artifactId>
             <version>3.9.2</version>
+            <scope>provided</scope>
         </dependency>
         <dependency>
             <groupId>org.apache.maven</groupId>
             <artifactId>maven-core</artifactId>
             <version>3.9.2</version>
+            <scope>provided</scope>
         </dependency>
         <dependency>
             <groupId>org.apache.maven.plugin-tools</groupId>
@@ -53,9 +63,28 @@
         </dependency>
 
         <dependency>
+            <groupId>org.projectlombok</groupId>
+            <artifactId>lombok</artifactId>
+            <version>1.18.26</version>
+            <scope>provided</scope>
+        </dependency>
+
+        <dependency>
             <groupId>org.eclipse.jgit</groupId>
             <artifactId>org.eclipse.jgit</artifactId>
             <version>6.6.1.202309021850-r</version>
+        </dependency>
+
+        <dependency>
+            <groupId>com.github.spullara.mustache.java</groupId>
+            <artifactId>compiler</artifactId>
+            <version>0.9.11</version>
+        </dependency>
+
+        <dependency>
+            <groupId>commons-codec</groupId>
+            <artifactId>commons-codec</artifactId>
+            <version>1.17.0</version>
         </dependency>
 
         <dependency>
@@ -89,5 +118,30 @@
             </plugins>
         </pluginManagement>
     </build>
+
+    <profiles>
+        <profile>
+            <id>release</id>
+            <build>
+                <plugins>
+                    <plugin>
+                        <groupId>${project.groupId}</groupId>
+                        <artifactId>${project.artifactId}</artifactId>
+                        <version>${project.version}</version>
+                        <executions>
+                            <execution>
+                                <id>self-release</id>
+                                <phase>prepare-package</phase>
+                                <goals>
+                                    <goal>semantic-release</goal>
+                                </goals>
+                            </execution>
+                        </executions>
+                        <configuration/>
+                    </plugin>
+                </plugins>
+            </build>
+        </profile>
+    </profiles>
 
 </project>

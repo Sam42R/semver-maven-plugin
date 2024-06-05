@@ -1,0 +1,2 @@
+com.github.sam42r.semver.analyzer.impl.ConventionalCommitAnalyzer
+com.github.sam42r.semver.analyzer.impl.GitMojiCommitAnalyzer
