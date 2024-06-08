@@ -1,3 +1,0 @@
-com.github.sam42r.semver.scm.impl.GitProviderFactory
-com.github.sam42r.semver.scm.impl.HgProvider
-com.github.sam42r.semver.scm.impl.SvnProvider
