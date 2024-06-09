@@ -94,16 +94,38 @@
         </dependency>
     </dependencies>
 
-    <build>
-        <pluginManagement>
-            <plugins>
-                <plugin>
-                    <groupId>org.apache.maven.plugins</groupId>
-                    <artifactId>maven-plugin-plugin</artifactId>
-                    <version>3.9.0</version>
-                </plugin>
-            </plugins>
-        </pluginManagement>
-    </build>
+    <profiles>
+        <profile>
+            <id>release</id>
+            <build>
+                <plugins>
+                    <plugin>
+                        <groupId>${project.groupId}</groupId>
+                        <artifactId>${project.artifactId}</artifactId>
+                        <version>${project.version}</version>
+                        <executions>
+                            <execution>
+                                <id>self-release</id>
+                                <phase>prepare-package</phase>
+                                <goals>
+                                    <goal>semantic-release</goal>
+                                </goals>
+                            </execution>
+                        </executions>
+                        <configuration>
+                            <commit-analyzer-name>Gitmoji</commit-analyzer-name>
+                        </configuration>
+                        <dependencies>
+                            <dependency>
+                                <groupId>${project.groupId}</groupId>
+                                <artifactId>semver-analyzer-gitmoji</artifactId>
+                                <version>${project.version}</version>
+                            </dependency>
+                        </dependencies>
+                    </plugin>
+                </plugins>
+            </build>
+        </profile>
+    </profiles>
 
 </project>

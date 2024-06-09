@@ -91,31 +91,6 @@
         </dependencies>
     </dependencyManagement>
 
-    <profiles>
-        <profile>
-            <id>release</id>
-            <build>
-                <plugins>
-                    <plugin>
-                        <groupId>${project.groupId}</groupId>
-                        <artifactId>semver-maven-plugin</artifactId>
-                        <version>${project.version}</version>
-                        <executions>
-                            <execution>
-                                <id>self-release</id>
-                                <phase>prepare-package</phase>
-                                <goals>
-                                    <goal>semantic-release</goal>
-                                </goals>
-                            </execution>
-                        </executions>
-                        <configuration/>
-                    </plugin>
-                </plugins>
-            </build>
-        </profile>
-    </profiles>
-
     <build>
         <pluginManagement>
             <plugins>
