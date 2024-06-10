@@ -36,7 +36,7 @@ class ConventionalCommitAnalyzerTest {
                         .build()
         ));
 
-        assertThat(actual).isEqualTo(List.of(
+        assertThat(actual).containsExactly(
                 AnalyzedCommit.builder()
                         .id("42")
                         .timestamp(Instant.EPOCH)
@@ -48,11 +48,14 @@ class ConventionalCommitAnalyzerTest {
                                                                 
                                 refs #42
                                 """)
-                        .type(AnalyzedCommit.Type.FIX)
+                        .category(AnalyzedCommit.Category.FIX)
                         .header("fix(scm): set clean commit message")
                         .body("* added scope for commit messages")
                         .footer("refs #42")
+                        .type("fix")
+                        .scope("scm")
+                        .subject("set clean commit message")
                         .build()
-        ));
+        );
     }
 }

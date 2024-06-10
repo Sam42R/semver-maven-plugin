@@ -9,6 +9,8 @@ import java.io.IOException;
 import java.io.StringReader;
 import java.io.UncheckedIOException;
 import java.util.List;
+import java.util.Optional;
+import java.util.regex.Pattern;
 
 /**
  * {@link CommitAnalyzer} for
@@ -17,6 +19,8 @@ import java.util.List;
 public class ConventionalCommitAnalyzer implements CommitAnalyzer {
 
     private static final String ANALYZER_NAME = "Conventional";
+
+    private static final String COMMIT_HEADER_PATTERN = "(?<TYPE>([a-z]*))(?<SCOPE>(\\([a-z]*\\)))?(?<DESCRIPTION>(: .*))";
 
     @Override
     public @NonNull String getName() {
@@ -35,22 +39,12 @@ public class ConventionalCommitAnalyzer implements CommitAnalyzer {
 
 
     @SuppressWarnings("MismatchedQueryAndUpdateOfStringBuilder")
-    private AnalyzedCommit analyzeCommit(Commit commit) {
-        var builder = AnalyzedCommit.builder()
+    private AnalyzedCommit analyzeCommit(@NonNull Commit commit) {
+        var analyzedCommitBuilder = AnalyzedCommit.builder()
                 .id(commit.getId())
                 .timestamp(commit.getTimestamp())
                 .author(commit.getAuthor())
                 .message(commit.getMessage());
-
-        if (commit.getMessage().startsWith("fix")) {
-            builder.type(AnalyzedCommit.Type.FIX);
-        } else if (commit.getMessage().startsWith("feat")) {
-            builder.type(AnalyzedCommit.Type.FEAT);
-        } else {
-            builder.type(AnalyzedCommit.Type.CHORE);
-        }
-
-        builder.breaking(commit.getMessage().contains("BREAKING CHANGE"));
 
         var headerBuilder = new StringBuilder();
         var bodyBuilder = new StringBuilder();
@@ -76,11 +70,56 @@ public class ConventionalCommitAnalyzer implements CommitAnalyzer {
             throw new UncheckedIOException(e);
         }
 
-        // TODO split header to type, scope and subject
-        return builder
-                .header(headerBuilder.toString().trim())
-                .body(bodyBuilder.toString().trim())
-                .footer(footerBuilder.toString().trim())
-                .build();
+        var header = headerBuilder.toString().trim();
+        var body = bodyBuilder.toString().trim();
+        var footer = footerBuilder.toString().trim();
+        analyzedCommitBuilder
+                .header(header)
+                .body(body)
+                .footer(footer);
+
+        if (!header.isEmpty()) {
+            var pattern = Pattern.compile(COMMIT_HEADER_PATTERN);
+            var matcher = pattern.matcher(header);
+            if (matcher.find()) {
+                var type = matcher.group("TYPE");
+                var scope = Optional.ofNullable(matcher.group("SCOPE"))
+                        .map(v -> v.replace("(", ""))
+                        .map(v -> v.replace(")", ""))
+                        .orElse(null);
+                var description = matcher.group("DESCRIPTION").replaceFirst(":", "").trim();
+
+                analyzedCommitBuilder
+                        .type(type)
+                        .scope(scope)
+                        .subject(description)
+                        .category(getCategory(type));
+            }
+        }
+
+        if (!footer.isEmpty()) {
+            analyzedCommitBuilder.breaking(footer.contains("BREAKING CHANGE"));
+            // TODO search for issues in footer
+        }
+
+        return analyzedCommitBuilder.build();
+    }
+
+    private AnalyzedCommit.Category getCategory(String type) {
+        if (type != null) {
+            return switch (type.toLowerCase()) {
+                case "fix" -> AnalyzedCommit.Category.FIX;
+                case "feat" -> AnalyzedCommit.Category.FEAT;
+                case "test" -> AnalyzedCommit.Category.TEST;
+                case "build" -> AnalyzedCommit.Category.BUILD;
+                case "ci" -> AnalyzedCommit.Category.CI;
+                case "refactor" -> AnalyzedCommit.Category.REFACTOR;
+                case "docs" -> AnalyzedCommit.Category.DOCS;
+                case "style" -> AnalyzedCommit.Category.STYLE;
+                case "perf" -> AnalyzedCommit.Category.PERF;
+                default -> AnalyzedCommit.Category.CHORE;
+            };
+        }
+        return AnalyzedCommit.Category.CHORE;
     }
 }
