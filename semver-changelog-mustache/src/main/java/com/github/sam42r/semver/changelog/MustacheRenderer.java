@@ -35,12 +35,14 @@ public class MustacheRenderer implements ChangelogRenderer {
 
         // TODO
         // Changelog -> docs(changelog): ...
+
         // Added -> feat
         // Changed -> refactor
         // Deprecated -> DEPRECATED footer
         // Removed -> ???
         // Fixed -> fix
         // Security -> fix(security): ... OR feat(security): ...
+        // Other ->
 
         var mustacheFactory = new DefaultMustacheFactory("com/github/sam42r/semver/changelog");
         try (

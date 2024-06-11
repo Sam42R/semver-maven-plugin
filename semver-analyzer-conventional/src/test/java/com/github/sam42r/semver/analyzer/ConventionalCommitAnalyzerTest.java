@@ -48,7 +48,7 @@ class ConventionalCommitAnalyzerTest {
                                                                 
                                 refs #42
                                 """)
-                        .category(AnalyzedCommit.Category.FIX)
+                        .category(AnalyzedCommit.Category.FIXED)
                         .header("fix(scm): set clean commit message")
                         .body("* added scope for commit messages")
                         .footer("refs #42")

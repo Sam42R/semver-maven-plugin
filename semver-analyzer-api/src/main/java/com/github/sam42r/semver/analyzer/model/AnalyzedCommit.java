@@ -25,12 +25,12 @@ public class AnalyzedCommit extends Commit {
 
     private List<String> issues;
 
-    // TODO reduce enum to categories rendered in changelog
     public enum Category {
-        FIX, FEAT, TEST, BUILD, CI, REFACTOR, DOCS, STYLE, PERF, CHORE;
+        ADDED, CHANGED, DEPRECATED, REMOVED, FIXED, SECURITY, OTHER;
     }
 
-    public static Predicate<AnalyzedCommit> isBugfix = analyzedCommit -> Category.FIX.equals(analyzedCommit.getCategory());
-    public static Predicate<AnalyzedCommit> isFeature = analyzedCommit -> Category.FEAT.equals(analyzedCommit.getCategory());
+    public static Predicate<AnalyzedCommit> isBugfix = analyzedCommit ->
+            Category.FIXED.equals(analyzedCommit.getCategory()) || Category.SECURITY.equals(analyzedCommit.getCategory());
+    public static Predicate<AnalyzedCommit> isFeature = analyzedCommit -> Category.ADDED.equals(analyzedCommit.getCategory());
     public static Predicate<AnalyzedCommit> isBreaking = AnalyzedCommit::isBreaking;
 }

@@ -4,7 +4,6 @@ import com.github.sam42r.semver.analyzer.model.AnalyzedCommit;
 import com.github.sam42r.semver.scm.model.Commit;
 import lombok.NonNull;
 
-import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 import java.util.regex.Pattern;
@@ -73,18 +72,15 @@ public class GitMojiCommitAnalyzer implements CommitAnalyzer {
     private AnalyzedCommit.Category getCategory(String intention) {
         if (intention != null) {
             return switch (intention.toLowerCase()) {
-                case ":bug:", ":ambulance:", ":lock:" -> AnalyzedCommit.Category.FIX;
-                case ":sparkles:", ":boom:" -> AnalyzedCommit.Category.FEAT;
-                case ":white_check_mark:" -> AnalyzedCommit.Category.TEST;
-                case ":rocket:", ":hammer:" -> AnalyzedCommit.Category.BUILD;
-                case ":green_heart:", ":construction_worker:" -> AnalyzedCommit.Category.CI;
-                case ":art:", ":recycle:" -> AnalyzedCommit.Category.REFACTOR;
-                case ":memo:" -> AnalyzedCommit.Category.DOCS;
-                case ":rotating_light:" -> AnalyzedCommit.Category.STYLE;
-                case ":zap:" -> AnalyzedCommit.Category.PERF;
-                default -> AnalyzedCommit.Category.CHORE;
+                case ":sparkles:", ":boom:" -> AnalyzedCommit.Category.ADDED;
+                case ":art:", ":recycle:" -> AnalyzedCommit.Category.CHANGED;
+                case ":wastebasket:" -> AnalyzedCommit.Category.DEPRECATED;
+                case ":fire:", ":coffin:" -> AnalyzedCommit.Category.REMOVED;
+                case ":bug:", ":ambulance:" -> AnalyzedCommit.Category.FIXED;
+                case ":lock:" -> AnalyzedCommit.Category.SECURITY;
+                default -> AnalyzedCommit.Category.OTHER;
             };
         }
-        return AnalyzedCommit.Category.CHORE;
+        return AnalyzedCommit.Category.OTHER;
     }
 }

@@ -46,7 +46,7 @@ class GetMojiCommitAnalyzerTest {
                         .scope("scm")
                         .subject("set clean commit message")
                         .issues(List.of("42"))
-                        .category(AnalyzedCommit.Category.FIX)
+                        .category(AnalyzedCommit.Category.FIXED)
                         .build(),
                 AnalyzedCommit.builder()
                         .id("42.2")
@@ -55,7 +55,7 @@ class GetMojiCommitAnalyzerTest {
                         .message(":sparkles: add awesome things")
                         .type(":sparkles:")
                         .subject("add awesome things")
-                        .category(AnalyzedCommit.Category.FEAT)
+                        .category(AnalyzedCommit.Category.ADDED)
                         .build()
         );
     }
@@ -81,7 +81,7 @@ class GetMojiCommitAnalyzerTest {
                         .scope("void")
                         .subject("break some glass")
                         .issues(List.of("42"))
-                        .category(AnalyzedCommit.Category.FEAT)
+                        .category(AnalyzedCommit.Category.ADDED)
                         .breaking(true)
                         .build()
         );
@@ -106,7 +106,7 @@ class GetMojiCommitAnalyzerTest {
                         .message(":white_check_mark: add test for something")
                         .type(":white_check_mark:")
                         .subject("add test for something")
-                        .category(AnalyzedCommit.Category.TEST)
+                        .category(AnalyzedCommit.Category.OTHER)
                         .build()
         );
     }
