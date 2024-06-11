@@ -108,18 +108,18 @@ public class ConventionalCommitAnalyzer implements CommitAnalyzer {
     private AnalyzedCommit.Category getCategory(String type) {
         if (type != null) {
             return switch (type.toLowerCase()) {
-                case "fix" -> AnalyzedCommit.Category.FIX;
-                case "feat" -> AnalyzedCommit.Category.FEAT;
-                case "test" -> AnalyzedCommit.Category.TEST;
-                case "build" -> AnalyzedCommit.Category.BUILD;
-                case "ci" -> AnalyzedCommit.Category.CI;
-                case "refactor" -> AnalyzedCommit.Category.REFACTOR;
-                case "docs" -> AnalyzedCommit.Category.DOCS;
-                case "style" -> AnalyzedCommit.Category.STYLE;
-                case "perf" -> AnalyzedCommit.Category.PERF;
-                default -> AnalyzedCommit.Category.CHORE;
+                case "feat" -> AnalyzedCommit.Category.ADDED;
+                case "refactor" -> AnalyzedCommit.Category.CHANGED;
+                // TODO DEPRECATED footer!?
+                //case "TODO" -> AnalyzedCommit.Category.DEPRECATED;
+                // TODO how to with conventional specification!?
+                //case "TODO" -> AnalyzedCommit.Category.REMOVED;
+                case "fix" -> AnalyzedCommit.Category.FIXED;
+                // TODO fix(security) | feat(security) !?
+                //case "TODO" -> AnalyzedCommit.Category.SECURITY;
+                default -> AnalyzedCommit.Category.OTHER;
             };
         }
-        return AnalyzedCommit.Category.CHORE;
+        return AnalyzedCommit.Category.OTHER;
     }
 }
