@@ -53,4 +53,53 @@ class PomHelperTest {
                         """
         );
     }
+
+    @Test
+    void shouldChangeParentVersion(@TempDir Path tempDir) throws IOException {
+        var pom = tempDir.resolve("pom.xml");
+        Files.writeString(
+                pom,
+                """
+                        <project>
+                            <parent>
+                                <groupId>org.junit</groupId>
+                                <artifactId>test</artifactId>
+                                <version>0.0.1-SNAPSHOT</version>
+                            </parent>
+                            <artifactId>module</artifactId>
+                            <dependencies>
+                                <dependency>
+                                    <groupId>org.junit</groupId>
+                                    <artifactId>sample</artifactId>
+                                    <version>1.2.3</version>
+                                </dependency>
+                            </dependencies>
+                        </project>
+                        """,
+                StandardOpenOption.CREATE
+        );
+
+        PomHelper.changeParentVersion(pom, "v0.8.15");
+
+        var actual = Files.readString(pom);
+        Assertions.assertThat(actual).isEqualToIgnoringWhitespace(
+                """
+                        <project>
+                            <parent>
+                                <groupId>org.junit</groupId>
+                                <artifactId>test</artifactId>
+                                <version>v0.8.15</version>
+                            </parent>
+                            <artifactId>module</artifactId>
+                            <dependencies>
+                                <dependency>
+                                    <groupId>org.junit</groupId>
+                                    <artifactId>sample</artifactId>
+                                    <version>1.2.3</version>
+                                </dependency>
+                            </dependencies>
+                        </project>
+                        """
+        );
+    }
 }

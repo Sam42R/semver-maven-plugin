@@ -22,10 +22,7 @@ import org.apache.maven.project.MavenProject;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.util.Comparator;
-import java.util.List;
-import java.util.Optional;
-import java.util.ServiceLoader;
+import java.util.*;
 
 /**
  * @author Sam42R
@@ -58,11 +55,9 @@ public class SemanticReleaseMojo extends AbstractMojo {
 
     @Override
     public void execute() throws MojoExecutionException, MojoFailureException {
-        var projectBaseDirectory = project.getFile().getParentFile().toPath();
-
-        if (project.hasParent()) {
-            projectBaseDirectory = projectBaseDirectory.getParent();
-        }
+        final var projectBaseDirectory = project.hasParent() ?
+                project.getFile().getParentFile().getParentFile().toPath() :
+                project.getFile().getParentFile().toPath();
 
         var verifiedConditions = verifyConditions(projectBaseDirectory);
         var scmProvider = verifiedConditions.scmProvider()
@@ -108,9 +103,23 @@ public class SemanticReleaseMojo extends AbstractMojo {
             var pomXml = projectBaseDirectory.resolve("pom.xml");
             PomHelper.changeVersion(pomXml, latestVersion.toString());
 
+            var modulePomsXml = new ArrayList<Path>();
+            if (project.hasParent()) {
+                for (var module : project.getParent().getModules()) {
+                    var modulePomXml = projectBaseDirectory.resolve(module).resolve("pom.xml");
+                    PomHelper.changeParentVersion(modulePomXml, latestVersion.toString());
+
+                    modulePomsXml.add(modulePomXml);
+                }
+            }
+
             try {
                 scmProvider.addFile(notes);
                 scmProvider.addFile(pomXml);
+
+                for (var modulePomXml : modulePomsXml) {
+                    scmProvider.addFile(modulePomXml);
+                }
 
                 scmProvider.commit(commitAnalyzer.generateReleaseCommitMessage(latestVersion.toString()));
 
