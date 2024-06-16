@@ -60,6 +60,10 @@ public class SemanticReleaseMojo extends AbstractMojo {
     public void execute() throws MojoExecutionException, MojoFailureException {
         var projectBaseDirectory = project.getFile().getParentFile().toPath();
 
+        if (project.hasParent()) {
+            projectBaseDirectory = projectBaseDirectory.getParent();
+        }
+
         var verifiedConditions = verifyConditions(projectBaseDirectory);
         var scmProvider = verifiedConditions.scmProvider()
                 .orElseThrow(() -> new IllegalArgumentException("Could not find SCM provider with name '%s'".formatted(scmProviderName)));
