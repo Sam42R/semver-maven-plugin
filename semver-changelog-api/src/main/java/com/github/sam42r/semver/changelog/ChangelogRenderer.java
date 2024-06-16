@@ -13,8 +13,6 @@ public interface ChangelogRenderer {
     @NonNull InputStream renderChangelog(
             @NonNull Path path,
             @NonNull String version,
-            @NonNull List<AnalyzedCommit> major,
-            @NonNull List<AnalyzedCommit> minor,
-            @NonNull List<AnalyzedCommit> patch
+            @NonNull List<AnalyzedCommit> analyzedCommits
     );
 }

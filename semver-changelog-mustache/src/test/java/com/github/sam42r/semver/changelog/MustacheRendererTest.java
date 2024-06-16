@@ -32,8 +32,6 @@ class MustacheRendererTest {
         try (var inputStream = uut.renderChangelog(
                 changelog,
                 "v1.0.0",
-                List.of(),
-                List.of(),
                 List.of(
                         AnalyzedCommit.builder()
                                 .id("42")
@@ -42,6 +40,7 @@ class MustacheRendererTest {
                                 .header("fix(scm): set clean commit message")
                                 .body("* added scope for commit messages")
                                 .footer("refs #42")
+                                .category(AnalyzedCommit.Category.FIXED)
                                 .build()
                 )
         )) {
@@ -79,8 +78,6 @@ class MustacheRendererTest {
         try (var inputStream = uut.renderChangelog(
                 changelog,
                 "v1.0.0",
-                List.of(),
-                List.of(),
                 List.of()
         )) {
             var actual = inputStream.readAllBytes();
