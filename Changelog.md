@@ -7,6 +7,22 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 <!-- DO NOT REMOVE - c871f32ed1b7a85b24a0f22e8e7d9e3ee285742c - DO NOT REMOVE -->
 
+## v1.0.0 - 2024-06-16
+
+
+### Added
+- :sparkles: (changelog) introduce changelog categories
+- :sparkles: (analyzer) add category in addition to type/intention
+- :boom: split project into multiple modules #3
+### Changed
+- :recycle: (changelog) pass all analyzed commits to renderer
+### Fixed
+- :bug: (gitmoji) set analyzed commit header
+- :bug: (mojo) support projects with parent
+### Others
+- :wrench: switch self release to gitmoji commit analyzer
+
+
 ## v0.1.0 - 2024-06-08
 
 
