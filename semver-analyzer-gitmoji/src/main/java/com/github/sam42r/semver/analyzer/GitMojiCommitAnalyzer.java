@@ -38,6 +38,7 @@ public class GitMojiCommitAnalyzer implements CommitAnalyzer {
                 .id(commit.getId())
                 .timestamp(commit.getTimestamp())
                 .author(commit.getAuthor())
+                .header(commit.getMessage().trim())
                 .message(commit.getMessage());
 
         if (commit.getMessage().startsWith(":")) {
