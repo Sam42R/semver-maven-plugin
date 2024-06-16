@@ -14,18 +14,22 @@ import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.HashMap;
 import java.util.List;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 public class MustacheRenderer implements ChangelogRenderer {
 
     private static final String CHANGELOG_TEMPLATE = "changelog.mustache";
 
+    private static AnalyzedCommit apply(AnalyzedCommit v) {
+        return v;
+    }
+
     @Override
     public @NonNull InputStream renderChangelog(
             @NonNull Path path,
             @NonNull String version,
-            @NonNull List<AnalyzedCommit> major,
-            @NonNull List<AnalyzedCommit> minor,
-            @NonNull List<AnalyzedCommit> patch
+            @NonNull List<AnalyzedCommit> analyzedCommits
     ) {
         var marker = DigestUtils.sha1Hex("Sam42R");
 
@@ -52,13 +56,38 @@ public class MustacheRenderer implements ChangelogRenderer {
                 var finalOutputStream = new ByteArrayOutputStream();
                 var finalWriter = new BufferedWriter(new OutputStreamWriter(finalOutputStream))
         ) {
+            var categorizedCommits = analyzedCommits.stream()
+                    .collect(Collectors.toMap(
+                            AnalyzedCommit::getCategory,
+                            List::of,
+                            (v1, v2) -> Stream.of(v1, v2).flatMap(List::stream).toList()
+                    ));
+
             var mustache = mustacheFactory.compile(reader, CHANGELOG_TEMPLATE);
             var context = new HashMap<String, Object>();
             context.put("release", release);
-            context.put("hasAdded", !minor.isEmpty());
-            context.put("added", minor);
-            context.put("hasPatches", !patch.isEmpty());
-            context.put("patches", patch);
+
+            context.put("hasAdded", categorizedCommits.containsKey(AnalyzedCommit.Category.ADDED));
+            context.put("added", categorizedCommits.get(AnalyzedCommit.Category.ADDED));
+
+            context.put("hasChanges", categorizedCommits.containsKey(AnalyzedCommit.Category.CHANGED));
+            context.put("changes", categorizedCommits.get(AnalyzedCommit.Category.CHANGED));
+
+            context.put("hasDeprecated", categorizedCommits.containsKey(AnalyzedCommit.Category.DEPRECATED));
+            context.put("deprecated", categorizedCommits.get(AnalyzedCommit.Category.DEPRECATED));
+
+            context.put("hasRemoved", categorizedCommits.containsKey(AnalyzedCommit.Category.REMOVED));
+            context.put("removed", categorizedCommits.get(AnalyzedCommit.Category.REMOVED));
+
+            context.put("hasPatches", categorizedCommits.containsKey(AnalyzedCommit.Category.FIXED));
+            context.put("patches", categorizedCommits.get(AnalyzedCommit.Category.FIXED));
+
+            context.put("hasSecurity", categorizedCommits.containsKey(AnalyzedCommit.Category.SECURITY));
+            context.put("securities", categorizedCommits.get(AnalyzedCommit.Category.SECURITY));
+
+            context.put("hasOthers", categorizedCommits.containsKey(AnalyzedCommit.Category.OTHER));
+            context.put("others", categorizedCommits.get(AnalyzedCommit.Category.OTHER));
+
             context.put("renderHeader", !alreadyExists);
             context.put("renderFooter", !alreadyExists);
             mustache.execute(writer, context).flush();

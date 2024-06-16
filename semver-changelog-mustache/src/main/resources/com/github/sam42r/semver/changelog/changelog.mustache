@@ -11,15 +11,24 @@
 {{#added}}
 - {{header}}
 {{/added}}
-{{#hasChanged}}
+{{#hasChanges}}
 ### Changed
-{{/hasChanged}}
+{{/hasChanges}}
+{{#changes}}
+- {{header}}
+{{/changes}}
 {{#hasDeprecated}}
 ### Deprecated
 {{/hasDeprecated}}
+{{#deprecated}}
+- {{header}}
+{{/deprecated}}
 {{#hasRemoved}}
 ### Removed
 {{/hasRemoved}}
+{{#removed}}
+- {{header}}
+{{/removed}}
 {{#hasPatches}}
 ### Fixed
 {{/hasPatches}}
@@ -29,6 +38,15 @@
 {{#hasSecurity}}
 ### Security
 {{/hasSecurity}}
+{{#securities}}
+- {{header}}
+{{/securities}}
+{{#hasOthers}}
+### Security
+{{/hasOthers}}
+{{#others}}
+- {{header}}
+{{/others}}
 
 {{#renderFooter}}
 {{> footer}}

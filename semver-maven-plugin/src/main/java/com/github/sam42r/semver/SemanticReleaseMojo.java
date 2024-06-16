@@ -80,10 +80,14 @@ public class SemanticReleaseMojo extends AbstractMojo {
         getLog().debug("Actual version: '%s'".formatted(latestVersion.toString()));
 
         var analyzedCommits = analyzeCommits(scmProvider, commitAnalyzer, latestCommit);
-        getLog().debug("Found %d major, %d minor and %d patch commits".formatted(
-                analyzedCommits.major().size(), analyzedCommits.minor().size(), analyzedCommits.patch().size()));
 
-        var nextVersionType = verifyRelease(analyzedCommits);
+        var majorCount = analyzedCommits.stream().filter(AnalyzedCommit.isBreaking).count();
+        var minorCount = analyzedCommits.stream().filter(AnalyzedCommit.isFeature).count();
+        var patchCount = analyzedCommits.stream().filter(AnalyzedCommit.isBugfix).count();
+        getLog().debug("Found %d major, %d minor and %d patch commits".formatted(
+                majorCount, minorCount, patchCount));
+
+        var nextVersionType = verifyRelease(majorCount > 0, minorCount > 0, patchCount > 0);
 
         if (nextVersionType == null) {
             getLog().info("No commits found to release");
@@ -94,8 +98,7 @@ public class SemanticReleaseMojo extends AbstractMojo {
             getLog().debug("Release version: '%s'".formatted(latestVersion.toString()));
 
             getLog().debug("Writing release notes to 'Changelog.md' for version '%s'".formatted(latestVersion.toString()));
-            var notes = generateNotes(projectBaseDirectory, new MustacheRenderer(), latestVersion.toString(),
-                    analyzedCommits.major(), analyzedCommits.minor(), analyzedCommits.patch());
+            var notes = generateNotes(projectBaseDirectory, new MustacheRenderer(), latestVersion.toString(), analyzedCommits);
 
             getLog().debug("Setting project version in 'pom.xml' to '%s'".formatted(latestVersion.toString()));
             var pomXml = projectBaseDirectory.resolve("pom.xml");
@@ -146,33 +149,27 @@ public class SemanticReleaseMojo extends AbstractMojo {
         }
     }
 
-    private AnalyzedCommits analyzeCommits(
+    private List<AnalyzedCommit> analyzeCommits(
             SCMProvider scmProvider,
             CommitAnalyzer commitAnalyzer,
             String latestCommit
     ) throws MojoExecutionException {
         try {
             var commits = scmProvider.readCommits(latestCommit);
-
-            var response = commitAnalyzer.analyzeCommits(commits.toList());
-            return new AnalyzedCommits(
-                    response.stream().filter(AnalyzedCommit.isBreaking).toList(),
-                    response.stream().filter(AnalyzedCommit.isFeature).toList(),
-                    response.stream().filter(AnalyzedCommit.isBugfix).toList()
-            );
+            return commitAnalyzer.analyzeCommits(commits.toList());
         } catch (SCMException e) {
             throw new MojoExecutionException(e.getMessage(), e.getCause());
         }
     }
 
-    private Version.Type verifyRelease(AnalyzedCommits analyzedCommits) {
+    private Version.Type verifyRelease(boolean hasMajor, boolean hasMinor, boolean hasPatch) {
         Version.Type nextVersionType = null;
 
-        if (!analyzedCommits.major().isEmpty()) {
+        if (hasMajor) {
             nextVersionType = Version.Type.MAJOR;
-        } else if (!analyzedCommits.minor().isEmpty()) {
+        } else if (hasMinor) {
             nextVersionType = Version.Type.MINOR;
-        } else if (!analyzedCommits.patch().isEmpty()) {
+        } else if (hasPatch) {
             nextVersionType = Version.Type.PATCH;
         }
 
@@ -183,13 +180,11 @@ public class SemanticReleaseMojo extends AbstractMojo {
             Path projectBaseDirectory,
             ChangelogRenderer renderer,
             String version,
-            List<AnalyzedCommit> major,
-            List<AnalyzedCommit> minor,
-            List<AnalyzedCommit> patch
+            List<AnalyzedCommit> analyzedCommits
     ) throws MojoExecutionException {
         var changelog = projectBaseDirectory.resolve("Changelog.md");
 
-        try (var inputStream = renderer.renderChangelog(changelog, version, major, minor, patch)) {
+        try (var inputStream = renderer.renderChangelog(changelog, version, analyzedCommits)) {
             Files.write(changelog, inputStream.readAllBytes());
         } catch (IOException e) {
             throw new MojoExecutionException(e.getMessage(), e.getCause());
@@ -213,8 +208,5 @@ public class SemanticReleaseMojo extends AbstractMojo {
     }
 
     private record LatestRelease(Optional<String> latestTag, Optional<String> latestCommit) {
-    }
-
-    private record AnalyzedCommits(List<AnalyzedCommit> major, List<AnalyzedCommit> minor, List<AnalyzedCommit> patch) {
     }
 }
