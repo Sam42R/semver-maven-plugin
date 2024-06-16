@@ -22,8 +22,16 @@ import java.util.Stack;
 public final class PomHelper {
 
     public static void changeVersion(Path pom, String version) {
+        changeVersionInternal(pom, version, "/project/version");
+    }
+
+    public static void changeParentVersion(Path pom, String version) {
+        changeVersionInternal(pom, version, "/project/parent/version");
+    }
+
+    private static void changeVersionInternal(Path pom, String version, String path) {
         final var parserFactory = SAXParserFactory.newInstance();
-        final var projectVersionLocator = new ProjectVersionLocator();
+        final var projectVersionLocator = new ProjectVersionLocator(path);
 
         try (var inputStream = Files.newInputStream(pom)) {
             var parser = parserFactory.newSAXParser();
@@ -73,13 +81,17 @@ public final class PomHelper {
      */
     private static class ProjectVersionLocator extends DefaultHandler {
         private static final String VERSION_ELEM_NAME = "version";
-        private static final String PROJECT_VERSION_PATH = "/project/" + VERSION_ELEM_NAME;
 
         private final Stack<String> stack = new Stack<>();
+        private final String path;
         private Locator locator;
 
         private Point versionStart;
         private Point versionEnd;
+
+        public ProjectVersionLocator(String path) {
+            this.path = path.toLowerCase();
+        }
 
         @Override
         public void setDocumentLocator(Locator locator) {
@@ -95,14 +107,14 @@ public final class PomHelper {
         public void startElement(String uri, String localName, String qName, Attributes attributes) throws SAXException {
             stack.push(qName);
 
-            if (VERSION_ELEM_NAME.equalsIgnoreCase(qName) && PROJECT_VERSION_PATH.equalsIgnoreCase(getCurrentPath())) {
+            if (VERSION_ELEM_NAME.equalsIgnoreCase(qName) && path.equalsIgnoreCase(getCurrentPath())) {
                 versionStart = new Point(locator.getColumnNumber() - 1, locator.getLineNumber() - 1);
             }
         }
 
         @Override
         public void endElement(String uri, String localName, String qName) throws SAXException {
-            if (VERSION_ELEM_NAME.equalsIgnoreCase(qName) && PROJECT_VERSION_PATH.equalsIgnoreCase(getCurrentPath())) {
+            if (VERSION_ELEM_NAME.equalsIgnoreCase(qName) && path.equalsIgnoreCase(getCurrentPath())) {
                 versionEnd = new Point(locator.getColumnNumber() - "</%s>".formatted(VERSION_ELEM_NAME).length() - 1, locator.getLineNumber() - 1);
             }
 
