@@ -12,6 +12,7 @@ import org.eclipse.jgit.lib.Ref;
 import org.eclipse.jgit.lib.Repository;
 import org.eclipse.jgit.storage.file.FileRepositoryBuilder;
 
+import java.io.File;
 import java.io.IOException;
 import java.io.UncheckedIOException;
 import java.nio.file.Files;
@@ -74,7 +75,9 @@ public class GitProvider implements SCMProvider {
     public void addFile(@NonNull Path file) throws SCMException {
         var repository = getRepository();
         try (var git = new Git(repository)) {
-            git.add().addFilepattern(repositoryPath.relativize(file).toString()).call();
+            // note: jGit seems to accept slash as file separator only; therefore we have to replace the platform file
+            // separator to make it run on windows also
+            git.add().addFilepattern(repositoryPath.relativize(file).toString().replace(File.separatorChar, '/')).call();
         } catch (GitAPIException e) {
             throw new SCMException(e);
         }

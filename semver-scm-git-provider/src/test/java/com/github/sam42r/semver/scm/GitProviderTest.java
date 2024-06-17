@@ -63,4 +63,19 @@ class GitProviderTest {
             );
         }
     }
+
+    @Test
+    void shouldAddFiles() throws GitAPIException, IOException, SCMException {
+        try (var git = Git.init().setDirectory(tempDirectory.toFile()).call()) {
+            var file = Files.writeString(tempDirectory.resolve("README.md"), "#JUnit");
+            var directory = Files.createDirectory(tempDirectory.resolve("directory"));
+            var anotherFile = Files.writeString(directory.resolve("file.dat"), "JUnit");
+
+            uut.addFile(file);
+            uut.addFile(anotherFile);
+
+            var actual = git.status().call();
+            assertThat(actual.getAdded()).hasSize(2);
+        }
+    }
 }
