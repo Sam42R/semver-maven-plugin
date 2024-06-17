@@ -7,6 +7,14 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 <!-- DO NOT REMOVE - c871f32ed1b7a85b24a0f22e8e7d9e3ee285742c - DO NOT REMOVE -->
 
+## v1.0.1 - 2024-06-17
+
+
+### Fixed
+- :bug: (git) replace platform file separator with slash
+- :bug: (mojo) update parent version on modules
+
+
 ## v1.0.0 - 2024-06-16
 
 

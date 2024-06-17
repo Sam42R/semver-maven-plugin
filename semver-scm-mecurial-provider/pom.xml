@@ -7,7 +7,7 @@
     <parent>
         <groupId>com.github.sam42r.semver</groupId>
         <artifactId>semver-parent</artifactId>
-        <version>v0.1.0-SNAPSHOT</version>
+        <version>v1.0.1</version>
     </parent>
 
     <artifactId>semver-scm-mecurial-provider</artifactId>
