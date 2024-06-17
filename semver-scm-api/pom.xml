@@ -5,7 +5,7 @@
     <modelVersion>4.0.0</modelVersion>
 
     <parent>
-        <groupId>com.github.sam42r.semver</groupId>
+        <groupId>io.github.sam42r</groupId>
         <artifactId>semver-parent</artifactId>
         <version>v1.0.1</version>
     </parent>

@@ -5,7 +5,7 @@
     <modelVersion>4.0.0</modelVersion>
 
     <parent>
-        <groupId>com.github.sam42r.semver</groupId>
+        <groupId>io.github.sam42r</groupId>
         <artifactId>semver-parent</artifactId>
         <version>v1.0.1</version>
     </parent>
@@ -22,32 +22,32 @@
 
     <dependencies>
         <dependency>
-            <groupId>com.github.sam42r.semver</groupId>
+            <groupId>io.github.sam42r</groupId>
             <artifactId>semver-scm-api</artifactId>
             <version>${project.version}</version>
         </dependency>
         <dependency>
-            <groupId>com.github.sam42r.semver</groupId>
+            <groupId>io.github.sam42r</groupId>
             <artifactId>semver-scm-git-provider</artifactId>
             <version>${project.version}</version>
         </dependency>
         <dependency>
-            <groupId>com.github.sam42r.semver</groupId>
+            <groupId>io.github.sam42r</groupId>
             <artifactId>semver-analyzer-api</artifactId>
             <version>${project.version}</version>
         </dependency>
         <dependency>
-            <groupId>com.github.sam42r.semver</groupId>
+            <groupId>io.github.sam42r</groupId>
             <artifactId>semver-analyzer-conventional</artifactId>
             <version>${project.version}</version>
         </dependency>
         <dependency>
-            <groupId>com.github.sam42r.semver</groupId>
+            <groupId>io.github.sam42r</groupId>
             <artifactId>semver-changelog-api</artifactId>
             <version>${project.version}</version>
         </dependency>
         <dependency>
-            <groupId>com.github.sam42r.semver</groupId>
+            <groupId>io.github.sam42r</groupId>
             <artifactId>semver-changelog-mustache</artifactId>
             <version>${project.version}</version>
         </dependency>
