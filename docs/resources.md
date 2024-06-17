@@ -20,3 +20,7 @@
 
 ## Others
 - [Git documentation](https://git-scm.com/doc)
+
+## Publish to maven central
+
+- [Central Portal](https://central.sonatype.org/register/central-portal/)

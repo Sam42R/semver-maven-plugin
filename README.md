@@ -19,6 +19,29 @@ The `semver-maven-plugin` aims to transfer the functionality of the
 | Publish           | Publish the release.                                                             |
 | Notify            | Notify of new releases or errors.                                                |
 
+# GPG signing
+
+## Generate key
+```bash
+$ gpg --gen-key
+```
+
+## List keys
+```bash
+$ gpg --list-keys
+```
+
+## Export public key to keyserver
+```bash
+$ gpg --keyserver keyserver.ubuntu.com --send-keys D826D9A9F4001BFDA16BD20C4A3649F0FDDA2A52
+```
+
+##
+```bash
+$ export MAVEN_GPG_PASSPHRASE=<PASSPHRASE>
+```
+
+
 # Links and Resources
 
 See [documentation](docs/resources.md)
