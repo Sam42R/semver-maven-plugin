@@ -48,7 +48,7 @@ public class MustacheRenderer implements ChangelogRenderer {
         // Security -> fix(security): ... OR feat(security): ...
         // Other ->
 
-        var mustacheFactory = new DefaultMustacheFactory("com/github/sam42r/semver/changelog");
+        var mustacheFactory = new DefaultMustacheFactory("io/github/sam42r/semver/changelog");
         try (
                 var reader = mustacheFactory.getReader(CHANGELOG_TEMPLATE);
                 var outputStream = new ByteArrayOutputStream();
