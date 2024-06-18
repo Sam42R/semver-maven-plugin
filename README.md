@@ -15,9 +15,7 @@ The `semver-maven-plugin` aims to transfer the functionality of the
 | Verify release    | Verify the release conformity.                                                   |
 | Generate notes    | Generate release notes for the commits added since the last release.             |
 | Create Git tag    | Create a Git tag corresponding to the new release version.                       |
-| Prepare           | Prepare the release.                                                             |
 | Publish           | Publish the release.                                                             |
-| Notify            | Notify of new releases or errors.                                                |
 
 # GPG signing
 
