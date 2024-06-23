@@ -28,7 +28,7 @@
         </dependency>
         <dependency>
             <groupId>io.github.sam42r</groupId>
-            <artifactId>semver-scm-git-provider</artifactId>
+            <artifactId>semver-scm-git</artifactId>
             <version>${project.version}</version>
         </dependency>
         <dependency>
