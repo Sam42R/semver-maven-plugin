@@ -3,7 +3,6 @@ package io.github.sam42r.semver;
 import io.github.sam42r.semver.analyzer.CommitAnalyzer;
 import io.github.sam42r.semver.analyzer.model.AnalyzedCommit;
 import io.github.sam42r.semver.changelog.ChangelogRenderer;
-import io.github.sam42r.semver.changelog.MustacheRenderer;
 import io.github.sam42r.semver.model.Version;
 import io.github.sam42r.semver.scm.SCMException;
 import io.github.sam42r.semver.scm.SCMProvider;
@@ -36,6 +35,7 @@ public class SemanticReleaseMojo extends AbstractMojo {
     @SuppressWarnings("rawtypes")
     private final ServiceLoader<SCMProviderFactory> scmProviderFactories = ServiceLoader.load(SCMProviderFactory.class);
     private final ServiceLoader<CommitAnalyzer> commitAnalyzers = ServiceLoader.load(CommitAnalyzer.class);
+    private final ServiceLoader<ChangelogRenderer> changelogRenderers = ServiceLoader.load(ChangelogRenderer.class);
 
     @Setter
     @Parameter(defaultValue = "${project}", required = true, readonly = true)
@@ -53,6 +53,10 @@ public class SemanticReleaseMojo extends AbstractMojo {
     @Parameter
     private Analyzer analyzer;
 
+    @Setter
+    @Parameter
+    private Changelog changelog;
+
     @Override
     public void execute() throws MojoExecutionException, MojoFailureException {
         if (scm == null) {
@@ -60,6 +64,9 @@ public class SemanticReleaseMojo extends AbstractMojo {
         }
         if (analyzer == null) {
             analyzer = Analyzer.builder().build();
+        }
+        if (changelog == null) {
+            changelog = Changelog.builder().build();
         }
 
         final var projectBaseDirectory = project.hasParent() ?
@@ -70,7 +77,9 @@ public class SemanticReleaseMojo extends AbstractMojo {
         var scmProvider = verifiedConditions.scmProvider()
                 .orElseThrow(() -> new IllegalArgumentException("Could not find SCM provider with name '%s'".formatted(scm.getProviderName())));
         var commitAnalyzer = verifiedConditions.commitAnalyzer()
-                .orElseThrow(() -> new IllegalArgumentException("Could not find commit analyzer with name '%s'".formatted(analyzer.getSpecificationName())));
+                .orElseThrow(() -> new IllegalArgumentException("Could not find commit analyzer with specification name '%s'".formatted(analyzer.getSpecificationName())));
+        var changelogRenderer = verifiedConditions.changelogRenderer()
+                .orElseThrow(() -> new IllegalArgumentException("Could not find changelog renderer with name '%s'".formatted(changelog.getRendererName())));
         getLog().info("Running semantic-release with SCM provider '%s'".formatted(scmProvider.getClass().getSimpleName()));
         getLog().info("Running semantic-release with commit analyzer '%s'".formatted(commitAnalyzer.getClass().getSimpleName()));
 
@@ -104,7 +113,7 @@ public class SemanticReleaseMojo extends AbstractMojo {
             getLog().debug("Release version: '%s'".formatted(latestVersion.toString()));
 
             getLog().debug("Writing release notes to 'Changelog.md' for version '%s'".formatted(latestVersion.toString()));
-            var notes = generateNotes(projectBaseDirectory, new MustacheRenderer(), latestVersion.toString(), analyzedCommits);
+            var notes = generateNotes(projectBaseDirectory, changelogRenderer, latestVersion.toString(), analyzedCommits);
 
             getLog().debug("Setting project version in 'pom.xml' to '%s'".formatted(latestVersion.toString()));
             var pomXml = projectBaseDirectory.resolve("pom.xml");
@@ -151,6 +160,10 @@ public class SemanticReleaseMojo extends AbstractMojo {
                 commitAnalyzers.stream()
                         .map(ServiceLoader.Provider::get)
                         .filter(v -> analyzer.getSpecificationName().equalsIgnoreCase(v.getName()))
+                        .findAny(),
+                changelogRenderers.stream()
+                        .map(ServiceLoader.Provider::get)
+                        .filter(v -> changelog.getRendererName().equalsIgnoreCase(v.getName()))
                         .findAny()
         );
     }
@@ -237,7 +250,8 @@ public class SemanticReleaseMojo extends AbstractMojo {
         }
     }
 
-    private record VerifiedConditions(Optional<SCMProvider> scmProvider, Optional<CommitAnalyzer> commitAnalyzer) {
+    private record VerifiedConditions(Optional<SCMProvider> scmProvider, Optional<CommitAnalyzer> commitAnalyzer,
+                                      Optional<ChangelogRenderer> changelogRenderer) {
     }
 
     private record LatestRelease(Optional<String> latestTag, Optional<String> latestCommit) {

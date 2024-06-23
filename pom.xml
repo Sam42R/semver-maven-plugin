@@ -23,7 +23,8 @@
         <module>semver-analyzer-conventional</module>
         <module>semver-analyzer-gitmoji</module>
         <module>semver-changelog-api</module>
-        <module>semver-changelog-mustache</module>
+        <module>semver-changelog-markup</module>
+        <module>semver-changelog-html</module>
         <module>semver-maven-plugin</module>
     </modules>
 

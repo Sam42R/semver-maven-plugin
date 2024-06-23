@@ -17,13 +17,13 @@ import java.util.List;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
-class MustacheRendererTest {
+class MarkupRendererTest {
 
     private ChangelogRenderer uut;
 
     @BeforeEach
     void setup() {
-        uut = new MustacheRenderer();
+        uut = new MarkupRenderer();
     }
 
     @Test

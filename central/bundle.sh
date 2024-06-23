@@ -1,7 +1,7 @@
 #!/bin/bash
 
 VERSION="$1"
-MODULES="semver-analyzer-api semver-analyzer-conventional semver-analyzer-gitmoji semver-changelog-api semver-changelog-mustache semver-maven-plugin semver-scm-api semver-scm-git-provider semver-scm-mecurial-provider semver-scm-subversion-provider"
+MODULES="semver-analyzer-api semver-analyzer-conventional semver-analyzer-gitmoji semver-changelog-api semver-changelog-html semver-changelog-markup semver-maven-plugin semver-scm-api semver-scm-git semver-scm-mecurial semver-scm-subversion"
 
 rm -rf io
 mkdir -p io/github/sam42r
