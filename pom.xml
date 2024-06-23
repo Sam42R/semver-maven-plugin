@@ -16,9 +16,9 @@
 
     <modules>
         <module>semver-scm-api</module>
-        <module>semver-scm-git-provider</module>
-        <module>semver-scm-subversion-provider</module>
-        <module>semver-scm-mecurial-provider</module>
+        <module>semver-scm-git</module>
+        <module>semver-scm-subversion</module>
+        <module>semver-scm-mecurial</module>
         <module>semver-analyzer-api</module>
         <module>semver-analyzer-conventional</module>
         <module>semver-analyzer-gitmoji</module>
