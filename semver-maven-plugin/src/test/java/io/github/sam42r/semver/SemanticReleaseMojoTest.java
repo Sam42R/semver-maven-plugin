@@ -43,7 +43,7 @@ class SemanticReleaseMojoTest {
 
         var pluginContext = new HashMap<>();
         uut.setPluginContext(pluginContext);
-        uut.setScmProviderName("Git");
+        uut.setScm(Scm.builder().build());
         uut.setCommitAnalyzerName("Conventional");
         uut.setVersionNumberPattern(SemanticReleaseMojo.VERSION_NUMBER_PATTERN_DEFAULT);
 

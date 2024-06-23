@@ -46,8 +46,8 @@ public class SemanticReleaseMojo extends AbstractMojo {
     private String versionNumberPattern;
 
     @Setter
-    @Parameter(name = "scm-provider-name", defaultValue = "Git")
-    private String scmProviderName;
+    @Parameter
+    private Scm scm;
 
     @Setter
     @Parameter(name = "commit-analyzer-name", defaultValue = "Conventional")
@@ -55,13 +55,17 @@ public class SemanticReleaseMojo extends AbstractMojo {
 
     @Override
     public void execute() throws MojoExecutionException, MojoFailureException {
+        if (scm == null) {
+            scm = Scm.builder().build();
+        }
+
         final var projectBaseDirectory = project.hasParent() ?
                 project.getFile().getParentFile().getParentFile().toPath() :
                 project.getFile().getParentFile().toPath();
 
         var verifiedConditions = verifyConditions(projectBaseDirectory);
         var scmProvider = verifiedConditions.scmProvider()
-                .orElseThrow(() -> new IllegalArgumentException("Could not find SCM provider with name '%s'".formatted(scmProviderName)));
+                .orElseThrow(() -> new IllegalArgumentException("Could not find SCM provider with name '%s'".formatted(scm.getProviderName())));
         var commitAnalyzer = verifiedConditions.commitAnalyzer()
                 .orElseThrow(() -> new IllegalArgumentException("Could not find commit analyzer with name '%s'".formatted(commitAnalyzerName)));
         getLog().info("Running semantic-release with SCM provider '%s'".formatted(scmProvider.getClass().getSimpleName()));
@@ -134,7 +138,7 @@ public class SemanticReleaseMojo extends AbstractMojo {
         return new VerifiedConditions(
                 scmProviderFactories.stream()
                         .map(ServiceLoader.Provider::get)
-                        .filter(v -> scmProviderName.equalsIgnoreCase(v.getProviderName()))
+                        .filter(v -> scm.getProviderName().equalsIgnoreCase(v.getProviderName()))
                         .map(v -> v.getInstance(projectBaseDirectory))
                         .findAny(),
                 commitAnalyzers.stream()
