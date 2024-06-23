@@ -54,7 +54,7 @@ public class SvnProvider implements SCMProviderFactory<SvnProvider>, SCMProvider
     }
 
     @Override
-    public void push(boolean force) {
+    public String push(boolean force) throws SCMException {
         throw new NotImplementedException();
     }
 }

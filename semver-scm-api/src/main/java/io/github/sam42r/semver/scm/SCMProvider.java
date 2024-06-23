@@ -23,4 +23,6 @@ public interface SCMProvider {
     @NonNull Commit commit(@NonNull String message) throws SCMException;
 
     @NonNull Tag tag(@NonNull String name) throws SCMException;
+
+    @NonNull String push(boolean force) throws SCMException;
 }
