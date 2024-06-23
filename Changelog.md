@@ -7,6 +7,20 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 <!-- DO NOT REMOVE - c871f32ed1b7a85b24a0f22e8e7d9e3ee285742c - DO NOT REMOVE -->
 
+## v1.2.0 - 2024-06-23
+
+
+### Added
+- :sparkles: (changelog) load as plugin with service loader #9
+- :sparkles: (mojo) publish to origin #10
+- :sparkles: (scm) add push command #10
+### Changed
+- :recycle: rename scm modules #10
+### Others
+- :label: (analyzer) add commit analyzer config type
+- :label: (scm) add SCM config type #10
+
+
 ## v1.1.1 - 2024-06-18
 
 
