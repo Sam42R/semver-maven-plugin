@@ -128,6 +128,10 @@ public class SemanticReleaseMojo extends AbstractMojo {
                 scmProvider.commit(commitAnalyzer.generateReleaseCommitMessage(latestVersion.toString()));
 
                 createTag(scmProvider, latestVersion);
+
+                if(scm.isPush()) {
+                    publish(scmProvider);
+                }
             } catch (SCMException e) {
                 throw new MojoExecutionException(e);
             }
@@ -216,6 +220,15 @@ public class SemanticReleaseMojo extends AbstractMojo {
     ) throws MojoExecutionException {
         try {
             scmProvider.tag(version.toString());
+        } catch (SCMException e) {
+            throw new MojoExecutionException(e.getMessage(), e.getCause());
+        }
+    }
+
+    private void publish(SCMProvider scmProvider) throws MojoExecutionException {
+        try {
+            var messages = scmProvider.push(false);
+            getLog().debug(messages);
         } catch (SCMException e) {
             throw new MojoExecutionException(e.getMessage(), e.getCause());
         }
