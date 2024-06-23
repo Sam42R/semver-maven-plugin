@@ -11,6 +11,7 @@ import org.eclipse.jgit.lib.ObjectId;
 import org.eclipse.jgit.lib.Ref;
 import org.eclipse.jgit.lib.Repository;
 import org.eclipse.jgit.storage.file.FileRepositoryBuilder;
+import org.eclipse.jgit.transport.PushResult;
 
 import java.io.File;
 import java.io.IOException;
@@ -19,6 +20,7 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.time.Instant;
 import java.util.Optional;
+import java.util.stream.Collectors;
 import java.util.stream.Stream;
 import java.util.stream.StreamSupport;
 
@@ -114,8 +116,20 @@ public class GitProvider implements SCMProvider {
     }
 
     @Override
-    public void push(boolean force) {
-        // TODO
+    public String push(boolean force) throws SCMException {
+        var repository = getRepository();
+        try (var git = new Git(repository)) {
+            var pushResults = git.push()
+                    .setRemote("origin")
+                    .setForce(force)
+                    .setPushTags()
+                    .call();
+            return StreamSupport.stream(pushResults.spliterator(), false)
+                    .map(PushResult::getMessages)
+                    .collect(Collectors.joining("\n"));
+        } catch (GitAPIException e) {
+            throw new SCMException(e);
+        }
     }
 
     private Repository getRepository() throws SCMException {
