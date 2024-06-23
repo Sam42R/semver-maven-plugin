@@ -50,13 +50,16 @@ public class SemanticReleaseMojo extends AbstractMojo {
     private Scm scm;
 
     @Setter
-    @Parameter(name = "commit-analyzer-name", defaultValue = "Conventional")
-    private String commitAnalyzerName;
+    @Parameter
+    private Analyzer analyzer;
 
     @Override
     public void execute() throws MojoExecutionException, MojoFailureException {
         if (scm == null) {
             scm = Scm.builder().build();
+        }
+        if (analyzer == null) {
+            analyzer = Analyzer.builder().build();
         }
 
         final var projectBaseDirectory = project.hasParent() ?
@@ -67,7 +70,7 @@ public class SemanticReleaseMojo extends AbstractMojo {
         var scmProvider = verifiedConditions.scmProvider()
                 .orElseThrow(() -> new IllegalArgumentException("Could not find SCM provider with name '%s'".formatted(scm.getProviderName())));
         var commitAnalyzer = verifiedConditions.commitAnalyzer()
-                .orElseThrow(() -> new IllegalArgumentException("Could not find commit analyzer with name '%s'".formatted(commitAnalyzerName)));
+                .orElseThrow(() -> new IllegalArgumentException("Could not find commit analyzer with name '%s'".formatted(analyzer.getSpecificationName())));
         getLog().info("Running semantic-release with SCM provider '%s'".formatted(scmProvider.getClass().getSimpleName()));
         getLog().info("Running semantic-release with commit analyzer '%s'".formatted(commitAnalyzer.getClass().getSimpleName()));
 
@@ -129,7 +132,7 @@ public class SemanticReleaseMojo extends AbstractMojo {
 
                 createTag(scmProvider, latestVersion);
 
-                if(scm.isPush()) {
+                if (scm.isPush()) {
                     publish(scmProvider);
                 }
             } catch (SCMException e) {
@@ -147,7 +150,7 @@ public class SemanticReleaseMojo extends AbstractMojo {
                         .findAny(),
                 commitAnalyzers.stream()
                         .map(ServiceLoader.Provider::get)
-                        .filter(v -> commitAnalyzerName.equalsIgnoreCase(v.getName()))
+                        .filter(v -> analyzer.getSpecificationName().equalsIgnoreCase(v.getName()))
                         .findAny()
         );
     }

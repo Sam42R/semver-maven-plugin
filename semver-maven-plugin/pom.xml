@@ -113,7 +113,9 @@
                             </execution>
                         </executions>
                         <configuration>
-                            <commit-analyzer-name>Gitmoji</commit-analyzer-name>
+                            <analyzer>
+                                <specification-name>Gitmoji</specification-name>
+                            </analyzer>
                         </configuration>
                         <dependencies>
                             <dependency>

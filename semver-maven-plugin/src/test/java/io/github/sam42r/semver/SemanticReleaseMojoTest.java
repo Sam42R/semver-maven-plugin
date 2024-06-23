@@ -44,7 +44,7 @@ class SemanticReleaseMojoTest {
         var pluginContext = new HashMap<>();
         uut.setPluginContext(pluginContext);
         uut.setScm(Scm.builder().push(false).build());
-        uut.setCommitAnalyzerName("Conventional");
+        uut.setAnalyzer(Analyzer.builder().build());
         uut.setVersionNumberPattern(SemanticReleaseMojo.VERSION_NUMBER_PATTERN_DEFAULT);
 
         var mavenProjectMock = mock(MavenProject.class);
