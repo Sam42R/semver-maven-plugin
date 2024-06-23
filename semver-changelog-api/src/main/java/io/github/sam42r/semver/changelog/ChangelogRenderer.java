@@ -9,6 +9,8 @@ import java.util.List;
 
 public interface ChangelogRenderer {
 
+    @NonNull String getName();
+
     @NonNull InputStream renderChangelog(
             @NonNull Path path,
             @NonNull String version,

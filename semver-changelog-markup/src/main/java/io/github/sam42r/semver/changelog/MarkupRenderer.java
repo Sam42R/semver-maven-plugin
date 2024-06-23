@@ -17,12 +17,14 @@ import java.util.List;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
-public class MustacheRenderer implements ChangelogRenderer {
+public class MarkupRenderer implements ChangelogRenderer {
 
+    private static final String RENDERER_NAME = "Markup";
     private static final String CHANGELOG_TEMPLATE = "changelog.mustache";
 
-    private static AnalyzedCommit apply(AnalyzedCommit v) {
-        return v;
+    @Override
+    public @NonNull String getName() {
+        return RENDERER_NAME;
     }
 
     @Override
