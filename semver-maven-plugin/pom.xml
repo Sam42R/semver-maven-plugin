@@ -7,7 +7,7 @@
     <parent>
         <groupId>io.github.sam42r</groupId>
         <artifactId>semver-parent</artifactId>
-        <version>v1.2.0</version>
+        <version>v1.2.1</version>
     </parent>
 
     <artifactId>semver-maven-plugin</artifactId>
@@ -113,6 +113,9 @@
                             </execution>
                         </executions>
                         <configuration>
+                            <scm>
+                                <push>false</push>
+                            </scm>
                             <analyzer>
                                 <specification-name>Gitmoji</specification-name>
                             </analyzer>
