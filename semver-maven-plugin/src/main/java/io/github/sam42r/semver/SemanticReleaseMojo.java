@@ -10,6 +10,7 @@ import io.github.sam42r.semver.scm.SCMProviderFactory;
 import io.github.sam42r.semver.scm.model.Commit;
 import io.github.sam42r.semver.scm.model.Tag;
 import io.github.sam42r.semver.util.PomHelper;
+import lombok.NonNull;
 import lombok.Setter;
 import org.apache.maven.plugin.AbstractMojo;
 import org.apache.maven.plugin.MojoExecutionException;
@@ -69,7 +70,7 @@ public class SemanticReleaseMojo extends AbstractMojo {
             changelog = Changelog.builder().build();
         }
 
-        final var projectBaseDirectory = project.hasParent() ?
+        final var projectBaseDirectory = isModule(project) ?
                 project.getFile().getParentFile().getParentFile().toPath() :
                 project.getFile().getParentFile().toPath();
 
@@ -120,7 +121,7 @@ public class SemanticReleaseMojo extends AbstractMojo {
             PomHelper.changeVersion(pomXml, latestVersion.toString());
 
             var modulePomsXml = new ArrayList<Path>();
-            if (project.hasParent()) {
+            if (isModule(project)) {
                 for (var module : project.getParent().getModules()) {
                     var modulePomXml = projectBaseDirectory.resolve(module).resolve("pom.xml");
                     PomHelper.changeParentVersion(modulePomXml, latestVersion.toString());
@@ -148,6 +149,16 @@ public class SemanticReleaseMojo extends AbstractMojo {
                 throw new MojoExecutionException(e);
             }
         }
+    }
+
+    private boolean isModule(@NonNull MavenProject mavenProject) {
+        getLog().debug("Checking if project is maven module");
+        if (project.hasParent()) {
+            var parentProjectDirectory = mavenProject.getFile().getParentFile().getParentFile().toPath();
+            getLog().debug("Looking for 'pom.xml' in '%s'".formatted(parentProjectDirectory.toAbsolutePath().toString()));
+            return Files.exists(parentProjectDirectory.resolve("pom.xml"));
+        }
+        return false;
     }
 
     private VerifiedConditions verifyConditions(Path projectBaseDirectory) {
