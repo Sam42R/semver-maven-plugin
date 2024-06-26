@@ -24,7 +24,7 @@ public class SvnProvider implements SCMProviderFactory<SvnProvider>, SCMProvider
     }
 
     @Override
-    public @NonNull SvnProvider getInstance(@NonNull Path path) {
+    public @NonNull SvnProvider getInstance(@NonNull Path path, String username, String password) {
         throw new NotImplementedException();
     }
 

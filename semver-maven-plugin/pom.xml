@@ -114,7 +114,7 @@
                         </executions>
                         <configuration>
                             <scm>
-                                <push>false</push>
+                                <password>${env.SSH_PASSPHRASE}</password>
                             </scm>
                             <analyzer>
                                 <specification-name>Gitmoji</specification-name>

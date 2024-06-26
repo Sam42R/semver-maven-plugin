@@ -24,7 +24,7 @@ public class HgProvider implements SCMProviderFactory<HgProvider>, SCMProvider {
     }
 
     @Override
-    public @NonNull HgProvider getInstance(@NonNull Path path) {
+    public @NonNull HgProvider getInstance(@NonNull Path path, String username, String password) {
         throw new NotImplementedException();
     }
 
