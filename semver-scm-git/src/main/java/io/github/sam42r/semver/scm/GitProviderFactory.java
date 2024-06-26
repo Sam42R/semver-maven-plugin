@@ -16,7 +16,7 @@ public class GitProviderFactory implements SCMProviderFactory<GitProvider> {
     }
 
     @Override
-    public @NonNull GitProvider getInstance(@NonNull Path path) {
-        return new GitProvider(path);
+    public @NonNull GitProvider getInstance(@NonNull Path path, String username, String password) {
+        return new GitProvider(path, username, password);
     }
 }

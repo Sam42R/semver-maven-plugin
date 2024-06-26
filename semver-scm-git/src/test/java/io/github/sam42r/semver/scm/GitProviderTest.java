@@ -6,6 +6,7 @@ import org.eclipse.jgit.api.Git;
 import org.eclipse.jgit.api.errors.GitAPIException;
 import org.eclipse.jgit.lib.UserConfig;
 import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.io.TempDir;
 
@@ -24,7 +25,7 @@ class GitProviderTest {
 
     @BeforeEach
     void setup() {
-        uut = new GitProviderFactory().getInstance(tempDirectory);
+        uut = new GitProviderFactory().getInstance(tempDirectory, null, null);
     }
 
     @Test
@@ -77,5 +78,14 @@ class GitProviderTest {
             var actual = git.status().call();
             assertThat(actual.getAdded()).hasSize(2);
         }
+    }
+
+    @Test
+    @Disabled("local testing only")
+    void shouldPushToRemote() throws IOException, SCMException {
+        var path = Path.of("..").toRealPath();
+
+        var scmProvider = new GitProvider(path, null, "***");
+        scmProvider.push(false);
     }
 }
