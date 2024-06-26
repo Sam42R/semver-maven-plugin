@@ -15,4 +15,7 @@ public class Scm {
     private String providerName = "Git";
     @Builder.Default
     private boolean push = true;
+
+    private String username;
+    private String password;
 }

@@ -166,7 +166,7 @@ public class SemanticReleaseMojo extends AbstractMojo {
                 scmProviderFactories.stream()
                         .map(ServiceLoader.Provider::get)
                         .filter(v -> scm.getProviderName().equalsIgnoreCase(v.getProviderName()))
-                        .map(v -> v.getInstance(projectBaseDirectory))
+                        .map(v -> v.getInstance(projectBaseDirectory, scm.getUsername(), scm.getPassword()))
                         .findAny(),
                 commitAnalyzers.stream()
                         .map(ServiceLoader.Provider::get)

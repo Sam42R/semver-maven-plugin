@@ -17,6 +17,7 @@
 
 ## Third Party
 - [Mustache Templates](https://github.com/mustache/mustache.github.com)
+- [JGit Authentication](https://www.codeaffine.com/2014/12/09/jgit-authentication/)
 
 ## Others
 - [Git documentation](https://git-scm.com/doc)

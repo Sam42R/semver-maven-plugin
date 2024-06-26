@@ -1,17 +1,25 @@
 package io.github.sam42r.semver.scm;
 
+
+import com.jcraft.jsch.JSch;
+import com.jcraft.jsch.JSchException;
+import com.jcraft.jsch.Session;
 import io.github.sam42r.semver.scm.model.Commit;
 import io.github.sam42r.semver.scm.model.Tag;
 import lombok.AccessLevel;
 import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.lang3.SystemUtils;
 import org.eclipse.jgit.api.Git;
 import org.eclipse.jgit.api.errors.GitAPIException;
 import org.eclipse.jgit.lib.ObjectId;
 import org.eclipse.jgit.lib.Ref;
 import org.eclipse.jgit.lib.Repository;
 import org.eclipse.jgit.storage.file.FileRepositoryBuilder;
-import org.eclipse.jgit.transport.PushResult;
+import org.eclipse.jgit.transport.*;
+import org.eclipse.jgit.transport.ssh.jsch.JschConfigSessionFactory;
+import org.eclipse.jgit.transport.ssh.jsch.OpenSshConfig;
 
 import java.io.File;
 import java.io.IOException;
@@ -20,6 +28,7 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.time.Instant;
 import java.util.Optional;
+import java.util.function.Predicate;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 import java.util.stream.StreamSupport;
@@ -29,10 +38,14 @@ import java.util.stream.StreamSupport;
  *
  * @author Sam42R
  */
+@Slf4j
 @RequiredArgsConstructor(access = AccessLevel.PROTECTED)
 public class GitProvider implements SCMProvider {
 
     private final Path repositoryPath;
+    private final String username;
+    private final String password;
+
     private Repository repository;
 
     @Override
@@ -120,6 +133,7 @@ public class GitProvider implements SCMProvider {
         var repository = getRepository();
         try (var git = new Git(repository)) {
             var pushResults = git.push()
+                    .setTransportConfigCallback(this::configureTransport)
                     .setRemote("origin")
                     .setForce(force)
                     .setPushTags()
@@ -154,5 +168,81 @@ public class GitProvider implements SCMProvider {
         } catch (IOException e) {
             throw new UncheckedIOException(e);
         }
+    }
+
+    private void configureTransport(@NonNull Transport transport) {
+        if (transport instanceof SshTransport sshTransport) {
+            configureSshTransport(sshTransport);
+        } else if (transport instanceof HttpTransport httpTransport) {
+            configureHttpTransport(httpTransport);
+        } else {
+            log.warn("Could not configure transport '{}'", transport.getClass().getSimpleName());
+        }
+    }
+
+    private void configureSshTransport(@NonNull SshTransport sshTransport) {
+        log.debug("Configure SshTransport with SSH keys");
+
+        var jschConfigSessionFactory = new JschConfigSessionFactory() {
+            @Override
+            protected void configureJSch(JSch jsch) {
+                super.configureJSch(jsch);
+
+                Predicate<Path> isKeyFile = path -> path.getFileName().toString().toLowerCase().startsWith("id_");
+                Predicate<Path> isPublicKeyFile = path -> path.getFileName().toString().toLowerCase().endsWith(".pub");
+
+                var sshDirectory = SystemUtils.getUserHome().toPath().resolve(".ssh");
+                try (var sshConfigFiles = Files.walk(sshDirectory)) {
+                    var sshKeyFiles = sshConfigFiles.filter(isKeyFile).toList();
+
+                    var publicKeyPath = sshKeyFiles.stream()
+                            .filter(isPublicKeyFile)
+                            .sorted()
+                            .findFirst();
+                    var publicKeyBytes = publicKeyPath.map(this::readAllBytes)
+                            .orElseThrow(() -> new IllegalStateException("Could not find public key file"));
+
+                    var privateKeyPath = sshKeyFiles.stream()
+                            .filter(Predicate.not(isPublicKeyFile))
+                            .sorted()
+                            .findFirst();
+                    var privateKeyBytes = privateKeyPath.map(this::readAllBytes)
+                            .orElseThrow(() -> new IllegalStateException("Could not find private key file"));
+
+                    var privateKeyPassword = Optional.ofNullable(password).map(String::getBytes).orElse(null);
+
+                    jsch.addIdentity(null, privateKeyBytes, publicKeyBytes, privateKeyPassword);
+                } catch (IOException | JSchException e) {
+                    throw new RuntimeException(e);
+                }
+            }
+
+            @Override
+            protected void configure(OpenSshConfig.Host hc, Session session) {
+                // do nothing
+                // session.setPassword("***"); // NOT supported by GitHub
+            }
+
+            private byte[] readAllBytes(@NonNull Path path) {
+                try {
+                    return Files.readAllBytes(path);
+                } catch (IOException e) {
+                    throw new UncheckedIOException(e);
+                }
+            }
+        };
+        sshTransport.setSshSessionFactory(jschConfigSessionFactory);
+    }
+
+
+    private void configureHttpTransport(@NonNull HttpTransport httpTransport) {
+        log.debug("Configure HttpTransport with username and password");
+
+        var usernameToSet = Optional.ofNullable(username).orElse(SystemUtils.getUserName());
+        var passwordToSet = Optional.ofNullable(password).orElse("");
+
+        httpTransport.setCredentialsProvider(
+                new UsernamePasswordCredentialsProvider(usernameToSet, passwordToSet)
+        );
     }
 }

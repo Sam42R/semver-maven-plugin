@@ -8,5 +8,5 @@ public interface SCMProviderFactory<P extends SCMProvider> {
 
     @NonNull String getProviderName();
 
-    @NonNull P getInstance(@NonNull Path path);
+    @NonNull P getInstance(@NonNull Path path, String username, String password);
 }
