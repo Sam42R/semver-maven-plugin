@@ -7,7 +7,7 @@
     <parent>
         <groupId>io.github.sam42r</groupId>
         <artifactId>semver-parent</artifactId>
-        <version>v1.2.1</version>
+        <version>v1.2.2</version>
     </parent>
 
     <artifactId>semver-analyzer-api</artifactId>
