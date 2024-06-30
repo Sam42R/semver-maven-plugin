@@ -132,15 +132,25 @@ public class GitProvider implements SCMProvider {
     public String push(boolean force) throws SCMException {
         var repository = getRepository();
         try (var git = new Git(repository)) {
-            var pushResults = git.push()
+            var pushBranchResults = git.push()
                     .setTransportConfigCallback(this::configureTransport)
                     .setRemote("origin")
                     .setForce(force)
-                    .setPushTags()
                     .call();
-            return StreamSupport.stream(pushResults.spliterator(), false)
+
+            var pushTagResults = git.push()
+                    .setTransportConfigCallback(this::configureTransport)
+                    .setRemote("origin")
+                    .setForce(force)
+                    .setPushTags() // pushes tags only
+                    .call();
+
+            return Stream.concat(
+                            StreamSupport.stream(pushBranchResults.spliterator(), false),
+                            StreamSupport.stream(pushTagResults.spliterator(), false)
+                    )
                     .map(PushResult::getMessages)
-                    .collect(Collectors.joining("\n"));
+                    .collect(Collectors.joining(System.lineSeparator()));
         } catch (GitAPIException e) {
             throw new SCMException(e);
         }
