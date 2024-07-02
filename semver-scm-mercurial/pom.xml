@@ -10,7 +10,7 @@
         <version>v1.2.2</version>
     </parent>
 
-    <artifactId>semver-scm-mecurial</artifactId>
+    <artifactId>semver-scm-mercurial</artifactId>
 
     <properties>
         <maven.compiler.source>19</maven.compiler.source>
