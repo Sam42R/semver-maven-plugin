@@ -7,6 +7,17 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 <!-- DO NOT REMOVE - c871f32ed1b7a85b24a0f22e8e7d9e3ee285742c - DO NOT REMOVE -->
 
+## v1.2.3 - 2024-07-02
+
+
+### Changed
+- :recycle: switch bundle creation from bash script to class #11
+### Fixed
+- :bug: (scm) push branches and tags #20
+### Others
+- :truck: rename mercurial module
+
+
 ## v1.2.2 - 2024-06-26
 
 
