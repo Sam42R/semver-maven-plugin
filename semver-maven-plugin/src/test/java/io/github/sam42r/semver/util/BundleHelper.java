@@ -22,7 +22,7 @@ public class BundleHelper {
             "semver-maven-plugin",
             "semver-scm-api",
             "semver-scm-git",
-            "semver-scm-mecurial",
+            "semver-scm-mercurial",
             "semver-scm-subversion"
     };
 
