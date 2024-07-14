@@ -23,7 +23,10 @@ public class BundleHelper {
             "semver-scm-api",
             "semver-scm-git",
             "semver-scm-mercurial",
-            "semver-scm-subversion"
+            "semver-scm-subversion",
+            "semver-release-api",
+            "semver-release-github",
+            "semver-release-gitlab"
     };
 
     public static void main(String[] args) {

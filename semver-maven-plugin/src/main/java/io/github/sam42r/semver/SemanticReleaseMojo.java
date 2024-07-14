@@ -1,5 +1,9 @@
 package io.github.sam42r.semver;
 
+import io.github.sam24r.semver.release.ReleaseException;
+import io.github.sam24r.semver.release.ReleasePublisher;
+import io.github.sam24r.semver.release.ReleasePublisherFactory;
+import io.github.sam24r.semver.release.model.ReleaseInfo;
 import io.github.sam42r.semver.analyzer.CommitAnalyzer;
 import io.github.sam42r.semver.analyzer.model.AnalyzedCommit;
 import io.github.sam42r.semver.changelog.ChangelogRenderer;
@@ -22,6 +26,8 @@ import org.apache.maven.project.MavenProject;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.time.LocalDateTime;
+import java.time.temporal.ChronoUnit;
 import java.util.*;
 
 /**
@@ -37,6 +43,7 @@ public class SemanticReleaseMojo extends AbstractMojo {
     private final ServiceLoader<SCMProviderFactory> scmProviderFactories = ServiceLoader.load(SCMProviderFactory.class);
     private final ServiceLoader<CommitAnalyzer> commitAnalyzers = ServiceLoader.load(CommitAnalyzer.class);
     private final ServiceLoader<ChangelogRenderer> changelogRenderers = ServiceLoader.load(ChangelogRenderer.class);
+    private final ServiceLoader<ReleasePublisherFactory> releasePublisherFactories = ServiceLoader.load(ReleasePublisherFactory.class);
 
     @Setter
     @Parameter(defaultValue = "${project}", required = true, readonly = true)
@@ -58,6 +65,10 @@ public class SemanticReleaseMojo extends AbstractMojo {
     @Parameter
     private Changelog changelog;
 
+    @Setter
+    @Parameter
+    private Release release;
+
     @Override
     public void execute() throws MojoExecutionException, MojoFailureException {
         if (scm == null) {
@@ -68,6 +79,9 @@ public class SemanticReleaseMojo extends AbstractMojo {
         }
         if (changelog == null) {
             changelog = Changelog.builder().build();
+        }
+        if (release == null) {
+            release = Release.builder().build();
         }
 
         final var projectBaseDirectory = isModule(project) ?
@@ -81,8 +95,12 @@ public class SemanticReleaseMojo extends AbstractMojo {
                 .orElseThrow(() -> new IllegalArgumentException("Could not find commit analyzer with specification name '%s'".formatted(analyzer.getSpecificationName())));
         var changelogRenderer = verifiedConditions.changelogRenderer()
                 .orElseThrow(() -> new IllegalArgumentException("Could not find changelog renderer with name '%s'".formatted(changelog.getRendererName())));
+        var releasePublisher = verifiedConditions.releasePublisher()
+                .orElseThrow(() -> new IllegalArgumentException("Could not find release publisher with name '%s'".formatted(release.getPublisherName())));
         getLog().info("Running semantic-release with SCM provider '%s'".formatted(scmProvider.getClass().getSimpleName()));
         getLog().info("Running semantic-release with commit analyzer '%s'".formatted(commitAnalyzer.getClass().getSimpleName()));
+        getLog().info("Running semantic-release with changelog renderer '%s'".formatted(changelogRenderer.getClass().getSimpleName()));
+        getLog().info("Running semantic-release with release publisher '%s'".formatted(releasePublisher.getClass().getSimpleName()));
 
         var latestRelease = getLatestRelease(scmProvider);
         var latestTag = latestRelease.latestTag().orElse("None");
@@ -145,6 +163,10 @@ public class SemanticReleaseMojo extends AbstractMojo {
                 if (scm.isPush()) {
                     publish(scmProvider);
                 }
+
+                if (release.isPublish()) {
+                    notify(scmProvider, releasePublisher, latestVersion);
+                }
             } catch (SCMException e) {
                 throw new MojoExecutionException(e);
             }
@@ -175,6 +197,11 @@ public class SemanticReleaseMojo extends AbstractMojo {
                 changelogRenderers.stream()
                         .map(ServiceLoader.Provider::get)
                         .filter(v -> changelog.getRendererName().equalsIgnoreCase(v.getName()))
+                        .findAny(),
+                releasePublisherFactories.stream()
+                        .map(ServiceLoader.Provider::get)
+                        .filter(v -> release.getPublisherName().equalsIgnoreCase(v.getName()))
+                        .map(v -> v.getInstance(release.getUsername(), release.getPassword()))
                         .findAny()
         );
     }
@@ -261,8 +288,34 @@ public class SemanticReleaseMojo extends AbstractMojo {
         }
     }
 
-    private record VerifiedConditions(Optional<SCMProvider> scmProvider, Optional<CommitAnalyzer> commitAnalyzer,
-                                      Optional<ChangelogRenderer> changelogRenderer) {
+    private void notify(
+            SCMProvider scmProvider,
+            ReleasePublisher releasePublisher,
+            Version version
+    ) throws MojoExecutionException {
+        try {
+            var remote = scmProvider.getRemote();
+
+            releasePublisher.publish(
+                    remote.getHost(),
+                    remote.getGroup(),
+                    remote.getProject(),
+                    ReleaseInfo.builder()
+                            .time(LocalDateTime.now().truncatedTo(ChronoUnit.DAYS))
+                            .tagName(version.toString())
+                            .name(version.toString())
+                            //.description("TODO")
+                            .build()
+            );
+        } catch (SCMException | ReleaseException e) {
+            throw new MojoExecutionException(e.getMessage(), e.getCause());
+        }
+    }
+
+    private record VerifiedConditions(Optional<SCMProvider> scmProvider,
+                                      Optional<CommitAnalyzer> commitAnalyzer,
+                                      Optional<ChangelogRenderer> changelogRenderer,
+                                      Optional<ReleasePublisher> releasePublisher) {
     }
 
     private record LatestRelease(Optional<String> latestTag, Optional<String> latestCommit) {
