@@ -31,6 +31,7 @@
             <artifactId>semver-scm-git</artifactId>
             <version>${project.version}</version>
         </dependency>
+
         <dependency>
             <groupId>io.github.sam42r</groupId>
             <artifactId>semver-analyzer-api</artifactId>
@@ -41,6 +42,7 @@
             <artifactId>semver-analyzer-conventional</artifactId>
             <version>${project.version}</version>
         </dependency>
+
         <dependency>
             <groupId>io.github.sam42r</groupId>
             <artifactId>semver-changelog-api</artifactId>
@@ -49,6 +51,17 @@
         <dependency>
             <groupId>io.github.sam42r</groupId>
             <artifactId>semver-changelog-markup</artifactId>
+            <version>${project.version}</version>
+        </dependency>
+
+        <dependency>
+            <groupId>io.github.sam42r</groupId>
+            <artifactId>semver-release-api</artifactId>
+            <version>${project.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>io.github.sam42r</groupId>
+            <artifactId>semver-release-github</artifactId>
             <version>${project.version}</version>
         </dependency>
 
@@ -170,6 +183,10 @@
                             <analyzer>
                                 <specification-name>Gitmoji</specification-name>
                             </analyzer>
+                            <release>
+                                <publish>true</publish>
+                                <password>${env.GITHUB_TOKEN}</password>
+                            </release>
                         </configuration>
                         <dependencies>
                             <dependency>

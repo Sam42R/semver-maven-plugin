@@ -1,16 +1,21 @@
 package io.github.sam42r.semver.scm;
 
 import io.github.sam42r.semver.scm.model.Commit;
+import io.github.sam42r.semver.scm.model.Remote;
 import io.github.sam42r.semver.scm.model.Tag;
 import org.eclipse.jgit.api.Git;
 import org.eclipse.jgit.api.errors.GitAPIException;
 import org.eclipse.jgit.lib.UserConfig;
+import org.eclipse.jgit.transport.URIish;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.io.TempDir;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.ValueSource;
 
 import java.io.IOException;
+import java.net.URISyntaxException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.time.Instant;
@@ -80,12 +85,54 @@ class GitProviderTest {
         }
     }
 
+    @ParameterizedTest
+    @ValueSource(strings = {
+            "git@github.com:JUnit/test.git",
+            "https://github.com/JUnit/test.git"
+    })
+    void shouldReadGithubRemote(String url) throws GitAPIException, URISyntaxException, SCMException {
+        try (var git = Git.init().setDirectory(tempDirectory.toFile()).call()) {
+            git.remoteAdd().setName("origin").setUri(new URIish(url)).call();
+
+            var actual = uut.getRemote();
+
+            assertThat(actual).isEqualTo(Remote.builder()
+                    .url(url)
+                    .host("github.com")
+                    .group("JUnit")
+                    .project("test")
+                    .build());
+        }
+    }
+
+    @ParameterizedTest
+    @ValueSource(strings = {
+            "git@gitlab.local:10022:JUnit/subgroup/test.git",
+            "https://gitlab.local:10022/JUnit/subgroup/test.git"
+    })
+    void shouldReadGitlabRemote(String url) throws GitAPIException, URISyntaxException, SCMException {
+        try (var git = Git.init().setDirectory(tempDirectory.toFile()).call()) {
+            git.remoteAdd().setName("origin").setUri(new URIish(url)).call();
+
+            var actual = uut.getRemote();
+
+            assertThat(actual).isEqualTo(Remote.builder()
+                    .url(url)
+                    .host("gitlab.local:10022")
+                    .group("JUnit/subgroup")
+                    .project("test")
+                    .build());
+        }
+    }
+
     @Test
     @Disabled("local testing only")
     void shouldPushToRemote() throws IOException, SCMException {
         var path = Path.of("..").toRealPath();
 
         var scmProvider = new GitProvider(path, null, "***");
-        scmProvider.push(false);
+
+        var actual = scmProvider.push(false);
+        assertThat(actual).isNotNull();
     }
 }

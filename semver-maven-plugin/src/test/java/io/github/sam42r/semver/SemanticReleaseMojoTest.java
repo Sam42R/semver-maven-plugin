@@ -46,6 +46,7 @@ class SemanticReleaseMojoTest {
         uut.setScm(Scm.builder().push(false).build());
         uut.setAnalyzer(Analyzer.builder().build());
         uut.setChangelog(Changelog.builder().build());
+        uut.setRelease(Release.builder().build());
         uut.setVersionNumberPattern(SemanticReleaseMojo.VERSION_NUMBER_PATTERN_DEFAULT);
 
         var mavenProjectMock = mock(MavenProject.class);

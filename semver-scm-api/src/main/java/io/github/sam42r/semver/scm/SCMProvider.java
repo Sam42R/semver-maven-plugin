@@ -1,6 +1,7 @@
 package io.github.sam42r.semver.scm;
 
 import io.github.sam42r.semver.scm.model.Commit;
+import io.github.sam42r.semver.scm.model.Remote;
 import io.github.sam42r.semver.scm.model.Tag;
 import lombok.NonNull;
 
@@ -25,4 +26,6 @@ public interface SCMProvider {
     @NonNull Tag tag(@NonNull String name) throws SCMException;
 
     @NonNull String push(boolean force) throws SCMException;
+
+    @NonNull Remote getRemote() throws SCMException;
 }
