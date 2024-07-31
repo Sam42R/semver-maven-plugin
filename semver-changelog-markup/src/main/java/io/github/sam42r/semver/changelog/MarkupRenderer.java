@@ -2,7 +2,6 @@ package io.github.sam42r.semver.changelog;
 
 import com.github.mustachejava.DefaultMustacheFactory;
 import io.github.sam42r.semver.analyzer.model.AnalyzedCommit;
-import io.github.sam42r.semver.changelog.model.Release;
 import lombok.NonNull;
 import org.apache.commons.codec.digest.DigestUtils;
 
@@ -113,10 +112,10 @@ public class MarkupRenderer implements ChangelogRenderer {
     }
 
     private Release getRelease(String version) {
-        return Release.builder()
-                .version(version)
-                .date(LocalDateTime.now().format(DateTimeFormatter.ISO_DATE))
-                .message("") // TODO read docs(changelog) commits and add as release description
-                .build();
+        return new Release(
+                version,
+                LocalDateTime.now().format(DateTimeFormatter.ISO_DATE),
+                "" // TODO read docs(changelog) commits and add as release description
+        );
     }
 }
