@@ -23,29 +23,31 @@ The `semver-maven-plugin` aims to transfer the functionality of the
 | Publish           | Publish the release.                                                             |
 | Notify            | Notify of new releases or errors.                                                |
 
-# GPG signing
+# Usage
 
-## Generate key
-```bash
-$ gpg --gen-key
+```xml
+<?xml version="1.0" encoding="UTF-8"?>
+<project>
+    <!-- ... -->
+    <build>
+        <plugins>
+            <plugin>
+                <groupId>io.github.sam42r</groupId>
+                <artifactId>semver-maven-plugin</artifactId>
+                <version>v1.3.3</version>
+            </plugin>
+        </plugins>
+    </build>
+    <!-- ... -->
+</project>
 ```
-
-## List keys
 ```bash
-$ gpg --list-keys
+$ mvn semver:semantic-release
 ```
-
-## Export public key to keyserver
-```bash
-$ gpg --keyserver keyserver.ubuntu.com --send-keys D826D9A9F4001BFDA16BD20C4A3649F0FDDA2A52
-```
-
-##
-```bash
-$ export MAVEN_GPG_PASSPHRASE=<PASSPHRASE>
-```
-
+For a complete documentation how to use and configure `semver-maven-plugin` check the [documentation](docs/README.md#usage-and-configuration)
 
 # Links and Resources
 
-See [documentation](docs/resources.md)
+- [Getting started](docs/README.md)
+- [External resources](docs/external-resources.md)
+- [Build plugin](docs/build-plugin.md)
