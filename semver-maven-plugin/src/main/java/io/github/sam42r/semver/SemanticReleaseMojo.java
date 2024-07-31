@@ -206,7 +206,7 @@ public class SemanticReleaseMojo extends AbstractMojo {
         );
     }
 
-    private LatestRelease getLatestRelease(SCMProvider scmProvider) throws MojoExecutionException {
+    private LatestReleaseInfo getLatestRelease(SCMProvider scmProvider) throws MojoExecutionException {
         try {
             var tags = scmProvider.readTags();
             var commits = scmProvider.readCommits(null);
@@ -215,7 +215,7 @@ public class SemanticReleaseMojo extends AbstractMojo {
             var latestCommitOpt = latestTagOpt.map(Tag::getCommitId)
                     .or(() -> commits.min(Comparator.comparing(Commit::getTimestamp)).map(Commit::getId));
 
-            return new LatestRelease(
+            return new LatestReleaseInfo(
                     latestTagOpt.map(Tag::getName),
                     latestCommitOpt
             );
@@ -318,6 +318,6 @@ public class SemanticReleaseMojo extends AbstractMojo {
                                       Optional<ReleasePublisher> releasePublisher) {
     }
 
-    private record LatestRelease(Optional<String> latestTag, Optional<String> latestCommit) {
+    private record LatestReleaseInfo(Optional<String> latestTag, Optional<String> latestCommit) {
     }
 }
