@@ -4,7 +4,14 @@ import io.github.sam42r.semver.scm.model.Commit;
 import io.github.sam42r.semver.scm.model.Remote;
 import io.github.sam42r.semver.scm.model.Tag;
 import lombok.NonNull;
+import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.NotImplementedException;
+import org.tmatesoft.svn.core.SVNException;
+import org.tmatesoft.svn.core.SVNLogEntry;
+import org.tmatesoft.svn.core.SVNURL;
+import org.tmatesoft.svn.core.io.SVNRepository;
+import org.tmatesoft.svn.core.io.SVNRepositoryFactory;
 
 import java.nio.file.Path;
 import java.util.stream.Stream;
@@ -15,23 +22,36 @@ import java.util.stream.Stream;
  *
  * @author Sam42R
  */
-public class SvnProvider implements SCMProviderFactory<SvnProvider>, SCMProvider {
+@Slf4j
+@RequiredArgsConstructor
+public class SvnProvider implements SCMProvider {
 
-    private static final String PROVIDER_NAME = "Subversion";
+    private final Path repositoryPath;
+    private final String username;
+    private final String password;
 
-    @Override
-    public @NonNull String getProviderName() {
-        return PROVIDER_NAME;
-    }
-
-    @Override
-    public @NonNull SvnProvider getInstance(@NonNull Path path, String username, String password) {
-        throw new NotImplementedException();
-    }
+    private SVNRepository repository;
 
     @Override
     public @NonNull Stream<Commit> readCommits(String fromCommitId) throws SCMException {
-        throw new SCMException(new NotImplementedException());
+        var repository = getRepository();
+        try {
+            var startRevision = 1L; // revision 0 (repository initialization) should be skipped
+            var endRevision = -1L; // HEAD (the latest) revision
+
+            Stream<?> rawStream = repository.log(new String[]{""}, null, startRevision, endRevision, true, true).stream();
+            var svnLogEntries = rawStream.filter(v -> v instanceof SVNLogEntry).map(v -> (SVNLogEntry) v).toList();
+
+            return svnLogEntries.stream()
+                    .map(v -> Commit.builder()
+                            .id(Long.toString(v.getRevision()))
+                            .timestamp(v.getDate().toInstant())
+                            .author(v.getAuthor())
+                            .message(v.getMessage())
+                            .build());
+        } catch (SVNException e) {
+            throw new SCMException(e);
+        }
     }
 
     @Override
@@ -62,5 +82,17 @@ public class SvnProvider implements SCMProviderFactory<SvnProvider>, SCMProvider
     @Override
     public @NonNull Remote getRemote() throws SCMException {
         throw new SCMException(new NotImplementedException());
+    }
+
+    private SVNRepository getRepository() throws SCMException {
+        if (repository == null) {
+            try {
+                var svnUrl = SVNURL.fromFile(repositoryPath.toFile());
+                repository = SVNRepositoryFactory.create(svnUrl);
+            } catch (SVNException e) {
+                throw new SCMException(e);
+            }
+        }
+        return repository;
     }
 }
