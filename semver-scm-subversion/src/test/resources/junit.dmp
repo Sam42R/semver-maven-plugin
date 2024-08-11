@@ -1,0 +1,97 @@
+SVN-fs-dump-format-version: 2
+
+UUID: 2ff3aad0-4ff7-d14d-a396-6c0b991586e8
+
+Revision-number: 0
+Prop-content-length: 56
+Content-length: 56
+
+K 8
+svn:date
+V 27
+2025-01-26T09:00:46.354900Z
+PROPS-END
+
+Revision-number: 1
+Prop-content-length: 128
+Content-length: 128
+
+K 10
+svn:author
+V 5
+r_ric
+K 8
+svn:date
+V 27
+2025-01-26T09:04:49.946444Z
+K 7
+svn:log
+V 28
+chore: initial project setup
+PROPS-END
+
+Node-path: branches
+Node-kind: dir
+Node-action: add
+Prop-content-length: 10
+Content-length: 10
+
+PROPS-END
+
+
+Node-path: tags
+Node-kind: dir
+Node-action: add
+Prop-content-length: 10
+Content-length: 10
+
+PROPS-END
+
+
+Node-path: trunk
+Node-kind: dir
+Node-action: add
+Prop-content-length: 10
+Content-length: 10
+
+PROPS-END
+
+
+Node-path: trunk/README.md
+Node-kind: file
+Node-action: add
+Text-content-md5: 818a729d088a42248bfd42bf240afd54
+Text-content-sha1: 6a4e24dc1e2e832583b4d70a751caa73978ca611
+Prop-content-length: 10
+Text-content-length: 8
+Content-length: 18
+
+PROPS-END
+# JUnit
+
+
+Revision-number: 2
+Prop-content-length: 115
+Content-length: 115
+
+K 10
+svn:author
+V 5
+r_ric
+K 8
+svn:date
+V 27
+2025-01-26T09:06:28.901810Z
+K 7
+svn:log
+V 15
+release: v0.0.1
+PROPS-END
+
+Node-path: tags/v0.0.1
+Node-kind: dir
+Node-action: add
+Node-copyfrom-rev: 1
+Node-copyfrom-path: trunk
+
+
