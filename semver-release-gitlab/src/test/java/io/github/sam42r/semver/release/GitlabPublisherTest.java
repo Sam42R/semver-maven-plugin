@@ -25,7 +25,7 @@ class GitlabPublisherTest {
     @BeforeEach
     void setup(MockServerClient client) {
         uut = new GitlabPublisherFactory().getInstance(
-                "%s://%s/api/v4/projects/%s/%s/releases",
+                "%s://%s/api/v4/projects/%s/releases",
                 null,
                 "token"
         );
@@ -62,7 +62,7 @@ class GitlabPublisherTest {
                 release);
 
         client.verify(request().withMethod("POST")
-                        .withPath("/api/v4/projects/JUnit/Test/releases")
+                        .withPath("/api/v4/projects/JUnit%2FTest/releases")
                         .withHeader("Content-Type", "application/json")
                         .withHeader("PRIVATE-TOKEN", "token"),
                 VerificationTimes.exactly(1));
@@ -93,7 +93,7 @@ class GitlabPublisherTest {
                 .hasMessage("Release API does return with HTTP-500 - Internal server error");
 
         client.verify(request().withMethod("POST")
-                        .withPath("/api/v4/projects/JUnit/Test/releases")
+                        .withPath("/api/v4/projects/JUnit%2FTest/releases")
                         .withHeader("Content-Type", "application/json")
                         .withHeader("PRIVATE-TOKEN", "token"),
                 VerificationTimes.exactly(1));
