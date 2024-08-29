@@ -7,6 +7,14 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 <!-- DO NOT REMOVE - c871f32ed1b7a85b24a0f22e8e7d9e3ee285742c - DO NOT REMOVE -->
 
+## v1.3.1 - 2024-08-29
+
+
+### Fixed
+- :bug: url encode project path (group inclusive project name) #29
+- :bug: read url scheme from scm and use for release url #29
+
+
 ## v1.3.0 - 2024-07-31
 
 
