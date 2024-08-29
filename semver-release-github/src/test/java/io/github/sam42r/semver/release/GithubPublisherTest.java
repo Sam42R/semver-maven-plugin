@@ -25,7 +25,7 @@ class GithubPublisherTest {
     @BeforeEach
     void setup(MockServerClient client) {
         uut = new GithubPublisherFactory().getInstance(
-                "http://%s/repos/%s/%s/releases",
+                "%s://%s/repos/%s/%s/releases",
                 null,
                 "token"
         );
@@ -53,6 +53,7 @@ class GithubPublisherTest {
                 .build();
 
         uut.publish(
+                "http",
                 "localhost:%d".formatted(client.getPort()),
                 "JUnit",
                 "Test",
@@ -82,6 +83,7 @@ class GithubPublisherTest {
                 .build();
 
         assertThatThrownBy(() -> uut.publish(
+                "http",
                 "localhost:%d".formatted(client.getPort()),
                 "JUnit",
                 "Test",

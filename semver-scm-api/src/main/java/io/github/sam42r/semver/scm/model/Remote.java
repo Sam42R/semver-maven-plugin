@@ -12,6 +12,7 @@ import lombok.NoArgsConstructor;
 public class Remote {
 
     private String url;
+    private String scheme;
     private String host;
     private String group;
     private String project;

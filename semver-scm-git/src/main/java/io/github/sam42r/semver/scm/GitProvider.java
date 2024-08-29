@@ -289,6 +289,7 @@ public class GitProvider implements SCMProvider {
 
         return Remote.builder()
                 .url(url)
+                .scheme(uri.getScheme())
                 .host(hostAndPort)
                 .group(group)
                 .project(project)
@@ -308,6 +309,7 @@ public class GitProvider implements SCMProvider {
 
         return Remote.builder()
                 .url(url)
+                .scheme("https")
                 .host(hostAndPort)
                 .group(group)
                 .project(project)

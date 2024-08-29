@@ -98,6 +98,7 @@ class GitProviderTest {
 
             assertThat(actual).isEqualTo(Remote.builder()
                     .url(url)
+                    .scheme("https")
                     .host("github.com")
                     .group("JUnit")
                     .project("test")
@@ -118,6 +119,7 @@ class GitProviderTest {
 
             assertThat(actual).isEqualTo(Remote.builder()
                     .url(url)
+                    .scheme("https")
                     .host("gitlab.local:10022")
                     .group("JUnit/subgroup")
                     .project("test")

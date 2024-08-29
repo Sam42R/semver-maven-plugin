@@ -6,6 +6,7 @@ import lombok.NonNull;
 public interface ReleasePublisher {
 
     void publish(
+            @NonNull String scheme,
             @NonNull String instance,
             @NonNull String group,
             @NonNull String project,
