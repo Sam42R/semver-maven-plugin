@@ -11,9 +11,11 @@ import lombok.extern.slf4j.Slf4j;
 
 import java.io.IOException;
 import java.net.URI;
+import java.net.URLEncoder;
 import java.net.http.HttpClient;
 import java.net.http.HttpRequest;
 import java.net.http.HttpResponse;
+import java.nio.charset.StandardCharsets;
 
 /**
  * {@link ReleasePublisher} for GitLab.<br/>
@@ -38,7 +40,9 @@ public class GitlabPublisher implements ReleasePublisher {
             @NonNull String project,
             @NonNull ReleaseInfo releaseInfo
     ) throws ReleaseException {
-        var uri = URI.create(baseUrl.formatted(scheme, instance, group, project));
+        var projectPath = "%s/%s".formatted(group, project);
+        var encodedProjectPath = URLEncoder.encode(projectPath, StandardCharsets.UTF_8);
+        var uri = URI.create(baseUrl.formatted(scheme, instance, encodedProjectPath));
         var payload = generatePayload(releaseInfo);
 
         try {

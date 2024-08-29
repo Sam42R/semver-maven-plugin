@@ -15,7 +15,7 @@ public class GitlabPublisherFactory implements ReleasePublisherFactory {
 
     @Override
     public @NonNull ReleasePublisher getInstance(String username, String password) {
-        return getInstance("%s://%s/api/v4/projects/%s/%s/releases", username, password);
+        return getInstance("%s://%s/api/v4/projects/%s/releases", username, password);
     }
 
     @Override
