@@ -297,6 +297,7 @@ public class SemanticReleaseMojo extends AbstractMojo {
             var remote = scmProvider.getRemote();
 
             releasePublisher.publish(
+                    remote.getScheme(),
                     remote.getHost(),
                     remote.getGroup(),
                     remote.getProject(),

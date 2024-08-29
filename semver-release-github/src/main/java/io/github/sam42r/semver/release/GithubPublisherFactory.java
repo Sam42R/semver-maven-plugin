@@ -15,7 +15,7 @@ public class GithubPublisherFactory implements ReleasePublisherFactory {
 
     @Override
     public @NonNull ReleasePublisher getInstance(String username, String password) {
-        return getInstance("https://api.%s/repos/%s/%s/releases", username, password);
+        return getInstance("%s://api.%s/repos/%s/%s/releases", username, password);
     }
 
     @Override

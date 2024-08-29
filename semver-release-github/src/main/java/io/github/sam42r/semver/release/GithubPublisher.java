@@ -31,12 +31,14 @@ public class GithubPublisher implements ReleasePublisher {
     private final String token;
 
     @Override
-    public void publish(@NonNull String instance,
-                        @NonNull String group,
-                        @NonNull String project,
-                        @NonNull ReleaseInfo releaseInfo
+    public void publish(
+            @NonNull String scheme,
+            @NonNull String instance,
+            @NonNull String group,
+            @NonNull String project,
+            @NonNull ReleaseInfo releaseInfo
     ) throws ReleaseException {
-        var uri = URI.create(baseUrl.formatted(instance, group, project));
+        var uri = URI.create(baseUrl.formatted(scheme, instance, group, project));
         var payload = generatePayload(releaseInfo);
 
         try {
