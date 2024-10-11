@@ -138,14 +138,13 @@ public class SemanticReleaseMojo extends AbstractMojo {
             var pomXml = projectBaseDirectory.resolve("pom.xml");
             PomHelper.changeVersion(pomXml, latestVersion.toString());
 
+            var modules = isModule(project) ? project.getParent().getModules() : project.getModules();
             var modulePomsXml = new ArrayList<Path>();
-            if (isModule(project)) {
-                for (var module : project.getParent().getModules()) {
-                    var modulePomXml = projectBaseDirectory.resolve(module).resolve("pom.xml");
-                    PomHelper.changeParentVersion(modulePomXml, latestVersion.toString());
+            for (var module : modules) {
+                var modulePomXml = projectBaseDirectory.resolve(module).resolve("pom.xml");
+                PomHelper.changeParentVersion(modulePomXml, latestVersion.toString());
 
-                    modulePomsXml.add(modulePomXml);
-                }
+                modulePomsXml.add(modulePomXml);
             }
 
             try {
