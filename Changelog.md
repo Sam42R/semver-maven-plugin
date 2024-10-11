@@ -7,6 +7,13 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 <!-- DO NOT REMOVE - c871f32ed1b7a85b24a0f22e8e7d9e3ee285742c - DO NOT REMOVE -->
 
+## v1.3.3 - 2024-10-11
+
+
+### Fixed
+- :bug: release from parent project #32
+
+
 ## v1.3.1 - 2024-08-29
 
 
