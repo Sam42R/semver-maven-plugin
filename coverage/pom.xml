@@ -106,10 +106,6 @@
                         <goals>
                             <goal>report-aggregate</goal>
                         </goals>
-                        <configuration>
-                            <dataFileIncludes>**/jacoco.exec</dataFileIncludes>
-                            <outputDirectory>${project.reporting.outputDirectory}/jacoco-aggregate</outputDirectory>
-                        </configuration>
                     </execution>
                 </executions>
             </plugin>
