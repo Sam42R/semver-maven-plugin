@@ -61,6 +61,14 @@
 
         <gpg.executable>C:\Program Files\Git\usr\bin\gpg.exe</gpg.executable>
         <gpg.keyname>D826D9A9F4001BFDA16BD20C4A3649F0FDDA2A52</gpg.keyname>
+
+        <sonar.host.url>https://sonarcloud.io</sonar.host.url>
+        <sonar.organization>sam42r</sonar.organization>
+        <sonar.projectKey>Sam42R_semver-maven-plugin</sonar.projectKey>
+        <sonar.projectName>semver-maven-plugin</sonar.projectName>
+        <sonar.sourceEncoding>UTF-8</sonar.sourceEncoding>
+        <sonar.core.codeCoveragePlugin>jacoco</sonar.core.codeCoveragePlugin>
+        <sonar.coverage.jacoco.xmlReportPaths>${project.basedir}/coverage/target/site/jacoco-aggregate/jacoco.xml</sonar.coverage.jacoco.xmlReportPaths>
     </properties>
 
     <dependencyManagement>
@@ -130,6 +138,11 @@
                     <groupId>org.jacoco</groupId>
                     <artifactId>jacoco-maven-plugin</artifactId>
                     <version>0.8.12</version>
+                </plugin>
+                <plugin>
+                    <groupId>org.sonarsource.scanner.maven</groupId>
+                    <artifactId>sonar-maven-plugin</artifactId>
+                    <version>3.11.0.3922</version>
                 </plugin>
             </plugins>
         </pluginManagement>
