@@ -1,6 +1,6 @@
 [![GitHub Actions Workflow Status](https://img.shields.io/github/actions/workflow/status/sam42r/semver-maven-plugin/maven.yml?label=Build)](https://github.com/Sam42R/semver-maven-plugin/actions?query=branch%3Amain)
 [![Sonar Quality Gate](https://img.shields.io/sonar/quality_gate/Sam42R_semver-maven-plugin?server=https%3A%2F%2Fsonarcloud.io&label=Quality%20Gate)](https://sonarcloud.io/project/overview?id=Sam42R_semver-maven-plugin)
-[![Maven Central](https://img.shields.io/maven-central/v/io.github.sam42r/semver-maven-plugin.svg?label=Maven%20Central)](https://search.maven.org/artifact/io.github.sam42r/semver-maven-plugin)
+[![Maven Central](https://img.shields.io/maven-central/v/io.github.sam42r/semver-maven-plugin.svg?label=Maven%20Central)](https://central.sonatype.com/artifact/io.github.sam42r/semver-maven-plugin)
 [![GNU GPL, Version 3.0, June 2007](https://img.shields.io/github/license/sam42r/semver-maven-plugin.svg?label=License)](https://www.gnu.org/licenses/gpl-3.0.txt)
 
 # semver-maven-plugin
