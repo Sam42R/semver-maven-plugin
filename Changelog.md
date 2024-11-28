@@ -7,6 +7,19 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 <!-- DO NOT REMOVE - c871f32ed1b7a85b24a0f22e8e7d9e3ee285742c - DO NOT REMOVE -->
 
+## v1.3.4 - 2024-11-28
+
+
+### Fixed
+- :ambulance: sort tags by semantic version
+### Others
+- :technologist: update link to maven central
+- :green_heart: make sonarcloud find coverage report
+- :memo: add minimal documentation
+- :technologist: add badges to README.md
+- :construction_worker: setup GitHub actions CI workflow
+
+
 ## v1.3.3 - 2024-10-11
 
 
