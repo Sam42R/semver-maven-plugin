@@ -14,6 +14,7 @@ import io.github.sam42r.semver.scm.SCMProviderFactory;
 import io.github.sam42r.semver.scm.model.Commit;
 import io.github.sam42r.semver.scm.model.Tag;
 import io.github.sam42r.semver.util.PomHelper;
+import io.github.sam42r.semver.util.TagVersionComparator;
 import lombok.NonNull;
 import lombok.Setter;
 import org.apache.maven.plugin.AbstractMojo;
@@ -37,7 +38,7 @@ import java.util.*;
 public class SemanticReleaseMojo extends AbstractMojo {
 
     // TODO we can not use html markup in pom.xml configuration (e.g. named groups)
-    protected static final String VERSION_NUMBER_PATTERN_DEFAULT = "v(?<MAJOR>[0-9]*).(?<MINOR>[0-9]*).(?<PATCH>[0-9]*)";
+    public static final String VERSION_NUMBER_PATTERN_DEFAULT = "v(?<MAJOR>[0-9]*).(?<MINOR>[0-9]*).(?<PATCH>[0-9]*)";
 
     @SuppressWarnings("rawtypes")
     private final ServiceLoader<SCMProviderFactory> scmProviderFactories = ServiceLoader.load(SCMProviderFactory.class);
@@ -210,7 +211,7 @@ public class SemanticReleaseMojo extends AbstractMojo {
             var tags = scmProvider.readTags();
             var commits = scmProvider.readCommits(null);
 
-            var latestTagOpt = tags.max(Comparator.comparing(Tag::getName));
+            var latestTagOpt = tags.max(new TagVersionComparator(versionNumberPattern));
             var latestCommitOpt = latestTagOpt.map(Tag::getCommitId)
                     .or(() -> commits.min(Comparator.comparing(Commit::getTimestamp)).map(Commit::getId));
 
