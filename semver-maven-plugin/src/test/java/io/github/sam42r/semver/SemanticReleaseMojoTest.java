@@ -1,5 +1,6 @@
 package io.github.sam42r.semver;
 
+import io.github.sam42r.semver.model.Version;
 import org.apache.maven.plugin.MojoExecutionException;
 import org.apache.maven.plugin.MojoFailureException;
 import org.apache.maven.plugin.logging.Log;
@@ -47,7 +48,7 @@ class SemanticReleaseMojoTest {
         uut.setAnalyzer(Analyzer.builder().build());
         uut.setChangelog(Changelog.builder().build());
         uut.setRelease(Release.builder().build());
-        uut.setVersionNumberPattern(SemanticReleaseMojo.VERSION_NUMBER_PATTERN_DEFAULT);
+        uut.setTagFormat(Version.TAG_FORMAT_DEFAULT);
 
         var mavenProjectMock = mock(MavenProject.class);
         uut.setProject(mavenProjectMock);

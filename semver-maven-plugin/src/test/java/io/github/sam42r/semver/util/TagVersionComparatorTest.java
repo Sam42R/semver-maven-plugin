@@ -1,6 +1,7 @@
 package io.github.sam42r.semver.util;
 
 import io.github.sam42r.semver.SemanticReleaseMojo;
+import io.github.sam42r.semver.model.Version;
 import io.github.sam42r.semver.scm.model.Tag;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -16,7 +17,7 @@ class TagVersionComparatorTest {
 
     @BeforeEach
     void setUp() {
-        uut = new TagVersionComparator(SemanticReleaseMojo.VERSION_NUMBER_PATTERN_DEFAULT);
+        uut = new TagVersionComparator(Version.TAG_FORMAT_DEFAULT);
     }
 
     @Test

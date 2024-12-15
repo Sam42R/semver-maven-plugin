@@ -120,7 +120,7 @@ or by setting corresponding system property.
                 <artifactId>semver-maven-plugin</artifactId>
                 <version>v1.3.3</version>
                 <configuration>
-                    <!--version-number-pattern></version-number-pattern-->
+                    <!--tag-format>v${version}</tag-format-->
                     <scm>
                         <provider-name>Git</provider-name>
                         <push>true</push>
