@@ -1,7 +1,9 @@
 package io.github.sam42r.semver.model;
 
 import lombok.*;
+import org.apache.commons.text.StringSubstitutor;
 
+import java.util.Map;
 import java.util.regex.Pattern;
 
 /**
@@ -16,27 +18,41 @@ public final class Version {
         MAJOR, MINOR, PATCH;
     }
 
-    private static final String MAJOR_GROUP = "(?<%s>[0-9]*)".formatted(Type.MAJOR.name());
-    private static final String MINOR_GROUP = "(?<%s>[0-9]*)".formatted(Type.MINOR.name());
-    private static final String PATCH_GROUP = "(?<%s>[0-9]*)".formatted(Type.PATCH.name());
-    private static final String DEFAULT_REGEX = "v%s.%s.%s".formatted(MAJOR_GROUP, MINOR_GROUP, PATCH_GROUP);
+    private static final String PLACEHOLDER_PREFIX = "${";
+    private static final String PLACEHOLDER_NAME = "version";
+    private static final String PLACEHOLDER_SUFFIX = "}";
+    private static final String VERSION_PLACEHOLDER = "%s%s%s".formatted(
+            PLACEHOLDER_PREFIX, PLACEHOLDER_NAME, PLACEHOLDER_SUFFIX);
+
+    public static final String TAG_FORMAT_DEFAULT = "v${version}";
+
+    private static final String NAMED_NUMBER_GROUP = "(?<%s>[0-9]*)";
+    private static final String MAJOR_GROUP = NAMED_NUMBER_GROUP.formatted(Type.MAJOR.name());
+    private static final String MINOR_GROUP = NAMED_NUMBER_GROUP.formatted(Type.MINOR.name());
+    private static final String PATCH_GROUP = NAMED_NUMBER_GROUP.formatted(Type.PATCH.name());
 
     private int major;
     private int minor;
     private int patch;
 
-    private String regex;
+    private String tagFormat;
 
     public static Version of(@NonNull String version) {
-        return of(version, DEFAULT_REGEX);
+        return of(version, TAG_FORMAT_DEFAULT);
     }
 
-    public static Version of(@NonNull String version, @NonNull String regex) {
-        if (!regex.contains(MAJOR_GROUP) || !regex.contains(MINOR_GROUP) || !regex.contains(PATCH_GROUP)) {
+    public static Version of(@NonNull String version, @NonNull String tagFormat) {
+        if (!tagFormat.contains(VERSION_PLACEHOLDER)) {
             throw new IllegalArgumentException(
-                    "Regular expression '%s' does not contain required capture groups ('%s', '%s', '%s')".formatted(
-                            regex, MAJOR_GROUP, MINOR_GROUP, PATCH_GROUP));
+                    "Given tag format '%s' does not contain required version placeholder '%s'".formatted(
+                            tagFormat, VERSION_PLACEHOLDER));
         }
+
+        var regex = StringSubstitutor.replace(
+                tagFormat,
+                Map.of(PLACEHOLDER_NAME, "%s.%s.%s".formatted(MAJOR_GROUP, MINOR_GROUP, PATCH_GROUP)),
+                PLACEHOLDER_PREFIX,
+                PLACEHOLDER_SUFFIX);
 
         var pattern = Pattern.compile(regex);
         var matcher = pattern.matcher(version);
@@ -45,17 +61,17 @@ public final class Version {
                     Integer.parseInt(matcher.group(Type.MAJOR.name())),
                     Integer.parseInt(matcher.group(Type.MINOR.name())),
                     Integer.parseInt(matcher.group(Type.PATCH.name())),
-                    regex);
+                    tagFormat);
         }
-        throw new IllegalArgumentException("Could not create version for '%s' with regex '%s'".formatted(version, regex));
+        throw new IllegalArgumentException("Could not create version for '%s' with tag format '%s'".formatted(version, tagFormat));
     }
 
     public static Version of(@NonNull int major, int minor, int patch) {
-        return of(major, minor, patch, DEFAULT_REGEX);
+        return of(major, minor, patch, TAG_FORMAT_DEFAULT);
     }
 
-    public static Version of(@NonNull int major, int minor, int patch, String regex) {
-        return new Version(major, minor, patch, regex);
+    public static Version of(@NonNull int major, int minor, int patch, String tagFormat) {
+        return new Version(major, minor, patch, tagFormat);
     }
 
     public void increment(@NonNull Type type) {
@@ -73,10 +89,11 @@ public final class Version {
 
     @Override
     public String toString() {
-        var format = regex
-                .replace(MAJOR_GROUP, "%d")
-                .replace(MINOR_GROUP, "%d")
-                .replace(PATCH_GROUP, "%d");
-        return format.formatted(major, minor, patch);
+        return "%d.%d.%d".formatted(major, minor, patch);
+    }
+
+    public String toTag() {
+        return StringSubstitutor.replace(
+                tagFormat, Map.of(PLACEHOLDER_NAME, toString()), PLACEHOLDER_PREFIX, PLACEHOLDER_SUFFIX);
     }
 }

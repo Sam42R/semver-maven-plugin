@@ -37,9 +37,6 @@ import java.util.*;
 @Mojo(name = "semantic-release")
 public class SemanticReleaseMojo extends AbstractMojo {
 
-    // TODO we can not use html markup in pom.xml configuration (e.g. named groups)
-    public static final String VERSION_NUMBER_PATTERN_DEFAULT = "v(?<MAJOR>[0-9]*).(?<MINOR>[0-9]*).(?<PATCH>[0-9]*)";
-
     @SuppressWarnings("rawtypes")
     private final ServiceLoader<SCMProviderFactory> scmProviderFactories = ServiceLoader.load(SCMProviderFactory.class);
     private final ServiceLoader<CommitAnalyzer> commitAnalyzers = ServiceLoader.load(CommitAnalyzer.class);
@@ -51,8 +48,8 @@ public class SemanticReleaseMojo extends AbstractMojo {
     private MavenProject project;
 
     @Setter
-    @Parameter(name = "version-number-pattern", defaultValue = VERSION_NUMBER_PATTERN_DEFAULT)
-    private String versionNumberPattern;
+    @Parameter(name = "tag-format", defaultValue = Version.TAG_FORMAT_DEFAULT)
+    private String tagFormat;
 
     @Setter
     @Parameter
@@ -110,8 +107,8 @@ public class SemanticReleaseMojo extends AbstractMojo {
         getLog().debug("Latest commit: '%s'".formatted(latestCommit));
 
         var latestVersion = latestRelease.latestTag()
-                .map(t -> Version.of(t, versionNumberPattern))
-                .orElse(Version.of(0, 0, 0, versionNumberPattern));
+                .map(t -> Version.of(t, tagFormat))
+                .orElse(Version.of(0, 0, 0, tagFormat));
         getLog().debug("Actual version: '%s'".formatted(latestVersion.toString()));
 
         var analyzedCommits = analyzeCommits(scmProvider, commitAnalyzer, latestCommit);
@@ -211,7 +208,7 @@ public class SemanticReleaseMojo extends AbstractMojo {
             var tags = scmProvider.readTags();
             var commits = scmProvider.readCommits(null);
 
-            var latestTagOpt = tags.max(new TagVersionComparator(versionNumberPattern));
+            var latestTagOpt = tags.max(new TagVersionComparator(tagFormat));
             var latestCommitOpt = latestTagOpt.map(Tag::getCommitId)
                     .or(() -> commits.min(Comparator.comparing(Commit::getTimestamp)).map(Commit::getId));
 
@@ -273,7 +270,7 @@ public class SemanticReleaseMojo extends AbstractMojo {
             Version version
     ) throws MojoExecutionException {
         try {
-            scmProvider.tag(version.toString());
+            scmProvider.tag(version.toTag());
         } catch (SCMException e) {
             throw new MojoExecutionException(e.getMessage(), e.getCause());
         }

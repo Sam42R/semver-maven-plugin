@@ -9,7 +9,7 @@ import java.util.Comparator;
 @RequiredArgsConstructor
 public class TagVersionComparator implements Comparator<Tag> {
 
-    private final String versionPattern;
+    private final String tagFormat;
 
     @Override
     public int compare(Tag o1, Tag o2) {
@@ -17,8 +17,8 @@ public class TagVersionComparator implements Comparator<Tag> {
                 .thenComparingInt(Version::getMinor)
                 .thenComparingInt(Version::getPatch)
                 .compare(
-                        Version.of(o1.getName(), versionPattern),
-                        Version.of(o2.getName(), versionPattern)
+                        Version.of(o1.getName(), tagFormat),
+                        Version.of(o2.getName(), tagFormat)
                 );
     }
 }

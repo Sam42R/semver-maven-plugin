@@ -33,7 +33,7 @@ class PomHelperTest {
                 StandardOpenOption.CREATE
         );
 
-        PomHelper.changeVersion(pom, "v0.8.15");
+        PomHelper.changeVersion(pom, "0.8.15");
 
         var actual = Files.readString(pom);
         Assertions.assertThat(actual).isEqualToIgnoringWhitespace(
@@ -41,7 +41,7 @@ class PomHelperTest {
                         <project>
                             <groupId>org.junit</groupId>
                             <artifactId>test</artifactId>
-                            <version>v0.8.15</version>
+                            <version>0.8.15</version>
                             <dependencies>
                                 <dependency>
                                     <groupId>org.junit</groupId>
@@ -79,7 +79,7 @@ class PomHelperTest {
                 StandardOpenOption.CREATE
         );
 
-        PomHelper.changeParentVersion(pom, "v0.8.15");
+        PomHelper.changeParentVersion(pom, "0.8.15");
 
         var actual = Files.readString(pom);
         Assertions.assertThat(actual).isEqualToIgnoringWhitespace(
@@ -88,7 +88,7 @@ class PomHelperTest {
                             <parent>
                                 <groupId>org.junit</groupId>
                                 <artifactId>test</artifactId>
-                                <version>v0.8.15</version>
+                                <version>0.8.15</version>
                             </parent>
                             <artifactId>module</artifactId>
                             <dependencies>
