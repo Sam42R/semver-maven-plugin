@@ -300,7 +300,7 @@ public class SemanticReleaseMojo extends AbstractMojo {
                     remote.getProject(),
                     ReleaseInfo.builder()
                             .time(LocalDateTime.now().truncatedTo(ChronoUnit.DAYS))
-                            .tagName(version.toString())
+                            .tagName(version.toTag())
                             .name(version.toString())
                             //.description("TODO")
                             .build()
