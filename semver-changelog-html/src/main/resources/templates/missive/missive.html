@@ -1,0 +1,86 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml"
+	  xmlns:th="http://www.thymeleaf.org"
+	  lang="en">
+<head>
+	<title>Changelog</title>
+	<meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
+	<link rel="stylesheet" type="text/css" href="missive.css" th:if="${'1' == '2'}"/>
+	<style type="text/css" th:insert="missive.css"></style>
+</head>
+
+<body>
+	<div style="text-align: center; margin: 0 auto;"
+			th:insert="../general.html :: header(styleH1='', styleP='')">
+		<h1>Changelog</h1>
+	</div>
+
+    <table border="0" cellpadding="0" cellspacing="0" width="100%" role="presentation">
+	   <!-- Changelog entry  -->
+	   <table align="center" border="0" cellpadding="0" cellspacing="0" width="100%" style="max-width: 600px" role="presentation">
+		   <!-- DO NOT REMOVE - c871f32ed1b7a85b24a0f22e8e7d9e3ee285742c - DO NOT REMOVE -->
+		   <tr>
+		    	<td bgcolor="#ffffff" align="center">
+			    	<table border="0" cellpadding="0" cellspacing="0" width="100%" style="max-width: 600px" role="presentation">
+					    <tr>
+							<td class="label-container"></td>
+					        <td class="changelog-date">
+								<th:block th:text="${release.version}">
+									v0.0.1
+								</th:block>
+								<span class="app-version"
+									  th:text="${'(' + release.date + ')'}">
+									(1970-01-01)
+								</span>
+					        </td>
+					    </tr>
+						<tr th:each="commit : ${commits}">
+							<td class="label-container">
+								<table width="100%" role="presentation">
+									<tr>
+										<td>
+											<table align="right" role="presentation">
+												<tr th:switch="${commit.category.name}">
+													<td th:case="'ADDED'"
+														class="label new">
+														NEW
+													</td>
+													<td th:case="'FIXED'"
+														class="label fixed">
+														FIXED
+													</td>
+													<td th:case="*"
+														class="label improved">
+														IMPROVED
+													</td>
+												</tr>
+											</table>
+										</td>
+									</tr>
+								</table>
+							</td>
+							<td>
+								<table role="presentation">
+									<tr>
+										<td th:text="${commit.header}"
+											class="changelog-text">
+											Lorem ipsum
+										</td>
+									</tr>
+								</table>
+							</td>
+						</tr>
+				    </table>
+		    	</td>
+		    </tr>
+		   <!-- DO NOT REMOVE - c871f32ed1b7a85b24a0f22e8e7d9e3ee285742c - DO NOT REMOVE -->
+	   </table>
+	    <!-- End changelog entry -->
+    </table>
+
+	<div style="text-align: center; margin: 0 auto;"
+			th:insert="../general.html :: footer(styleH1='', styleP='')">
+		<h1>Disclaimer</h1>
+	</div>
+</body>
+</html>

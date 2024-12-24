@@ -1,0 +1,32 @@
+<!DOCTYPE HTML>
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:th="http://www.thymeleaf.org"
+      lang="en">
+<head>
+    <title>fragments</title>
+</head>
+<body>
+
+<header th:fragment="header(styleH1, styleP)">
+    <h1 th:class="${styleH1}">Changelog</h1>
+
+    <p th:class="${styleP}">
+        All notable changes to this project will be documented in this file.</p>
+    <p th:class="${styleP}">
+        The format is based on <a href="https://keepachangelog.com/en/1.1.0/">Keep a Changelog</a>,
+        and this project adheres to <a href="https://semver.org/spec/v2.0.0.html">Semantic Versioning</a>.
+    </p>
+</header>
+
+<footer th:fragment="footer(styleH1, styleP)">
+    <h1 th:class="${styleH1}">Disclaimer</h1>
+
+    <p th:class="${styleP}">
+        This changelog was created with <a href="https://github.com/Sam42R/semver-maven-plugin">semver-maven-plugin</a>.
+        If you have any issue with <code>semver-maven-plugin</code> or want to contribute please visit project site on
+        <a href="https://github.com/Sam42R/semver-maven-plugin">GitHub</a>.
+    </p>
+</footer>
+
+</body>
+</html>
