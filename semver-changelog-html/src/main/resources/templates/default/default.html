@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:th="http://www.thymeleaf.org"
+      lang="en">
+<head>
+    <title>Changelog</title>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
+    <link rel="stylesheet" type="text/css" href="default.css" th:if="${'1' == '2'}"/>
+    <style type="text/css" th:insert="default.css"></style>
+</head>
+
+<body>
+    <div style="text-align: center; margin: 0 auto;"
+            th:insert="../general.html :: header(styleH1='', styleP='')">
+        <h1>Changelog</h1>
+    </div>
+
+    <div class="wrap-content">
+        <article class="changelog">
+            <!-- DO NOT REMOVE - c871f32ed1b7a85b24a0f22e8e7d9e3ee285742c - DO NOT REMOVE -->
+            <section class="version -planned">
+                <div class="header">
+                    <h2 class="version-num"
+                        th:text="${release.version}">
+                        v0.0.1
+                    </h2>
+                    <time class="datetime"
+                          th:datetime="${release.date}"
+                          th:text="${'(' + release.date + ')'}">
+                        (1970-01-01)
+                    </time>
+                </div>
+                <th:block th:each="commit : ${commits}">
+                    <section>
+                        <th:block th:switch="${commit.category.name}">
+                            <div th:case="'ADDED'"
+                                 class="label -s -green">
+                                New
+                            </div>
+                            <div th:case="'FIXED'"
+                                 class="label -s -orange">
+                                Fixed
+                            </div>
+                            <div th:case="*"
+                                 class="label -s -blue">
+                                Changed
+                            </div>
+                        </th:block>
+                        <ul>
+                            <li th:text="${commit.header}">
+                                Lorem ipsum
+                            </li>
+                        </ul>
+                    </section>
+                </th:block>
+            </section>
+            <!-- DO NOT REMOVE - c871f32ed1b7a85b24a0f22e8e7d9e3ee285742c - DO NOT REMOVE -->
+        </article>
+    </div>
+
+    <div style="text-align: center; margin: 0 auto;"
+            th:insert="../general.html :: footer(styleH1='', styleP='')">
+        <h1>Disclaimer</h1>
+    </div>
+</body>
+</html>
