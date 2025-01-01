@@ -2,39 +2,34 @@ package io.github.sam42r.semver.changelog;
 
 import com.github.mustachejava.DefaultMustacheFactory;
 import io.github.sam42r.semver.analyzer.model.AnalyzedCommit;
+import io.github.sam42r.semver.changelog.model.VersionInfo;
 import lombok.NonNull;
+import lombok.RequiredArgsConstructor;
 import org.apache.commons.codec.digest.DigestUtils;
 
 import java.io.*;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.time.LocalDateTime;
-import java.time.format.DateTimeFormatter;
 import java.util.HashMap;
 import java.util.List;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
+@RequiredArgsConstructor
 public class MarkupRenderer implements ChangelogRenderer {
 
-    private static final String RENDERER_NAME = "Markup";
-    private static final String CHANGELOG_TEMPLATE = "changelog.mustache";
+    private static final String CHANGELOG_TEMPLATE = "%s.mustache";
 
-    @Override
-    public @NonNull String getName() {
-        return RENDERER_NAME;
-    }
+    private final String template;
 
     @Override
     public @NonNull InputStream renderChangelog(
             @NonNull Path path,
-            @NonNull String version,
+            @NonNull VersionInfo versionInfo,
             @NonNull List<AnalyzedCommit> analyzedCommits
     ) {
         var marker = DigestUtils.sha1Hex("Sam42R");
-
-        var release = getRelease(version);
 
         var alreadyExists = Files.exists(path);
 
@@ -47,11 +42,11 @@ public class MarkupRenderer implements ChangelogRenderer {
         // Removed -> ???
         // Fixed -> fix
         // Security -> fix(security): ... OR feat(security): ...
-        // Other ->
+        // Other -> all others
 
         var mustacheFactory = new DefaultMustacheFactory("io/github/sam42r/semver/changelog");
         try (
-                var reader = mustacheFactory.getReader(CHANGELOG_TEMPLATE);
+                var reader = mustacheFactory.getReader(CHANGELOG_TEMPLATE.formatted(template));
                 var outputStream = new ByteArrayOutputStream();
                 var writer = new OutputStreamWriter(outputStream);
                 var finalOutputStream = new ByteArrayOutputStream();
@@ -64,9 +59,9 @@ public class MarkupRenderer implements ChangelogRenderer {
                             (v1, v2) -> Stream.of(v1, v2).flatMap(List::stream).toList()
                     ));
 
-            var mustache = mustacheFactory.compile(reader, CHANGELOG_TEMPLATE);
+            var mustache = mustacheFactory.compile(reader, CHANGELOG_TEMPLATE.formatted(template));
             var context = new HashMap<String, Object>();
-            context.put("release", release);
+            context.put("release", versionInfo);
 
             context.put("hasAdded", categorizedCommits.containsKey(AnalyzedCommit.Category.ADDED));
             context.put("added", categorizedCommits.get(AnalyzedCommit.Category.ADDED));
@@ -109,13 +104,5 @@ public class MarkupRenderer implements ChangelogRenderer {
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
-    }
-
-    private Release getRelease(String version) {
-        return new Release(
-                version,
-                LocalDateTime.now().format(DateTimeFormatter.ISO_DATE),
-                "" // TODO read docs(changelog) commits and add as release description
-        );
     }
 }

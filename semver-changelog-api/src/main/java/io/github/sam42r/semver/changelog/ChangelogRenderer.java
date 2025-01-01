@@ -1,6 +1,7 @@
 package io.github.sam42r.semver.changelog;
 
 import io.github.sam42r.semver.analyzer.model.AnalyzedCommit;
+import io.github.sam42r.semver.changelog.model.VersionInfo;
 import lombok.NonNull;
 
 import java.io.InputStream;
@@ -9,11 +10,9 @@ import java.util.List;
 
 public interface ChangelogRenderer {
 
-    @NonNull String getName();
-
     @NonNull InputStream renderChangelog(
             @NonNull Path path,
-            @NonNull String version,
+            @NonNull VersionInfo versionInfo,
             @NonNull List<AnalyzedCommit> analyzedCommits
     );
 }

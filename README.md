@@ -34,7 +34,7 @@ The `semver-maven-plugin` aims to transfer the functionality of the
             <plugin>
                 <groupId>io.github.sam42r</groupId>
                 <artifactId>semver-maven-plugin</artifactId>
-                <version>v1.3.3</version>
+                <version>1.4.0</version>
             </plugin>
         </plugins>
     </build>
