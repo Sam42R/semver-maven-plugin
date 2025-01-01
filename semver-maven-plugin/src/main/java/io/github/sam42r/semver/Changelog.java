@@ -13,4 +13,6 @@ public class Changelog {
 
     @Builder.Default
     private String rendererName = "Markup";
+    @Builder.Default
+    private String template = "changelog";
 }

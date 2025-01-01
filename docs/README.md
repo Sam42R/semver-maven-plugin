@@ -118,7 +118,7 @@ or by setting corresponding system property.
             <plugin>
                 <groupId>io.github.sam42r</groupId>
                 <artifactId>semver-maven-plugin</artifactId>
-                <version>v1.3.3</version>
+                <version>1.4.0</version>
                 <configuration>
                     <!--tag-format>v${version}</tag-format-->
                     <scm>
@@ -132,6 +132,7 @@ or by setting corresponding system property.
                     </analyzer>
                     <changelog>
                         <renderer-name>Markup</renderer-name>
+                        <template>changelog</template>
                     </changelog>
                     <release>
                         <publisher-name>GitHub</publisher-name>
@@ -144,22 +145,22 @@ or by setting corresponding system property.
                     <dependency>
                         <groupId>io.github.sam42r</groupId>
                         <artifactId>semver-scm-[git|subversion|mercurial]</artifactId>
-                        <version>v1.3.3</version>
+                        <version>1.4.0</version>
                     </dependency>
                     <dependency>
                         <groupId>io.github.sam42r</groupId>
                         <artifactId>semver-analyzer-[conventional|gitmoji]</artifactId>
-                        <version>v1.3.3</version>
+                        <version>1.4.0</version>
                     </dependency>
                     <dependency>
                         <groupId>io.github.sam42r</groupId>
                         <artifactId>semver-changelog-[markup|html]</artifactId>
-                        <version>v1.3.3</version>
+                        <version>1.4.0</version>
                     </dependency>
                     <dependency>
                         <groupId>io.github.sam42r</groupId>
                         <artifactId>semver-release-[github|gitlab]</artifactId>
-                        <version>v1.3.3</version>
+                        <version>1.4.0</version>
                     </dependency>
                 </dependencies>
             </plugin>
@@ -169,18 +170,19 @@ or by setting corresponding system property.
 </project>
 ```
 
-| Module    | Parameter           | Property | Default        | Values                               | Description                           |
-|-----------|---------------------|----------|----------------|--------------------------------------|---------------------------------------|
-| scm       | provider-name       |          | `Git`          | [Git&vert;Subversion&vert;Mercurial] | SCM provider                          |             |
-|           | push                |          | `true`         | [true&vert;false]                    | push changes to remote                |
-|           | username            |          |                |                                      |                                       |
-|           | password            |          |                |                                      |                                       |
-| analyzer  | specification-name  |          | `Conventional` | [Conventional&vert;Gitmoji]          | Commit message analyzer specification |
-| changelog | renderer-name       |          | `Markup`       | [Markup&vert;Html]                   | Changelog renderer                    |
-| release   | publisher-name      |          | `GitHub`       | [Github&vert;Gitlab]                 | Release publisher                     |
-|           | publish             |          | `false`        | [true&vert;false]                    | publish release to remote             |
-|           | username            |          |                |                                      |                                       |
-|           | password            |          |                |                                      |                                       |
+| Module    | Parameter          | Property | Default        | Values                               | Description                           |
+|-----------|--------------------|----------|----------------|--------------------------------------|---------------------------------------|
+| scm       | provider-name      |          | `Git`          | [Git&vert;Subversion&vert;Mercurial] | SCM provider                          |             |
+|           | push               |          | `true`         | [true&vert;false]                    | push changes to remote                |
+|           | username           |          |                |                                      |                                       |
+|           | password           |          |                |                                      |                                       |
+| analyzer  | specification-name |          | `Conventional` | [Conventional&vert;Gitmoji]          | Commit message analyzer specification |
+| changelog | renderer-name      |          | `Markup`       | [Markup&vert;Html]                   | Changelog renderer                    |
+|           | template           |          | `changelog`    |                                      | Changelog template                    |
+| release   | publisher-name     |          | `GitHub`       | [Github&vert;Gitlab]                 | Release publisher                     |
+|           | publish            |          | `false`        | [true&vert;false]                    | publish release to remote             |
+|           | username           |          |                |                                      |                                       |
+|           | password           |          |                |                                      |                                       |
 
 If you use a none default SCM-Provider, Commit-Message-Analyzer, Changelog-Renderer or Release-Publisher your have to add
 the corresponding dependency to the plugin dependencies.

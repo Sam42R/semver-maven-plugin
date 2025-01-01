@@ -7,6 +7,8 @@ import io.github.sam24r.semver.release.model.ReleaseInfo;
 import io.github.sam42r.semver.analyzer.CommitAnalyzer;
 import io.github.sam42r.semver.analyzer.model.AnalyzedCommit;
 import io.github.sam42r.semver.changelog.ChangelogRenderer;
+import io.github.sam42r.semver.changelog.ChangelogRendererFactory;
+import io.github.sam42r.semver.changelog.model.VersionInfo;
 import io.github.sam42r.semver.model.Version;
 import io.github.sam42r.semver.scm.SCMException;
 import io.github.sam42r.semver.scm.SCMProvider;
@@ -28,6 +30,7 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.time.temporal.ChronoUnit;
 import java.util.*;
 
@@ -40,7 +43,7 @@ public class SemanticReleaseMojo extends AbstractMojo {
     @SuppressWarnings("rawtypes")
     private final ServiceLoader<SCMProviderFactory> scmProviderFactories = ServiceLoader.load(SCMProviderFactory.class);
     private final ServiceLoader<CommitAnalyzer> commitAnalyzers = ServiceLoader.load(CommitAnalyzer.class);
-    private final ServiceLoader<ChangelogRenderer> changelogRenderers = ServiceLoader.load(ChangelogRenderer.class);
+    private final ServiceLoader<ChangelogRendererFactory> changelogRendererFactories = ServiceLoader.load(ChangelogRendererFactory.class);
     private final ServiceLoader<ReleasePublisherFactory> releasePublisherFactories = ServiceLoader.load(ReleasePublisherFactory.class);
 
     @Setter
@@ -130,7 +133,12 @@ public class SemanticReleaseMojo extends AbstractMojo {
             getLog().debug("Release version: '%s'".formatted(latestVersion.toString()));
 
             getLog().debug("Writing release notes to 'Changelog.md' for version '%s'".formatted(latestVersion.toString()));
-            var notes = generateNotes(projectBaseDirectory, changelogRenderer, latestVersion.toString(), analyzedCommits);
+            var versionInfo = new VersionInfo(
+                    latestVersion.toString(),
+                    LocalDateTime.now().format(DateTimeFormatter.ISO_DATE),
+                    "" // TODO read docs(changelog) commits and add as release description
+            );
+            var notes = generateNotes(projectBaseDirectory, changelogRenderer, versionInfo, analyzedCommits);
 
             getLog().debug("Setting project version in 'pom.xml' to '%s'".formatted(latestVersion.toString()));
             var pomXml = projectBaseDirectory.resolve("pom.xml");
@@ -191,9 +199,10 @@ public class SemanticReleaseMojo extends AbstractMojo {
                         .map(ServiceLoader.Provider::get)
                         .filter(v -> analyzer.getSpecificationName().equalsIgnoreCase(v.getName()))
                         .findAny(),
-                changelogRenderers.stream()
+                changelogRendererFactories.stream()
                         .map(ServiceLoader.Provider::get)
                         .filter(v -> changelog.getRendererName().equalsIgnoreCase(v.getName()))
+                        .map(v -> v.getInstance(changelog.getTemplate()))
                         .findAny(),
                 releasePublisherFactories.stream()
                         .map(ServiceLoader.Provider::get)
@@ -251,12 +260,11 @@ public class SemanticReleaseMojo extends AbstractMojo {
     private Path generateNotes(
             Path projectBaseDirectory,
             ChangelogRenderer renderer,
-            String version,
+            VersionInfo versionInfo,
             List<AnalyzedCommit> analyzedCommits
     ) throws MojoExecutionException {
         var changelog = projectBaseDirectory.resolve("Changelog.md");
-
-        try (var inputStream = renderer.renderChangelog(changelog, version, analyzedCommits)) {
+        try (var inputStream = renderer.renderChangelog(changelog, versionInfo, analyzedCommits)) {
             Files.write(changelog, inputStream.readAllBytes());
         } catch (IOException e) {
             throw new MojoExecutionException(e.getMessage(), e.getCause());
