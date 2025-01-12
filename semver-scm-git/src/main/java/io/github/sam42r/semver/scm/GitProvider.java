@@ -7,6 +7,7 @@ import com.jcraft.jsch.Session;
 import io.github.sam42r.semver.scm.model.Commit;
 import io.github.sam42r.semver.scm.model.Remote;
 import io.github.sam42r.semver.scm.model.Tag;
+import io.github.sam42r.semver.scm.util.RemoteUtil;
 import lombok.AccessLevel;
 import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
@@ -25,7 +26,6 @@ import org.eclipse.jgit.transport.ssh.jsch.OpenSshConfig;
 import java.io.File;
 import java.io.IOException;
 import java.io.UncheckedIOException;
-import java.net.URI;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.time.Instant;
@@ -171,7 +171,7 @@ public class GitProvider implements SCMProvider {
                     .map(URIish::toString)
                     .findAny()
                     .orElseThrow();
-            return url.startsWith("http") ? parseHttpRemoteUrl(url) : parseSshRemoteUrl(url);
+            return RemoteUtil.parseUrl(url);
         } catch (GitAPIException e) {
             throw new SCMException(e);
         }
@@ -275,44 +275,5 @@ public class GitProvider implements SCMProvider {
         httpTransport.setCredentialsProvider(
                 new UsernamePasswordCredentialsProvider(usernameToSet, passwordToSet)
         );
-    }
-
-    private @NonNull Remote parseHttpRemoteUrl(String url) {
-        var uri = URI.create(url);
-
-        var lastSlashIndex = uri.getPath().lastIndexOf("/");
-
-        var group = uri.getPath().substring(1, lastSlashIndex);
-        var project = uri.getPath().substring(lastSlashIndex + 1).replace(".git", "");
-
-        var hostAndPort = uri.getHost().concat(uri.getPort() > 0 ? ":%d".formatted(uri.getPort()) : "");
-
-        return Remote.builder()
-                .url(url)
-                .scheme(uri.getScheme())
-                .host(hostAndPort)
-                .group(group)
-                .project(project)
-                .build();
-    }
-
-    private @NonNull Remote parseSshRemoteUrl(String url) {
-        var lastColonIndex = url.lastIndexOf(":");
-
-        var hostAndPort = url.substring(0, lastColonIndex).replace("git@", "");
-
-        var path = url.substring(lastColonIndex + 1);
-        var lastSlashIndex = path.lastIndexOf("/");
-
-        var group = path.substring(0, lastSlashIndex);
-        var project = path.substring(lastSlashIndex + 1).replace(".git", "");
-
-        return Remote.builder()
-                .url(url)
-                .scheme("https")
-                .host(hostAndPort)
-                .group(group)
-                .project(project)
-                .build();
     }
 }
