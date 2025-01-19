@@ -4,10 +4,12 @@ import io.github.sam42r.semver.model.Version;
 import org.apache.maven.plugin.MojoExecutionException;
 import org.apache.maven.plugin.MojoFailureException;
 import org.apache.maven.plugin.logging.Log;
+import org.apache.maven.plugin.logging.SystemStreamLog;
 import org.apache.maven.project.MavenProject;
 import org.eclipse.jgit.api.Git;
 import org.eclipse.jgit.api.errors.GitAPIException;
 import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.io.TempDir;
 
@@ -15,6 +17,7 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.HashMap;
+import java.util.List;
 
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.Mockito.mock;
@@ -114,5 +117,32 @@ class SemanticReleaseMojoTest {
             Files.writeString(file, content);
         }
         return file;
+    }
+
+    @Test
+    @Disabled("local testing only")
+    void shouldReleaseLocal() throws MojoExecutionException, MojoFailureException {
+        var mojo = new SemanticReleaseMojo();
+
+        mojo.setLog(new SystemStreamLog());
+
+        var pluginContext = new HashMap<>();
+        mojo.setPluginContext(pluginContext);
+        mojo.setScm(Scm.builder().push(true).username(null).password("***").build());
+        mojo.setAnalyzer(Analyzer.builder().specificationName("Gitmoji").build());
+        mojo.setChangelog(Changelog.builder().build());
+        mojo.setRelease(Release.builder().build());
+        mojo.setTagFormat(Version.TAG_FORMAT_DEFAULT);
+
+        var mavenParentProjectMock = mock(MavenProject.class);
+        when(mavenParentProjectMock.getModules()).thenReturn(List.of());
+
+        var mavenProjectMock = mock(MavenProject.class);
+        when(mavenProjectMock.getFile()).thenReturn(Path.of("pom.xml").toFile().getAbsoluteFile());
+        when(mavenProjectMock.hasParent()).thenReturn(Boolean.TRUE);
+        when(mavenProjectMock.getParent()).thenReturn(mavenParentProjectMock);
+        mojo.setProject(mavenProjectMock);
+
+        mojo.execute();
     }
 }
