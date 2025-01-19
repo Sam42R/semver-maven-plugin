@@ -7,6 +7,21 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 <!-- DO NOT REMOVE - c871f32ed1b7a85b24a0f22e8e7d9e3ee285742c - DO NOT REMOVE -->
 
+## 1.5.0 - 2025-01-19
+
+
+### Added
+- :sparkles: add maven scm based git provider #34
+- :sparkles: add abstract maven scm provider #34
+### Changed
+- :recycle: move remote URL parsing to util #34
+### Deprecated
+- :wastebasket: deprecate legacy git provider #34
+### Others
+- :white_check_mark: add local mojo test
+- :white_check_mark: extract abstract test git provider class
+
+
 ## 1.4.0 - 2025-01-05
 
 
