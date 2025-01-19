@@ -40,9 +40,11 @@ import java.util.stream.StreamSupport;
  * {@link SCMProvider} for <a href="https://git-scm.com/">git</a>.
  *
  * @author Sam42R
+ * @deprecated since switching to Maven-SCM {@link DefaultGitProvider} is used instead
  */
 @Slf4j
 @RequiredArgsConstructor(access = AccessLevel.PROTECTED)
+@Deprecated(since = "1.5.0", forRemoval = true)
 public class GitProvider implements SCMProvider {
 
     private final Path repositoryPath;

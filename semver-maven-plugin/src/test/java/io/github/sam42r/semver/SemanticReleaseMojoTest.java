@@ -93,7 +93,7 @@ class SemanticReleaseMojoTest {
         try (var ignored = initializeGitRepository(tmp)) {
             assertThatThrownBy(() -> uut.execute())
                     .isInstanceOf(MojoExecutionException.class)
-                    .hasMessageStartingWith("No HEAD exists");
+                    .hasRootCauseMessage("Cannot resolve HEAD");
         }
     }
 
@@ -101,7 +101,7 @@ class SemanticReleaseMojoTest {
     void shouldThrowWithMissingGitRepository() {
         assertThatThrownBy(() -> uut.execute())
                 .isInstanceOf(MojoExecutionException.class)
-                .hasMessageStartingWith("Could not find git repository");
+                .hasMessageStartingWith("Could not find git configuration");
     }
 
     private Git initializeGitRepository(Path path) throws GitAPIException {
