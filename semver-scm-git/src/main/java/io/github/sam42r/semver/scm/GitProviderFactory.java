@@ -5,7 +5,12 @@ import lombok.NonNull;
 
 import java.nio.file.Path;
 
+
+/**
+ * @deprecated since switching to Maven-SCM {@link DefaultGitProviderFactory} is used instead
+ */
 @NoArgsConstructor
+@Deprecated(since = "1.5.0", forRemoval = true)
 public class GitProviderFactory implements SCMProviderFactory<GitProvider> {
 
     private static final String PROVIDER_NAME = "Git";
