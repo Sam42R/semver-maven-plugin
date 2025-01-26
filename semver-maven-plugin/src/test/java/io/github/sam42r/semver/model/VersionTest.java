@@ -2,6 +2,8 @@ package io.github.sam42r.semver.model;
 
 import org.junit.jupiter.api.Test;
 
+import java.util.List;
+
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
@@ -51,5 +53,20 @@ class VersionTest {
         actual.increment(Version.Type.MAJOR);
         assertThat(actual).hasToString("2.0.0");
         assertThat(actual.toTag()).isEqualTo("v2.0.0");
+    }
+
+    @Test
+    void shouldFilterInvalidVersions() {
+        var tags = List.of("v0.0.1", "r-0-0-1", "test", "v0.0.2");
+
+        var actual = tags.stream()
+                .filter(v -> Version.matchesPattern(v, Version.TAG_FORMAT_DEFAULT))
+                .map(Version::of)
+                .toList();
+
+        assertThat(actual).containsExactlyInAnyOrder(
+                Version.of(0,0,1),
+                Version.of(0,0,2)
+        );
     }
 }
