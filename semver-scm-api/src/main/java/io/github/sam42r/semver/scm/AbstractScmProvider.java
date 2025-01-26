@@ -7,10 +7,7 @@ import io.github.sam42r.semver.scm.util.RemoteUtil;
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NonNull;
-import org.apache.maven.scm.ChangeSet;
-import org.apache.maven.scm.ScmException;
-import org.apache.maven.scm.ScmFileSet;
-import org.apache.maven.scm.ScmRevision;
+import org.apache.maven.scm.*;
 import org.apache.maven.scm.command.changelog.ChangeLogScmRequest;
 import org.apache.maven.scm.manager.BasicScmManager;
 import org.apache.maven.scm.manager.NoSuchScmProviderException;
@@ -20,9 +17,10 @@ import org.apache.maven.scm.repository.ScmRepository;
 import org.apache.maven.scm.repository.ScmRepositoryException;
 
 import java.nio.file.Path;
-import java.util.Date;
 import java.time.Instant;
 import java.time.temporal.ChronoUnit;
+import java.util.Comparator;
+import java.util.Date;
 import java.util.Optional;
 import java.util.function.Predicate;
 import java.util.stream.Stream;
@@ -62,6 +60,10 @@ abstract class AbstractScmProvider implements SCMProvider {
         this.scmManager.setScmProvider(providerType, provider);
     }
 
+    protected Path getFileBase() {
+        return getPath();
+    }
+
     @Override
     public @NonNull Stream<Commit> readCommits(String fromCommitId) throws SCMException {
         return readCommits(fromCommitId, null);
@@ -82,9 +84,7 @@ abstract class AbstractScmProvider implements SCMProvider {
             }
 
             var changeLogScmResult = scmManager.changeLog(changeLogScmRequest);
-            if (!changeLogScmResult.isSuccess()) {
-                throw new SCMException(changeLogScmResult.getProviderMessage(), new IllegalStateException(changeLogScmResult.getCommandOutput()));
-            }
+            check(changeLogScmResult);
 
             return changeLogScmResult.getChangeLog().getChangeSets().stream()
                     .filter(v -> v.getComment() != null)
@@ -108,9 +108,7 @@ abstract class AbstractScmProvider implements SCMProvider {
             changeLogScmRequest.setStartDate(Date.from(Instant.EPOCH));
 
             var changeLogScmResult = scmManager.changeLog(changeLogScmRequest);
-            if (!changeLogScmResult.isSuccess()) {
-                throw new SCMException(changeLogScmResult.getProviderMessage(), new IllegalStateException(changeLogScmResult.getCommandOutput()));
-            }
+            check(changeLogScmResult);
 
             return changeLogScmResult.getChangeLog().getChangeSets().stream()
                     .filter(hasTag.or(hasTagPath))
@@ -138,8 +136,8 @@ abstract class AbstractScmProvider implements SCMProvider {
         try {
             var repository = getScmRepository();
 
-            var addScmResult = scmManager.add(repository, new ScmFileSet(path.toFile(), file.toFile()));
-            assert addScmResult.isSuccess();
+            var addScmResult = scmManager.add(repository, new ScmFileSet(getFileBase().toFile(), getFileBase().relativize(file).toFile()));
+            check(addScmResult);
         } catch (ScmException e) {
             throw new SCMException(e);
         }
@@ -151,9 +149,9 @@ abstract class AbstractScmProvider implements SCMProvider {
             var repository = getScmRepository();
 
             var checkInScmResult = scmManager.checkIn(repository, new ScmFileSet(path.toFile()), message);
-            var scmRevision = checkInScmResult.getScmRevision();
+            check(checkInScmResult);
 
-            return readCommits(scmRevision, scmRevision).findFirst().orElseThrow();
+            return readCommits(null).max(Comparator.comparing(Commit::getTimestamp)).orElseThrow();
         } catch (ScmException e) {
             throw new SCMException(e);
         }
@@ -164,8 +162,8 @@ abstract class AbstractScmProvider implements SCMProvider {
         try {
             var repository = getScmRepository();
 
-            var tagScmResult = scmManager.tag(repository, new ScmFileSet(path.toFile()), name);
-            assert tagScmResult.isSuccess();
+            var tagScmResult = scmManager.tag(repository, new ScmFileSet(getFileBase().toFile()), name);
+            check(tagScmResult);
 
             return readTags().filter(v -> name.equals(v.getName())).findFirst().orElseThrow();
         } catch (ScmException e) {
@@ -186,6 +184,12 @@ abstract class AbstractScmProvider implements SCMProvider {
             return scmRepository;
         } catch (ScmRepositoryException | NoSuchScmProviderException e) {
             throw new SCMException(e);
+        }
+    }
+
+    private void check(@NonNull ScmResult scmResult) throws SCMException {
+        if (!scmResult.isSuccess()) {
+            throw new SCMException(scmResult.getProviderMessage(), new IllegalStateException(scmResult.getCommandOutput()));
         }
     }
 
