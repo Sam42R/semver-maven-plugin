@@ -35,6 +35,8 @@ import java.util.stream.Stream;
 abstract class AbstractScmProvider implements SCMProvider {
 
     private static final Predicate<ChangeSet> hasTag = changeSet -> changeSet.getTags() != null && !changeSet.getTags().isEmpty();
+    private static final Predicate<ChangeSet> hasTagPath = changeSet -> changeSet.getFiles() != null &&
+            !changeSet.getFiles().isEmpty() && changeSet.getFiles().get(0).getName().contains("/tags/");
 
     private final Path path;
     private final String username;
@@ -103,17 +105,32 @@ abstract class AbstractScmProvider implements SCMProvider {
             var repository = getScmRepository();
 
             var changeLogScmRequest = new ChangeLogScmRequest(repository, new ScmFileSet(path.toFile()));
+            changeLogScmRequest.setStartDate(Date.from(Instant.EPOCH));
+
             var changeLogScmResult = scmManager.changeLog(changeLogScmRequest);
+            if (!changeLogScmResult.isSuccess()) {
+                throw new SCMException(changeLogScmResult.getProviderMessage(), new IllegalStateException(changeLogScmResult.getCommandOutput()));
+            }
 
             return changeLogScmResult.getChangeLog().getChangeSets().stream()
-                    .filter(hasTag)
+                    .filter(hasTag.or(hasTagPath))
                     .map(v -> Tag.builder()
-                            .name(v.getTags().get(0))
+                            .name(getTag(v))
                             .commitId(v.getRevision())
                             .build());
         } catch (ScmException e) {
             throw new SCMException(e);
         }
+    }
+
+    private String getTag(@NonNull ChangeSet changeSet) {
+        if (hasTag.test(changeSet)) {
+            return changeSet.getTags().get(0);
+        } else if (hasTagPath.test(changeSet)) {
+            var filename = changeSet.getFiles().get(0).getName();
+            return filename.substring(filename.lastIndexOf("/") + 1);
+        }
+        return null;
     }
 
     @Override
