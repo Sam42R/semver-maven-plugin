@@ -20,6 +20,9 @@ import org.apache.maven.scm.repository.ScmRepository;
 import org.apache.maven.scm.repository.ScmRepositoryException;
 
 import java.nio.file.Path;
+import java.util.Date;
+import java.time.Instant;
+import java.time.temporal.ChronoUnit;
 import java.util.Optional;
 import java.util.function.Predicate;
 import java.util.stream.Stream;
@@ -69,19 +72,25 @@ abstract class AbstractScmProvider implements SCMProvider {
             var changeLogScmRequest = new ChangeLogScmRequest(repository, new ScmFileSet(path.toFile()));
             if (fromCommitId != null) {
                 changeLogScmRequest.setStartRevision(new ScmRevision(fromCommitId));
+            } else {
+                changeLogScmRequest.setStartDate(Date.from(Instant.EPOCH));
             }
             if (toCommitId != null) {
                 changeLogScmRequest.setEndRevision(new ScmRevision(toCommitId));
             }
 
             var changeLogScmResult = scmManager.changeLog(changeLogScmRequest);
+            if (!changeLogScmResult.isSuccess()) {
+                throw new SCMException(changeLogScmResult.getProviderMessage(), new IllegalStateException(changeLogScmResult.getCommandOutput()));
+            }
 
             return changeLogScmResult.getChangeLog().getChangeSets().stream()
+                    .filter(v -> v.getComment() != null)
                     .map(v -> Commit.builder()
                             .id(v.getRevision())
-                            .timestamp(v.getDate().toInstant())
+                            .timestamp(v.getDate().toInstant().truncatedTo(ChronoUnit.SECONDS))
                             .author(v.getAuthor())
-                            .message(v.getComment())
+                            .message(v.getComment().trim())
                             .build());
         } catch (ScmException e) {
             throw new SCMException(e);
