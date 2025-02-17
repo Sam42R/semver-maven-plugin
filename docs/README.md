@@ -120,7 +120,7 @@ or by setting corresponding system property.
                 <artifactId>semver-maven-plugin</artifactId>
                 <version>1.4.0</version>
                 <configuration>
-                    <!--tag-format>v${version}</tag-format-->
+                    <!--tag-format>v@version@</tag-format-->
                     <scm>
                         <provider-name>Git</provider-name>
                         <push>true</push>
@@ -172,7 +172,8 @@ or by setting corresponding system property.
 
 | Module    | Parameter          | Property | Default        | Values                               | Description                           |
 |-----------|--------------------|----------|----------------|--------------------------------------|---------------------------------------|
-| scm       | provider-name      |          | `Git`          | [Git&vert;Subversion&vert;Mercurial] | SCM provider                          |             |
+|           | tag-format         |          | `v@version@`   |                                      | Tag format pattern                    |
+| scm       | provider-name      |          | `Git`          | [Git&vert;Subversion&vert;Mercurial] | SCM provider                          |
 |           | push               |          | `true`         | [true&vert;false]                    | push changes to remote                |
 |           | username           |          |                |                                      |                                       |
 |           | password           |          |                |                                      |                                       |

@@ -20,7 +20,7 @@ class VersionTest {
 
     @Test
     void shouldCreateVersionWithCustomRegex() {
-        var actual = Version.of("Release 1.0.0", "Release ${version}");
+        var actual = Version.of("Release 1.0.0", "Release @version@");
 
         assertThat(actual)
                 .extracting("major", "minor", "patch")
@@ -33,7 +33,7 @@ class VersionTest {
     void shouldThrowWithInvalidRegex() {
         assertThatThrownBy(() -> Version.of("v1.0.0", "invalid"))
                 .isInstanceOf(IllegalArgumentException.class)
-                .hasMessageStartingWith("Given tag format 'invalid' does not contain required version placeholder '${version}'");
+                .hasMessageStartingWith("Given tag format 'invalid' does not contain required version placeholder '@version@'");
     }
 
     @Test
