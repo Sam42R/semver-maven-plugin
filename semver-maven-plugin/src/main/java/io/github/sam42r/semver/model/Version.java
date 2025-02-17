@@ -18,13 +18,13 @@ public final class Version {
         MAJOR, MINOR, PATCH;
     }
 
-    private static final String PLACEHOLDER_PREFIX = "${";
+    private static final String PLACEHOLDER_PREFIX = "@";
     private static final String PLACEHOLDER_NAME = "version";
-    private static final String PLACEHOLDER_SUFFIX = "}";
+    private static final String PLACEHOLDER_SUFFIX = "@";
     private static final String VERSION_PLACEHOLDER = "%s%s%s".formatted(
             PLACEHOLDER_PREFIX, PLACEHOLDER_NAME, PLACEHOLDER_SUFFIX);
 
-    public static final String TAG_FORMAT_DEFAULT = "v${version}";
+    public static final String TAG_FORMAT_DEFAULT = "v@version@";
 
     private static final String NAMED_NUMBER_GROUP = "(?<%s>[0-9]*)";
     private static final String MAJOR_GROUP = NAMED_NUMBER_GROUP.formatted(Type.MAJOR.name());
