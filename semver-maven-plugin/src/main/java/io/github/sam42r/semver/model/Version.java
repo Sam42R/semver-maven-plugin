@@ -4,12 +4,14 @@ import lombok.*;
 import org.apache.commons.text.StringSubstitutor;
 
 import java.util.Map;
+import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 /**
  * @author Sam42R
  */
 @Getter
+@EqualsAndHashCode
 @NoArgsConstructor(access = AccessLevel.PRIVATE)
 @AllArgsConstructor(access = AccessLevel.PRIVATE)
 public final class Version {
@@ -42,6 +44,18 @@ public final class Version {
     }
 
     public static Version of(@NonNull String version, @NonNull String tagFormat) {
+        var matcher = getMatcher(version, tagFormat);
+        if (matcher.find()) {
+            return new Version(
+                    Integer.parseInt(matcher.group(Type.MAJOR.name())),
+                    Integer.parseInt(matcher.group(Type.MINOR.name())),
+                    Integer.parseInt(matcher.group(Type.PATCH.name())),
+                    tagFormat);
+        }
+        throw new IllegalArgumentException("Could not create version for '%s' with tag format '%s'".formatted(version, tagFormat));
+    }
+
+    private static Matcher getMatcher(String version, String tagFormat) {
         if (!tagFormat.contains(VERSION_PLACEHOLDER)) {
             throw new IllegalArgumentException(
                     "Given tag format '%s' does not contain required version placeholder '%s'".formatted(
@@ -55,15 +69,7 @@ public final class Version {
                 PLACEHOLDER_SUFFIX);
 
         var pattern = Pattern.compile(regex);
-        var matcher = pattern.matcher(version);
-        if (matcher.find()) {
-            return new Version(
-                    Integer.parseInt(matcher.group(Type.MAJOR.name())),
-                    Integer.parseInt(matcher.group(Type.MINOR.name())),
-                    Integer.parseInt(matcher.group(Type.PATCH.name())),
-                    tagFormat);
-        }
-        throw new IllegalArgumentException("Could not create version for '%s' with tag format '%s'".formatted(version, tagFormat));
+        return pattern.matcher(version);
     }
 
     public static Version of(@NonNull int major, int minor, int patch) {
@@ -72,6 +78,10 @@ public final class Version {
 
     public static Version of(@NonNull int major, int minor, int patch, String tagFormat) {
         return new Version(major, minor, patch, tagFormat);
+    }
+
+    public static boolean matchesPattern(String version, String tagFormat) {
+        return getMatcher(version, tagFormat).find();
     }
 
     public void increment(@NonNull Type type) {
