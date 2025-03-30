@@ -1,0 +1,227 @@
+release: ":bookmark: (release)"
+items:
+  - type: ":art:"
+    category: CHANGED
+    level: NONE
+  - type: ":zap:"
+    category: OTHER
+    level: PATCH
+  - type: ":fire:"
+    category: REMOVED
+    level: NONE
+  - type: ":bug:"
+    category: FIXED
+    level: PATCH
+  - type: ":ambulance:"
+    category: FIXED
+    level: PATCH
+  - type: ":sparkles:"
+    category: ADDED
+    level: MINOR
+  - type: ":memo:"
+    category: OTHER
+    level: NONE
+  - type: ":rocket:"
+    category: OTHER
+    level: NONE
+  - type: ":lipstick:"
+    category: OTHER
+    level: PATCH
+  - type: ":tada:"
+    category: OTHER
+    level: NONE
+  - type: ":white_check_mark:"
+    category: OTHER
+    level: NONE
+  - type: ":lock:"
+    category: SECURITY
+    level: PATCH
+  - type: ":closed_lock_with_key:"
+    category: OTHER
+    level: NONE
+#  - type: ":bookmark:"
+#    category: OTHER
+#    level: NONE
+  - type: ":rotating_light:"
+    category: OTHER
+    level: NONE
+  - type: ":construction:"
+    category: OTHER
+    level: NONE
+  - type: ":green_heart:"
+    category: OTHER
+    level: NONE
+  - type: ":arrow_down:"
+    category: OTHER
+    level: PATCH
+  - type: ":arrow_up:"
+    category: OTHER
+    level: PATCH
+  - type: ":pushpin:"
+    category: OTHER
+    level: PATCH
+  - type: ":construction_worker:"
+    category: OTHER
+    level: NONE
+  - type: ":chart_with_upwards_trend:"
+    category: OTHER
+    level: PATCH
+  - type: ":recycle:"
+    category: CHANGED
+    level: NONE
+  - type: ":heavy_plus_sign:"
+    category: OTHER
+    level: PATCH
+  - type: ":heavy_minus_sign:"
+    category: OTHER
+    level: PATCH
+  - type: ":wrench:"
+    category: OTHER
+    level: PATCH
+  - type: ":hammer:"
+    category: OTHER
+    level: NONE
+  - type: ":globe_with_meridians:"
+    category: OTHER
+    level: PATCH
+  - type: ":pencil2:"
+    category: OTHER
+    level: PATCH
+  - type: ":poop:"
+    category: OTHER
+    level: NONE
+  - type: ":rewind:"
+    category: OTHER
+    level: PATCH
+  - type: ":twisted_rightwards_arrows:"
+    category: OTHER
+    level: NONE
+  - type: ":package:"
+    category: OTHER
+    level: PATCH
+  - type: ":alien:"
+    category: OTHER
+    level: PATCH
+  - type: ":truck:"
+    category: OTHER
+    level: NONE
+  - type: ":page_facing_up:"
+    category: OTHER
+    level: NONE
+  - type: ":boom:"
+    category: ADDED
+    level: MAJOR
+  - type: ":bento:"
+    category: OTHER
+    level: PATCH
+  - type: ":wheelchair:"
+    category: OTHER
+    level: PATCH
+  - type: ":bulb:"
+    category: OTHER
+    level: NONE
+  - type: ":beers:"
+    category: OTHER
+    level: NONE
+  - type: ":speech_balloon:"
+    category: OTHER
+    level: PATCH
+  - type: ":card_file_box:"
+    category: OTHER
+    level: PATCH
+  - type: ":loud_sound:"
+    category: OTHER
+    level: NONE
+  - type: ":mute:"
+    category: OTHER
+    level: NONE
+  - type: ":busts_in_silhouette:"
+    category: OTHER
+    level: NONE
+  - type: ":children_crossing:"
+    category: OTHER
+    level: PATCH
+  - type: ":building_construction:"
+    category: OTHER
+    level: NONE
+  - type: ":iphone:"
+    category: OTHER
+    level: PATCH
+  - type: "::clown_face:"
+    category: OTHER
+    level: NONE
+  - type: ":egg:"
+    category: OTHER
+    level: PATCH
+  - type: ":see_no_evil:"
+    category: OTHER
+    level: NONE
+  - type: ":camera_flash:"
+    category: OTHER
+    level: NONE
+  - type: ":alembic:"
+    category: OTHER
+    level: PATCH
+  - type: ":mag:"
+    category: OTHER
+    level: PATCH
+  - type: ":label:"
+    category: OTHER
+    level: PATCH
+  - type: ":seedling:"
+    category: OTHER
+    level: NONE
+  - type: ":triangular_flag_on_post:"
+    category: OTHER
+    level: PATCH
+  - type: ":goal_net:"
+    category: OTHER
+    level: PATCH
+  - type: ":dizzy:"
+    category: OTHER
+    level: PATCH
+  - type: ":wastebasket:"
+    category: DEPRECATED
+    level: PATCH
+  - type: ":passport_control:"
+    category: OTHER
+    level: PATCH
+  - type: ":adhesive_bandage:"
+    category: OTHER
+    level: PATCH
+  - type: ":monocle_face:"
+    category: OTHER
+    level: NONE
+  - type: ":coffin:"
+    category: REMOVED
+    level: NONE
+  - type: ":test_tube:"
+    category: OTHER
+    level: NONE
+  - type: ":necktie:"
+    category: OTHER
+    level: PATCH
+  - type: ":stethoscope:"
+    category: OTHER
+    level: NONE
+  - type: ":bricks:"
+    category: OTHER
+    level: NONE
+  - type: ":technologist:"
+    category: OTHER
+    level: NONE
+  - type: ":money_with_wings:"
+    category: OTHER
+    level: NONE
+  - type: ":thread:"
+    category: OTHER
+    level: NONE
+  - type: ":safety_vest:"
+    category: OTHER
+    level: NONE
+  - type: ":airplane:"
+    category: OTHER
+    level: NONE
+  - type: ":ship:"
+    category: OTHER
+    level: NONE

@@ -1,0 +1,23 @@
+release: "R0"
+items:
+  - type: "D1"
+    category: DEPRECATED
+    level: NONE
+  - type: "R1"
+    category: REMOVED
+    level: NONE
+  - type: "F1"
+    category: FIXED
+    level: PATCH
+  - type: "S1"
+    category: SECURITY
+    level: PATCH
+  - type: "A1"
+    category: ADDED
+    level: MINOR
+  - type: "C1"
+    category: CHANGED
+    level: MINOR
+  - type: "B1"
+    category: OTHER
+    level: MAJOR

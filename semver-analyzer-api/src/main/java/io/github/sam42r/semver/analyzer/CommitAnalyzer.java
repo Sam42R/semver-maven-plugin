@@ -12,8 +12,6 @@ import java.util.List;
  */
 public interface CommitAnalyzer {
 
-    @NonNull String getName();
-
     @NonNull List<AnalyzedCommit> analyzeCommits(@NonNull List<Commit> commits);
 
     @NonNull String generateReleaseCommitMessage(@NonNull String version);

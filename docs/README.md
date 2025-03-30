@@ -77,17 +77,50 @@ A gitmoji commit message has the following structure:
 > :bug: (database): Load objects by id #42
 
 #### Semantics
-The following table contains all intentions** which lead to an updated version:
+The following table contains all intentions** which lead to an updated version***:
 
-| Intention   | Description                    | Major              | Minor              | Patch              |
-|-------------|--------------------------------|--------------------|--------------------|--------------------|
-| :boom:      | Introduce breaking changes     | :heavy_check_mark: |                    |                    |
-| :sparkles:  | Introduce new features         |                    | :heavy_check_mark: |                    |
-| :bug:       | Fix a bug                      |                    |                    | :heavy_check_mark: |
-| :ambulance: | Critical hotfix                |                    |                    | :heavy_check_mark: |
-| :lock:      | Fix security or privacy issues |                    |                    | :heavy_check_mark: |
+| Intention                  | Description                                                  | Major              | Minor              | Patch              |
+|----------------------------|--------------------------------------------------------------|--------------------|--------------------|--------------------|
+| :boom:                     | Introduce breaking changes                                   | :heavy_check_mark: |                    |                    |
+| :sparkles:                 | Introduce new features                                       |                    | :heavy_check_mark: |                    |
+| :zap:                      | Improve performance                                          |                    |                    | :heavy_check_mark: |
+| :bug:                      | Fix a bug                                                    |                    |                    | :heavy_check_mark: |
+| :ambulance:                | Critical hotfix                                              |                    |                    | :heavy_check_mark: |
+| :lipstick:                 | Add or update the UI and style files                         |                    |                    | :heavy_check_mark: |
+| :lock:                     | Fix security or privacy issues                               |                    |                    | :heavy_check_mark: |
+| :arrow_down:               | Downgrade dependencies                                       |                    |                    | :heavy_check_mark: |
+| :arrow_up:                 | Upgrade dependencies                                         |                    |                    | :heavy_check_mark: |
+| :pushpin:                  | Pin dependencies to specific versions                        |                    |                    | :heavy_check_mark: |
+| :chart_with_upwards_trend: | Add or update analytics or track code                        |                    |                    | :heavy_check_mark: |
+| :heavy_plus_sign:          | Add a dependency                                             |                    |                    | :heavy_check_mark: |
+| :heavy_minus_sign:         | Remove a dependency                                          |                    |                    | :heavy_check_mark: |
+| :wrench:                   | Add or update configuration files                            |                    |                    | :heavy_check_mark: |
+| :globe_with_meridians:     | Internationalization and localization                        |                    |                    | :heavy_check_mark: |
+| :pencil2:                  | Fix typos                                                    |                    |                    | :heavy_check_mark: |
+| :rewind:                   | Revert changes                                               |                    |                    | :heavy_check_mark: |
+| :package:                  | Add or update compiled files or packages                     |                    |                    | :heavy_check_mark: |
+| :alien:                    | Update code due to external API changes                      |                    |                    | :heavy_check_mark: |
+| :bento:                    | Add or update assets                                         |                    |                    | :heavy_check_mark: |
+| :wheelchair:               | Improve accessibility                                        |                    |                    | :heavy_check_mark: |
+| :speech_balloon:           | Add or update text and literals                              |                    |                    | :heavy_check_mark: |
+| :card_file_box:            | Perform database related changes                             |                    |                    | :heavy_check_mark: |
+| :children_crossing:        | Improve user experience / usability                          |                    |                    | :heavy_check_mark: |
+| :iphone:                   | Work on responsive design                                    |                    |                    | :heavy_check_mark: |
+| :egg:                      | Add or update an easter egg                                  |                    |                    | :heavy_check_mark: |
+| :alembic:                  | Perform experiments                                          |                    |                    | :heavy_check_mark: |
+| :mag:                      | Improve SEO                                                  |                    |                    | :heavy_check_mark: |
+| :label:                    | Add or update types                                          |                    |                    | :heavy_check_mark: |
+| :triangular_flag_on_post:  | Add, update, or remove feature flags                         |                    |                    | :heavy_check_mark: |
+| :goal_net:                 | Catch errors                                                 |                    |                    | :heavy_check_mark: |
+| :dizzy:                    | Add or update animations and transitions                     |                    |                    | :heavy_check_mark: |
+| :wastebasket:              | Deprecate code that needs to be cleaned up                   |                    |                    | :heavy_check_mark: |
+| :passport_control:         | Work on code related to authorization, roles and permissions |                    |                    | :heavy_check_mark: |
+| :adhesive_bandage:         | Simple fix for a non-critical issue                          |                    |                    | :heavy_check_mark: |
+| :necktie:                  | Add or update business logic                                 |                    |                    | :heavy_check_mark: |
 
 ** a complete list of all intentions can be found [here](https://gitmoji.dev/)
+
+*** following https://identeco.de/en/gitmoji/
 
 ## Changelog
 _"The reason for creating and keeping a changelog is simple; when a contributor or end-user wants to see if any changes

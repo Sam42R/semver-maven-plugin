@@ -1,6 +1,7 @@
 package io.github.sam42r.semver.changelog;
 
 import io.github.sam42r.semver.analyzer.model.AnalyzedCommit;
+import io.github.sam42r.semver.analyzer.model.ChangeCategory;
 import io.github.sam42r.semver.changelog.model.VersionInfo;
 import org.junit.jupiter.api.io.TempDir;
 import org.junit.jupiter.params.ParameterizedTest;
@@ -75,7 +76,7 @@ class HtmlRendererTest {
                         .header("feat(scm): Lorem ipsum")
                         .body("* Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam")
                         .footer("refs #42")
-                        .category(AnalyzedCommit.Category.ADDED)
+                        .category(ChangeCategory.ADDED)
                         .build(),
                 AnalyzedCommit.builder()
                         .id("42")
@@ -84,7 +85,7 @@ class HtmlRendererTest {
                         .header("fix(scm): Lorem ipsum")
                         .body("* Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam")
                         .footer("refs #42")
-                        .category(AnalyzedCommit.Category.FIXED)
+                        .category(ChangeCategory.FIXED)
                         .build(),
                 AnalyzedCommit.builder()
                         .id("42")
@@ -93,7 +94,7 @@ class HtmlRendererTest {
                         .header("chore(scm): Lorem ipsum")
                         .body("* Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam")
                         .footer("refs #42")
-                        .category(AnalyzedCommit.Category.CHANGED)
+                        .category(ChangeCategory.CHANGED)
                         .build()
         );
     }

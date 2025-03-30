@@ -1,0 +1,29 @@
+release: "chore(release)"
+items:
+  - type: "build"
+    category: OTHER
+    level: NONE
+  - type: "ci"
+    category: OTHER
+    level: NONE
+  - type: "docs"
+    category: OTHER
+    level: NONE
+  - type: "feat"
+    category: ADDED
+    level: MINOR
+  - type: "fix"
+    category: FIXED
+    level: PATCH
+  - type: "perf"
+    category: OTHER
+    level: NONE
+  - type: "refactor"
+    category: CHANGED
+    level: NONE
+  - type: "style"
+    category: OTHER
+    level: NONE
+  - type: "test"
+    category: OTHER
+    level: NONE
