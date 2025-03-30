@@ -3,6 +3,7 @@ package io.github.sam42r.semver.analyzer.model;
 import io.github.sam42r.semver.scm.model.Commit;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
+import lombok.NoArgsConstructor;
 import lombok.experimental.SuperBuilder;
 
 import java.util.List;
@@ -11,6 +12,7 @@ import java.util.function.Predicate;
 @Data
 @SuperBuilder
 @EqualsAndHashCode(callSuper = false)
+@NoArgsConstructor
 public class AnalyzedCommit extends Commit {
 
     private String header;
@@ -18,19 +20,17 @@ public class AnalyzedCommit extends Commit {
     private String footer;
 
     private String type;
-    private Category category;
+    private ChangeCategory category;
     private String scope;
     private String subject;
-    private boolean breaking;
+    private SemVerChangeLevel level;
 
     private List<String> issues;
 
-    public enum Category {
-        ADDED, CHANGED, DEPRECATED, REMOVED, FIXED, SECURITY, OTHER;
-    }
-
-    public static Predicate<AnalyzedCommit> isBugfix = analyzedCommit ->
-            Category.FIXED.equals(analyzedCommit.getCategory()) || Category.SECURITY.equals(analyzedCommit.getCategory());
-    public static Predicate<AnalyzedCommit> isFeature = analyzedCommit -> Category.ADDED.equals(analyzedCommit.getCategory());
-    public static Predicate<AnalyzedCommit> isBreaking = AnalyzedCommit::isBreaking;
+    public static final Predicate<AnalyzedCommit> isBugfix = analyzedCommit ->
+            SemVerChangeLevel.PATCH.equals(analyzedCommit.getLevel());
+    public static final Predicate<AnalyzedCommit> isFeature = analyzedCommit ->
+            SemVerChangeLevel.MINOR.equals(analyzedCommit.getLevel());
+    public static final Predicate<AnalyzedCommit> isBreaking = analyzedCommit ->
+            SemVerChangeLevel.MINOR.equals(analyzedCommit.getLevel());
 }

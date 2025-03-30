@@ -1,8 +1,13 @@
 package io.github.sam42r.semver.analyzer;
 
 import io.github.sam42r.semver.analyzer.model.AnalyzedCommit;
+import io.github.sam42r.semver.analyzer.model.ChangeCategory;
+import io.github.sam42r.semver.analyzer.model.Configuration;
+import io.github.sam42r.semver.analyzer.model.SemVerChangeLevel;
 import io.github.sam42r.semver.scm.model.Commit;
+import lombok.AccessLevel;
 import lombok.NonNull;
+import lombok.RequiredArgsConstructor;
 
 import java.util.List;
 import java.util.Optional;
@@ -12,16 +17,12 @@ import java.util.regex.Pattern;
  * {@link CommitAnalyzer} for
  * <a href="https://gitmoji.dev/specification">GitM&#x1f60e;ji commit message specification</a>.
  */
+@RequiredArgsConstructor(access = AccessLevel.PROTECTED)
 public class GitMojiCommitAnalyzer implements CommitAnalyzer {
-
-    private static final String ANALYZER_NAME = "Gitmoji";
 
     private static final String COMMIT_MESSAGE_PATTERN = "(?<INTENTION>(:[a-z\\_]*:))(?<SCOPE>( \\([a-z]*\\)):?)?(?<MESSAGE>[^#]*)(?<REF>(#[0-9]*))?";
 
-    @Override
-    public @NonNull String getName() {
-        return ANALYZER_NAME;
-    }
+    private final Configuration configuration;
 
     @Override
     public @NonNull List<AnalyzedCommit> analyzeCommits(@NonNull List<Commit> commits) {
@@ -30,7 +31,7 @@ public class GitMojiCommitAnalyzer implements CommitAnalyzer {
 
     @Override
     public @NonNull String generateReleaseCommitMessage(@NonNull String version) {
-        return ":bookmark: (release): bump version %s".formatted(version);
+        return "%s: bump version %s".formatted(configuration.getRelease(), version);
     }
 
     private AnalyzedCommit analyzeCommit(@NonNull Commit commit) {
@@ -63,25 +64,32 @@ public class GitMojiCommitAnalyzer implements CommitAnalyzer {
                         .scope(scope)
                         .subject(message)
                         .issues(ref)
-                        .breaking(":boom:".equals(intention))
-                        .category(getCategory(intention));
+                        .category(getCategory(intention))
+                        .level(getLevel(intention));
             }
         }
         return analyzedCommitBuilder.build();
     }
 
-    private AnalyzedCommit.Category getCategory(String intention) {
+    private ChangeCategory getCategory(String intention) {
         if (intention != null) {
-            return switch (intention.toLowerCase()) {
-                case ":sparkles:", ":boom:" -> AnalyzedCommit.Category.ADDED;
-                case ":art:", ":recycle:" -> AnalyzedCommit.Category.CHANGED;
-                case ":wastebasket:" -> AnalyzedCommit.Category.DEPRECATED;
-                case ":fire:", ":coffin:" -> AnalyzedCommit.Category.REMOVED;
-                case ":bug:", ":ambulance:" -> AnalyzedCommit.Category.FIXED;
-                case ":lock:" -> AnalyzedCommit.Category.SECURITY;
-                default -> AnalyzedCommit.Category.OTHER;
-            };
+            return configuration.getItems().stream()
+                    .filter(v -> v.getType().equals(intention))
+                    .findAny()
+                    .map(AnalyzedCommit::getCategory)
+                    .orElse(ChangeCategory.OTHER);
         }
-        return AnalyzedCommit.Category.OTHER;
+        return ChangeCategory.OTHER;
+    }
+
+    private SemVerChangeLevel getLevel(String intention) {
+        if (intention != null) {
+            return configuration.getItems().stream()
+                    .filter(v -> v.getType().equals(intention))
+                    .findAny()
+                    .map(AnalyzedCommit::getLevel)
+                    .orElse(SemVerChangeLevel.NONE);
+        }
+        return SemVerChangeLevel.NONE;
     }
 }

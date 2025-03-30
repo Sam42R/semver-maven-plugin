@@ -2,6 +2,7 @@ package io.github.sam42r.semver.changelog;
 
 import com.github.mustachejava.DefaultMustacheFactory;
 import io.github.sam42r.semver.analyzer.model.AnalyzedCommit;
+import io.github.sam42r.semver.analyzer.model.ChangeCategory;
 import io.github.sam42r.semver.changelog.model.VersionInfo;
 import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
@@ -63,26 +64,26 @@ public class MarkupRenderer implements ChangelogRenderer {
             var context = new HashMap<String, Object>();
             context.put("release", versionInfo);
 
-            context.put("hasAdded", categorizedCommits.containsKey(AnalyzedCommit.Category.ADDED));
-            context.put("added", categorizedCommits.get(AnalyzedCommit.Category.ADDED));
+            context.put("hasAdded", categorizedCommits.containsKey(ChangeCategory.ADDED));
+            context.put("added", categorizedCommits.get(ChangeCategory.ADDED));
 
-            context.put("hasChanges", categorizedCommits.containsKey(AnalyzedCommit.Category.CHANGED));
-            context.put("changes", categorizedCommits.get(AnalyzedCommit.Category.CHANGED));
+            context.put("hasChanges", categorizedCommits.containsKey(ChangeCategory.CHANGED));
+            context.put("changes", categorizedCommits.get(ChangeCategory.CHANGED));
 
-            context.put("hasDeprecated", categorizedCommits.containsKey(AnalyzedCommit.Category.DEPRECATED));
-            context.put("deprecated", categorizedCommits.get(AnalyzedCommit.Category.DEPRECATED));
+            context.put("hasDeprecated", categorizedCommits.containsKey(ChangeCategory.DEPRECATED));
+            context.put("deprecated", categorizedCommits.get(ChangeCategory.DEPRECATED));
 
-            context.put("hasRemoved", categorizedCommits.containsKey(AnalyzedCommit.Category.REMOVED));
-            context.put("removed", categorizedCommits.get(AnalyzedCommit.Category.REMOVED));
+            context.put("hasRemoved", categorizedCommits.containsKey(ChangeCategory.REMOVED));
+            context.put("removed", categorizedCommits.get(ChangeCategory.REMOVED));
 
-            context.put("hasPatches", categorizedCommits.containsKey(AnalyzedCommit.Category.FIXED));
-            context.put("patches", categorizedCommits.get(AnalyzedCommit.Category.FIXED));
+            context.put("hasPatches", categorizedCommits.containsKey(ChangeCategory.FIXED));
+            context.put("patches", categorizedCommits.get(ChangeCategory.FIXED));
 
-            context.put("hasSecurity", categorizedCommits.containsKey(AnalyzedCommit.Category.SECURITY));
-            context.put("securities", categorizedCommits.get(AnalyzedCommit.Category.SECURITY));
+            context.put("hasSecurity", categorizedCommits.containsKey(ChangeCategory.SECURITY));
+            context.put("securities", categorizedCommits.get(ChangeCategory.SECURITY));
 
-            context.put("hasOthers", categorizedCommits.containsKey(AnalyzedCommit.Category.OTHER));
-            context.put("others", categorizedCommits.get(AnalyzedCommit.Category.OTHER));
+            context.put("hasOthers", categorizedCommits.containsKey(ChangeCategory.OTHER));
+            context.put("others", categorizedCommits.get(ChangeCategory.OTHER));
 
             context.put("renderHeader", !alreadyExists);
             context.put("renderFooter", !alreadyExists);

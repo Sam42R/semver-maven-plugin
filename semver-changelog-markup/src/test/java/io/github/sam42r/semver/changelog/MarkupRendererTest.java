@@ -1,6 +1,7 @@
 package io.github.sam42r.semver.changelog;
 
 import io.github.sam42r.semver.analyzer.model.AnalyzedCommit;
+import io.github.sam42r.semver.analyzer.model.ChangeCategory;
 import io.github.sam42r.semver.changelog.model.VersionInfo;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -87,7 +88,7 @@ class MarkupRendererTest {
                         .header("fix(scm): set clean commit message")
                         .body("* added scope for commit messages")
                         .footer("refs #42")
-                        .category(AnalyzedCommit.Category.FIXED)
+                        .category(ChangeCategory.FIXED)
                         .build()
         );
     }

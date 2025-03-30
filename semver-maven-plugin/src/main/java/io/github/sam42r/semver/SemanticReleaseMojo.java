@@ -5,6 +5,7 @@ import io.github.sam24r.semver.release.ReleasePublisher;
 import io.github.sam24r.semver.release.ReleasePublisherFactory;
 import io.github.sam24r.semver.release.model.ReleaseInfo;
 import io.github.sam42r.semver.analyzer.CommitAnalyzer;
+import io.github.sam42r.semver.analyzer.CommitAnalyzerFactory;
 import io.github.sam42r.semver.analyzer.model.AnalyzedCommit;
 import io.github.sam42r.semver.changelog.ChangelogRenderer;
 import io.github.sam42r.semver.changelog.ChangelogRendererFactory;
@@ -42,7 +43,7 @@ public class SemanticReleaseMojo extends AbstractMojo {
 
     @SuppressWarnings("rawtypes")
     private final ServiceLoader<SCMProviderFactory> scmProviderFactories = ServiceLoader.load(SCMProviderFactory.class);
-    private final ServiceLoader<CommitAnalyzer> commitAnalyzers = ServiceLoader.load(CommitAnalyzer.class);
+    private final ServiceLoader<CommitAnalyzerFactory> commitAnalyzerFactories = ServiceLoader.load(CommitAnalyzerFactory.class);
     private final ServiceLoader<ChangelogRendererFactory> changelogRendererFactories = ServiceLoader.load(ChangelogRendererFactory.class);
     private final ServiceLoader<ReleasePublisherFactory> releasePublisherFactories = ServiceLoader.load(ReleasePublisherFactory.class);
 
@@ -195,9 +196,10 @@ public class SemanticReleaseMojo extends AbstractMojo {
                         .filter(v -> scm.getProviderName().equalsIgnoreCase(v.getProviderName()))
                         .map(v -> v.getInstance(projectBaseDirectory, scm.getUsername(), scm.getPassword()))
                         .findAny(),
-                commitAnalyzers.stream()
+                commitAnalyzerFactories.stream()
                         .map(ServiceLoader.Provider::get)
                         .filter(v -> analyzer.getSpecificationName().equalsIgnoreCase(v.getName()))
+                        .map(v -> v.getInstance(analyzer.getConfigurationPath()))
                         .findAny(),
                 changelogRendererFactories.stream()
                         .map(ServiceLoader.Provider::get)

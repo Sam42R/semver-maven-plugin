@@ -1,6 +1,8 @@
 package io.github.sam42r.semver.analyzer;
 
 import io.github.sam42r.semver.analyzer.model.AnalyzedCommit;
+import io.github.sam42r.semver.analyzer.model.ChangeCategory;
+import io.github.sam42r.semver.analyzer.model.SemVerChangeLevel;
 import io.github.sam42r.semver.scm.model.Commit;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -16,7 +18,7 @@ class GetMojiCommitAnalyzerTest {
 
     @BeforeEach
     void setup() {
-        uut = new GitMojiCommitAnalyzer();
+        uut = new GitMojiCommitAnalyzerFactory().getInstance("classpath:/configuration.yml");
     }
 
     @Test
@@ -47,7 +49,8 @@ class GetMojiCommitAnalyzerTest {
                         .scope("scm")
                         .subject("set clean commit message")
                         .issues(List.of("42"))
-                        .category(AnalyzedCommit.Category.FIXED)
+                        .category(ChangeCategory.FIXED)
+                        .level(SemVerChangeLevel.PATCH)
                         .build(),
                 AnalyzedCommit.builder()
                         .id("42.2")
@@ -57,7 +60,8 @@ class GetMojiCommitAnalyzerTest {
                         .message(":sparkles: add awesome things")
                         .type(":sparkles:")
                         .subject("add awesome things")
-                        .category(AnalyzedCommit.Category.ADDED)
+                        .category(ChangeCategory.ADDED)
+                        .level(SemVerChangeLevel.MINOR)
                         .build()
         );
     }
@@ -84,8 +88,8 @@ class GetMojiCommitAnalyzerTest {
                         .scope("void")
                         .subject("break some glass")
                         .issues(List.of("42"))
-                        .category(AnalyzedCommit.Category.ADDED)
-                        .breaking(true)
+                        .category(ChangeCategory.ADDED)
+                        .level(SemVerChangeLevel.MAJOR)
                         .build()
         );
     }
@@ -110,7 +114,8 @@ class GetMojiCommitAnalyzerTest {
                         .message(":white_check_mark: add test for something")
                         .type(":white_check_mark:")
                         .subject("add test for something")
-                        .category(AnalyzedCommit.Category.OTHER)
+                        .category(ChangeCategory.OTHER)
+                        .level(SemVerChangeLevel.NONE)
                         .build()
         );
     }
