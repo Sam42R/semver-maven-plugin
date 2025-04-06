@@ -32,5 +32,5 @@ public class AnalyzedCommit extends Commit {
     public static final Predicate<AnalyzedCommit> isFeature = analyzedCommit ->
             SemVerChangeLevel.MINOR.equals(analyzedCommit.getLevel());
     public static final Predicate<AnalyzedCommit> isBreaking = analyzedCommit ->
-            SemVerChangeLevel.MINOR.equals(analyzedCommit.getLevel());
+            SemVerChangeLevel.MAJOR.equals(analyzedCommit.getLevel());
 }

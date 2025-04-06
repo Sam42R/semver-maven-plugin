@@ -6,5 +6,5 @@ public interface CommitAnalyzerFactory {
 
     @NonNull String getName();
 
-    @NonNull CommitAnalyzer getInstance(@NonNull String configuration);
+    @NonNull CommitAnalyzer getInstance(String configuration);
 }
