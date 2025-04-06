@@ -18,7 +18,7 @@ class ConventionalCommitAnalyzerTest {
 
     @BeforeEach
     void setup() {
-        uut = new ConventionalCommitAnalyzerFactory().getInstance("classpath:/configuration.yml");
+        uut = new ConventionalCommitAnalyzerFactory().getInstance(null);
     }
 
     @Test

@@ -3,7 +3,11 @@ package io.github.sam42r.semver.analyzer;
 import io.github.sam42r.semver.analyzer.model.Configuration;
 import lombok.NonNull;
 
+import java.util.Optional;
+
 public class GitMojiCommitAnalyzerFactory implements CommitAnalyzerFactory {
+
+    private static final String DEFAULT_CONFIG = "classpath:/configuration-gitmoji.yml";
 
     private static final String ANALYZER_NAME = "Gitmoji";
 
@@ -13,7 +17,8 @@ public class GitMojiCommitAnalyzerFactory implements CommitAnalyzerFactory {
     }
 
     @Override
-    public @NonNull CommitAnalyzer getInstance(@NonNull String configuration) {
-        return new GitMojiCommitAnalyzer(Configuration.read(configuration));
+    public @NonNull CommitAnalyzer getInstance(String configuration) {
+        return new GitMojiCommitAnalyzer(
+                Configuration.read(Optional.ofNullable(configuration).orElse(DEFAULT_CONFIG)));
     }
 }

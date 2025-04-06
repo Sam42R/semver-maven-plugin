@@ -13,6 +13,5 @@ public class Analyzer {
 
     @Builder.Default
     private String specificationName = "Conventional";
-    @Builder.Default
-    private String configurationPath = "classpath:/configuration.yml";
+    private String configurationPath;
 }

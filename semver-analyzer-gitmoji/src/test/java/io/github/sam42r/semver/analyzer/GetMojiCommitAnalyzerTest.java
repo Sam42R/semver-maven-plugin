@@ -18,7 +18,7 @@ class GetMojiCommitAnalyzerTest {
 
     @BeforeEach
     void setup() {
-        uut = new GitMojiCommitAnalyzerFactory().getInstance("classpath:/configuration.yml");
+        uut = new GitMojiCommitAnalyzerFactory().getInstance(null);
     }
 
     @Test
