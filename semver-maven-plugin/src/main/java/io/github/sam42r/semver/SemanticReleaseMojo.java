@@ -219,7 +219,7 @@ public class SemanticReleaseMojo extends AbstractMojo {
             var tags = scmProvider.readTags();
             var commits = scmProvider.readCommits(null);
 
-            var latestTagOpt = tags.max(new TagVersionComparator(tagFormat));
+            var latestTagOpt = tags.filter(t -> Version.matchesPattern(t.getName(), tagFormat)).max(new TagVersionComparator(tagFormat));
             var latestCommitOpt = latestTagOpt.map(Tag::getCommitId)
                     .or(() -> commits.min(Comparator.comparing(Commit::getTimestamp)).map(Commit::getId));
 
