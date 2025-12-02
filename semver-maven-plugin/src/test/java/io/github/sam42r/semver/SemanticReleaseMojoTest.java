@@ -1,6 +1,10 @@
 package io.github.sam42r.semver;
 
+import io.github.sam42r.semver.analyzer.ConventionalCommitAnalyzerFactory;
+import io.github.sam42r.semver.changelog.MarkupRendererFactory;
 import io.github.sam42r.semver.model.Version;
+import io.github.sam42r.semver.release.GithubPublisherFactory;
+import io.github.sam42r.semver.scm.DefaultGitProviderFactory;
 import org.apache.maven.plugin.MojoExecutionException;
 import org.apache.maven.plugin.MojoFailureException;
 import org.apache.maven.plugin.logging.Log;
@@ -18,6 +22,7 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.Mockito.mock;
@@ -40,7 +45,12 @@ class SemanticReleaseMojoTest {
 
     @BeforeEach
     void setup() throws IOException {
-        uut = new SemanticReleaseMojo();
+        uut = new SemanticReleaseMojo(
+                Map.of("Git", new DefaultGitProviderFactory()),
+                Map.of("Conventional", new ConventionalCommitAnalyzerFactory()),
+                Map.of("Markup", new MarkupRendererFactory()),
+                Map.of("Github", new GithubPublisherFactory())
+        );
 
         var logMock = mock(Log.class);
         uut.setLog(logMock);
@@ -122,7 +132,12 @@ class SemanticReleaseMojoTest {
     @Test
     @Disabled("local testing only")
     void shouldReleaseLocal() throws MojoExecutionException, MojoFailureException {
-        var mojo = new SemanticReleaseMojo();
+        var mojo = new SemanticReleaseMojo(
+                Map.of("Git", new DefaultGitProviderFactory()),
+                Map.of("Conventional", new ConventionalCommitAnalyzerFactory()),
+                Map.of("Markup", new MarkupRendererFactory()),
+                Map.of("Github", new GithubPublisherFactory())
+        );
 
         mojo.setLog(new SystemStreamLog());
 

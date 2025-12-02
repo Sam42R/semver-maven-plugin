@@ -2,14 +2,10 @@ package io.github.sam42r.semver.changelog;
 
 import lombok.NonNull;
 
+import javax.inject.Named;
+
+@Named("Markup")
 public class MarkupRendererFactory implements ChangelogRendererFactory<MarkupRenderer> {
-
-    private static final String RENDERER_NAME = "Markup";
-
-    @Override
-    public @NonNull String getName() {
-        return RENDERER_NAME;
-    }
 
     @Override
     public @NonNull MarkupRenderer getInstance(@NonNull String template) {

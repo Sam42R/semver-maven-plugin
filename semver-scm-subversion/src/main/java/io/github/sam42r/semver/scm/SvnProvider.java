@@ -6,6 +6,7 @@ import io.github.sam42r.semver.scm.model.Tag;
 import lombok.NonNull;
 import org.apache.commons.lang3.NotImplementedException;
 
+import javax.inject.Named;
 import java.nio.file.Path;
 import java.util.stream.Stream;
 
@@ -15,14 +16,8 @@ import java.util.stream.Stream;
  *
  * @author Sam42R
  */
+@Named("Subversion")
 public class SvnProvider implements SCMProviderFactory<SvnProvider>, SCMProvider {
-
-    private static final String PROVIDER_NAME = "Subversion";
-
-    @Override
-    public @NonNull String getProviderName() {
-        return PROVIDER_NAME;
-    }
 
     @Override
     public @NonNull SvnProvider getInstance(@NonNull Path path, String username, String password) {
