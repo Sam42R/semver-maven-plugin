@@ -11,6 +11,7 @@
     </parent>
 
     <artifactId>semver-scm-mercurial</artifactId>
+    <name>${project.groupId}:${project.artifactId}</name>
 
     <properties>
         <maven.compiler.source>19</maven.compiler.source>
