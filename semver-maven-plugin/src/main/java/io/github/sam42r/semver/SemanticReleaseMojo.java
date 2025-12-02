@@ -27,6 +27,7 @@ import org.apache.maven.plugins.annotations.Mojo;
 import org.apache.maven.plugins.annotations.Parameter;
 import org.apache.maven.project.MavenProject;
 
+import javax.inject.Inject;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -39,13 +40,8 @@ import java.util.*;
  * @author Sam42R
  */
 @Mojo(name = "semantic-release")
+@SuppressWarnings("rawtypes")
 public class SemanticReleaseMojo extends AbstractMojo {
-
-    @SuppressWarnings("rawtypes")
-    private final ServiceLoader<SCMProviderFactory> scmProviderFactories = ServiceLoader.load(SCMProviderFactory.class);
-    private final ServiceLoader<CommitAnalyzerFactory> commitAnalyzerFactories = ServiceLoader.load(CommitAnalyzerFactory.class);
-    private final ServiceLoader<ChangelogRendererFactory> changelogRendererFactories = ServiceLoader.load(ChangelogRendererFactory.class);
-    private final ServiceLoader<ReleasePublisherFactory> releasePublisherFactories = ServiceLoader.load(ReleasePublisherFactory.class);
 
     @Setter
     @Parameter(defaultValue = "${project}", required = true, readonly = true)
@@ -70,6 +66,24 @@ public class SemanticReleaseMojo extends AbstractMojo {
     @Setter
     @Parameter
     private Release release;
+
+    private final Map<String, SCMProviderFactory> scmProviderFactories;
+    private final Map<String, CommitAnalyzerFactory> commitAnalyzerFactories;
+    private final Map<String, ChangelogRendererFactory> changelogRendererFactories;
+    private final Map<String, ReleasePublisherFactory> releasePublisherFactories;
+
+    @Inject
+    public SemanticReleaseMojo(
+            Map<String, SCMProviderFactory> scmProviderFactories,
+            Map<String, CommitAnalyzerFactory> commitAnalyzerFactories,
+            Map<String, ChangelogRendererFactory> changelogRendererFactories,
+            Map<String, ReleasePublisherFactory> releasePublisherFactories
+    ) {
+        this.scmProviderFactories = scmProviderFactories;
+        this.commitAnalyzerFactories = commitAnalyzerFactories;
+        this.changelogRendererFactories = changelogRendererFactories;
+        this.releasePublisherFactories = releasePublisherFactories;
+    }
 
     @Override
     public void execute() throws MojoExecutionException, MojoFailureException {
@@ -191,24 +205,24 @@ public class SemanticReleaseMojo extends AbstractMojo {
 
     private VerifiedConditions verifyConditions(Path projectBaseDirectory) {
         return new VerifiedConditions(
-                scmProviderFactories.stream()
-                        .map(ServiceLoader.Provider::get)
-                        .filter(v -> scm.getProviderName().equalsIgnoreCase(v.getProviderName()))
+                scmProviderFactories.entrySet().stream()
+                        .filter(v -> v.getKey().equalsIgnoreCase(scm.getProviderName()))
+                        .map(Map.Entry::getValue)
                         .map(v -> v.getInstance(projectBaseDirectory, scm.getUsername(), scm.getPassword()))
                         .findAny(),
-                commitAnalyzerFactories.stream()
-                        .map(ServiceLoader.Provider::get)
-                        .filter(v -> analyzer.getSpecificationName().equalsIgnoreCase(v.getName()))
+                commitAnalyzerFactories.entrySet().stream()
+                        .filter(v -> v.getKey().equalsIgnoreCase(analyzer.getSpecificationName()))
+                        .map(Map.Entry::getValue)
                         .map(v -> v.getInstance(analyzer.getConfigurationPath()))
                         .findAny(),
-                changelogRendererFactories.stream()
-                        .map(ServiceLoader.Provider::get)
-                        .filter(v -> changelog.getRendererName().equalsIgnoreCase(v.getName()))
+                changelogRendererFactories.entrySet().stream()
+                        .filter(v -> v.getKey().equalsIgnoreCase(changelog.getRendererName()))
+                        .map(Map.Entry::getValue)
                         .map(v -> v.getInstance(changelog.getTemplate()))
                         .findAny(),
-                releasePublisherFactories.stream()
-                        .map(ServiceLoader.Provider::get)
-                        .filter(v -> release.getPublisherName().equalsIgnoreCase(v.getName()))
+                releasePublisherFactories.entrySet().stream()
+                        .filter(v -> v.getKey().equalsIgnoreCase(release.getPublisherName()))
+                        .map(Map.Entry::getValue)
                         .map(v -> v.getInstance(release.getUsername(), release.getPassword()))
                         .findAny()
         );

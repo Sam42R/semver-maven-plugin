@@ -4,7 +4,5 @@ import lombok.NonNull;
 
 public interface CommitAnalyzerFactory {
 
-    @NonNull String getName();
-
     @NonNull CommitAnalyzer getInstance(String configuration);
 }

@@ -4,14 +4,10 @@ import io.github.sam24r.semver.release.ReleasePublisher;
 import io.github.sam24r.semver.release.ReleasePublisherFactory;
 import lombok.NonNull;
 
+import javax.inject.Named;
+
+@Named("Github")
 public class GithubPublisherFactory implements ReleasePublisherFactory {
-
-    private static final String PUBLISHER_NAME = "Github";
-
-    @Override
-    public @NonNull String getName() {
-        return PUBLISHER_NAME;
-    }
 
     @Override
     public @NonNull ReleasePublisher getInstance(String username, String password) {

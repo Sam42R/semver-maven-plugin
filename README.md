@@ -9,6 +9,13 @@ The `semver-maven-plugin` aims to transfer the functionality of the
 [semantic-release](https://www.npmjs.com/package/semantic-release) package for
 [node.js](https://nodejs.org/en) into the maven universe.
 
+# Requirements
+
+| Plugin-Version | minimal Maven-Version | Comment             |
+|----------------|-----------------------|---------------------|
+| &lt;= 1.6.0    | 3.8.x                 |                     |
+| &gt;= 1.7.0    | 3.9.6                 | sisu 0.9.x required |
+
 # Release steps
 (as defined by [semantic-release](https://www.npmjs.com/package/semantic-release))
 
