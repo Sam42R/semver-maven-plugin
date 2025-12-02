@@ -7,6 +7,16 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 <!-- DO NOT REMOVE - c871f32ed1b7a85b24a0f22e8e7d9e3ee285742c - DO NOT REMOVE -->
 
+## 1.7.0 - 2025-12-02
+
+
+### Added
+- :sparkles: switch from service-loader to jsr330 dependency injection #37
+### Others
+- :arrow_up: Bump org.apache.commons:commons-lang3 from 3.12.0 to 3.18.0&#10;&#10;Bumps org.apache.commons:commons-lang3 from 3.12.0 to 3.18.0.&#10;&#10;---&#10;updated-dependencies:&#10;- dependency-name: org.apache.commons:commons-lang3&#10;  dependency-version: 3.18.0&#10;  dependency-type: direct:production&#10;...&#10;&#10;Signed-off-by: dependabot[bot] &lt;support@github.com&gt;
+- :arrow_up: bump org.eclipse.jgit&#10;&#10;Bumps org.eclipse.jgit:org.eclipse.jgit from 6.6.1.202309021850-r to 6.10.1.202505221210-r.&#10;&#10;---&#10;updated-dependencies:&#10;- dependency-name: org.eclipse.jgit:org.eclipse.jgit&#10;  dependency-version: 6.10.1.202505221210-r&#10;  dependency-type: direct:production&#10;...&#10;&#10;Signed-off-by: dependabot[bot] &lt;support@github.com&gt;
+
+
 ## 1.6.0 - 2025-04-06
 
 
