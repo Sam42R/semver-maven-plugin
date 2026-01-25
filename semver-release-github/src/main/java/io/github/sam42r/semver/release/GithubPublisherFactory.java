@@ -11,11 +11,11 @@ public class GithubPublisherFactory implements ReleasePublisherFactory {
 
     @Override
     public @NonNull ReleasePublisher getInstance(String username, String password) {
-        return getInstance("%s://api.%s/repos/%s/%s/releases", username, password);
+        return getInstance("%s://api.%s", username, password);
     }
 
     @Override
     public @NonNull ReleasePublisher getInstance(@NonNull String baseUrl, String username, String password) {
-        return new GithubPublisher(baseUrl, password);
+        return new DefaultGithubPublisher(baseUrl, username, password);
     }
 }
