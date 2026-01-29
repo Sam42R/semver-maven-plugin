@@ -20,7 +20,7 @@ import java.util.regex.Pattern;
 @RequiredArgsConstructor(access = AccessLevel.PROTECTED)
 public class GitMojiCommitAnalyzer implements CommitAnalyzer {
 
-    private static final String COMMIT_MESSAGE_PATTERN = "(?<INTENTION>(:[a-z\\_]*:))(?<SCOPE>( \\([a-z]*\\)):?)?(?<MESSAGE>[^#]*)(?<REF>(#[0-9]*))?";
+    private static final String COMMIT_MESSAGE_PATTERN = "(?<INTENTION>(:[a-z_]*:))(?<SCOPE>( \\([a-z]*\\)):?)?(?<MESSAGE>[^#]*)(?<REF>(#\\d*))?";
 
     private final Configuration configuration;
 
