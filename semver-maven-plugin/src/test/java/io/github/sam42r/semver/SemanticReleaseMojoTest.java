@@ -75,7 +75,7 @@ class SemanticReleaseMojoTest {
     void shouldFindNoLatestRelease() throws GitAPIException, MojoExecutionException, MojoFailureException {
         try (var git = initializeGitRepository(tmp)) {
             git.add().addFilepattern("pom.xml").call();
-            var commit = git.commit().setMessage("Initial commit").call();
+            git.commit().setMessage("Initial commit").call();
 
             uut.execute();
 
@@ -102,7 +102,7 @@ class SemanticReleaseMojoTest {
     }
 
     @Test
-    void shouldThrowWithEmptyGitRepository() throws GitAPIException, MojoExecutionException, MojoFailureException {
+    void shouldThrowWithEmptyGitRepository() throws GitAPIException {
         try (var ignored = initializeGitRepository(tmp)) {
             assertThatThrownBy(() -> uut.execute())
                     .isInstanceOf(MojoExecutionException.class)

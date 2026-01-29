@@ -39,7 +39,7 @@ public final class PomHelper {
         } catch (IOException e) {
             throw new UncheckedIOException(e);
         } catch (ParserConfigurationException | SAXException e) {
-            throw new RuntimeException(e);
+            throw new IllegalArgumentException(e);
         }
 
         var projectVersionLocation = projectVersionLocator.getProjectVersionLocation();
@@ -79,6 +79,7 @@ public final class PomHelper {
      *
      * @author Sam42R
      */
+    @SuppressWarnings("java:S1149")
     private static class ProjectVersionLocator extends DefaultHandler {
         private static final String VERSION_ELEM_NAME = "version";
 

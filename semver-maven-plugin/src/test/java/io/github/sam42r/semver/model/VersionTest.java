@@ -14,7 +14,7 @@ class VersionTest {
         assertThat(actual)
                 .extracting("major", "minor", "patch")
                 .containsExactly(1, 0, 0);
-        assertThat(actual.toString()).isEqualTo("1.0.0");
+        assertThat(actual).hasToString("1.0.0");
         assertThat(actual.toTag()).isEqualTo("v1.0.0");
     }
 

@@ -103,7 +103,7 @@ public class MarkupRenderer implements ChangelogRenderer {
             finalWriter.flush();
             return new ByteArrayInputStream(finalOutputStream.toByteArray());
         } catch (IOException e) {
-            throw new RuntimeException(e);
+            throw new UncheckedIOException(e);
         }
     }
 }

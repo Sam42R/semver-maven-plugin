@@ -43,6 +43,8 @@ import java.util.*;
 @SuppressWarnings("rawtypes")
 public class SemanticReleaseMojo extends AbstractMojo {
 
+    private static final String POM = "pom.xml";
+
     @Setter
     @Parameter(defaultValue = "${project}", required = true, readonly = true)
     private MavenProject project;
@@ -155,14 +157,14 @@ public class SemanticReleaseMojo extends AbstractMojo {
             );
             var notes = generateNotes(projectBaseDirectory, changelogRenderer, versionInfo, analyzedCommits);
 
-            getLog().debug("Setting project version in 'pom.xml' to '%s'".formatted(latestVersion.toString()));
-            var pomXml = projectBaseDirectory.resolve("pom.xml");
+            getLog().debug("Setting project version in '%s' to '%s'".formatted(POM, latestVersion.toString()));
+            var pomXml = projectBaseDirectory.resolve(POM);
             PomHelper.changeVersion(pomXml, latestVersion.toString());
 
             var modules = isModule(project) ? project.getParent().getModules() : project.getModules();
             var modulePomsXml = new ArrayList<Path>();
             for (var module : modules) {
-                var modulePomXml = projectBaseDirectory.resolve(module).resolve("pom.xml");
+                var modulePomXml = projectBaseDirectory.resolve(module).resolve(POM);
                 PomHelper.changeParentVersion(modulePomXml, latestVersion.toString());
 
                 modulePomsXml.add(modulePomXml);
@@ -197,8 +199,8 @@ public class SemanticReleaseMojo extends AbstractMojo {
         getLog().debug("Checking if project is maven module");
         if (project.hasParent()) {
             var parentProjectDirectory = mavenProject.getFile().getParentFile().getParentFile().toPath();
-            getLog().debug("Looking for 'pom.xml' in '%s'".formatted(parentProjectDirectory.toAbsolutePath().toString()));
-            return Files.exists(parentProjectDirectory.resolve("pom.xml"));
+            getLog().debug("Looking for '%s' in '%s'".formatted(POM, parentProjectDirectory.toAbsolutePath().toString()));
+            return Files.exists(parentProjectDirectory.resolve(POM));
         }
         return false;
     }
@@ -279,14 +281,14 @@ public class SemanticReleaseMojo extends AbstractMojo {
             VersionInfo versionInfo,
             List<AnalyzedCommit> analyzedCommits
     ) throws MojoExecutionException {
-        var changelog = projectBaseDirectory.resolve("Changelog.md");
-        try (var inputStream = renderer.renderChangelog(changelog, versionInfo, analyzedCommits)) {
-            Files.write(changelog, inputStream.readAllBytes());
+        var path = projectBaseDirectory.resolve("Changelog.md");
+        try (var inputStream = renderer.renderChangelog(path, versionInfo, analyzedCommits)) {
+            Files.write(path, inputStream.readAllBytes());
         } catch (IOException e) {
             throw new MojoExecutionException(e.getMessage(), e.getCause());
         }
 
-        return changelog;
+        return path;
     }
 
     private void createTag(
