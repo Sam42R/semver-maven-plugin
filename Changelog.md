@@ -7,6 +7,19 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 <!-- DO NOT REMOVE - c871f32ed1b7a85b24a0f22e8e7d9e3ee285742c - DO NOT REMOVE -->
 
+## 1.8.0 - 2026-01-29
+
+
+### Added
+- :sparkles: use hub4j to create GitHub release #52
+### Removed
+- :coffin: remove legacy github model #52
+### Others
+- :construction_worker: update coverage aggregation
+- :arrow_up: Bump org.assertj:assertj-core from 3.24.2 to 3.27.7&#10;&#10;Bumps [org.assertj:assertj-core](https://github.com/assertj/assertj) from 3.24.2 to 3.27.7.&#10;- [Release notes](https://github.com/assertj/assertj/releases)&#10;- [Commits](https://github.com/assertj/assertj/compare/assertj-build-3.24.2...assertj-build-3.27.7)&#10;&#10;---&#10;updated-dependencies:&#10;- dependency-name: org.assertj:assertj-core&#10;  dependency-version: 3.27.7&#10;  dependency-type: direct:production&#10;...&#10;&#10;Signed-off-by: dependabot[bot] &lt;support@github.com&gt;
+- :construction_worker: add project-name to all modules
+
+
 ## 1.7.0 - 2025-12-02
 
 
