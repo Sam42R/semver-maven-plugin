@@ -12,4 +12,6 @@ public interface ReleasePublisher {
             @NonNull String project,
             @NonNull ReleaseInfo releaseInfo
     ) throws ReleaseException;
+
+    default String generateIssueLink(String issue) { return issue; }
 }

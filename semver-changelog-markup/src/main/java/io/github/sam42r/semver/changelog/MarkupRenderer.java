@@ -14,11 +14,12 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.HashMap;
 import java.util.List;
+import java.util.function.Function;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 @RequiredArgsConstructor
-public class MarkupRenderer implements ChangelogRenderer {
+public class MarkupRenderer extends AbstractChangelogRenderer {
 
     private static final String CHANGELOG_TEMPLATE = "%s.mustache";
 
@@ -28,7 +29,8 @@ public class MarkupRenderer implements ChangelogRenderer {
     public @NonNull InputStream renderChangelog(
             @NonNull Path path,
             @NonNull VersionInfo versionInfo,
-            @NonNull List<AnalyzedCommit> analyzedCommits
+            @NonNull List<AnalyzedCommit> analyzedCommits,
+            @NonNull Function<String, String> issueLinkGenerator
     ) {
         var marker = DigestUtils.sha1Hex("Sam42R");
 
@@ -54,6 +56,7 @@ public class MarkupRenderer implements ChangelogRenderer {
                 var finalWriter = new BufferedWriter(new OutputStreamWriter(finalOutputStream))
         ) {
             var categorizedCommits = analyzedCommits.stream()
+                    .map(v -> generateIssueLinks(v, issueLinkGenerator))
                     .collect(Collectors.toMap(
                             AnalyzedCommit::getCategory,
                             List::of,

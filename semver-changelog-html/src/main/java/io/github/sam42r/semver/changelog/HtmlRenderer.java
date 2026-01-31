@@ -14,6 +14,7 @@ import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.List;
+import java.util.function.Function;
 
 @RequiredArgsConstructor
 public class HtmlRenderer implements ChangelogRenderer {
@@ -24,7 +25,8 @@ public class HtmlRenderer implements ChangelogRenderer {
     public @NonNull InputStream renderChangelog(
             @NonNull Path path,
             @NonNull VersionInfo versionInfo,
-            @NonNull List<AnalyzedCommit> analyzedCommits
+            @NonNull List<AnalyzedCommit> analyzedCommits,
+            @NonNull Function<String, String> issueLinkGenerator
     ) {
         var marker = DigestUtils.sha1Hex("Sam42R");
 

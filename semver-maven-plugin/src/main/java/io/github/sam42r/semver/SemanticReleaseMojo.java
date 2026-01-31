@@ -35,6 +35,7 @@ import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.time.temporal.ChronoUnit;
 import java.util.*;
+import java.util.function.Function;
 
 /**
  * @author Sam42R
@@ -155,7 +156,7 @@ public class SemanticReleaseMojo extends AbstractMojo {
                     LocalDateTime.now().format(DateTimeFormatter.ISO_DATE),
                     "" // TODO read docs(changelog) commits and add as release description
             );
-            var notes = generateNotes(projectBaseDirectory, changelogRenderer, versionInfo, analyzedCommits);
+            var notes = generateNotes(projectBaseDirectory, changelogRenderer, versionInfo, analyzedCommits, releasePublisher);
 
             getLog().debug("Setting project version in '%s' to '%s'".formatted(POM, latestVersion.toString()));
             var pomXml = projectBaseDirectory.resolve(POM);
@@ -279,10 +280,11 @@ public class SemanticReleaseMojo extends AbstractMojo {
             Path projectBaseDirectory,
             ChangelogRenderer renderer,
             VersionInfo versionInfo,
-            List<AnalyzedCommit> analyzedCommits
+            List<AnalyzedCommit> analyzedCommits,
+            ReleasePublisher publisher
     ) throws MojoExecutionException {
         var path = projectBaseDirectory.resolve("Changelog.md");
-        try (var inputStream = renderer.renderChangelog(path, versionInfo, analyzedCommits)) {
+        try (var inputStream = renderer.renderChangelog(path, versionInfo, analyzedCommits, publisher::generateIssueLink)) {
             Files.write(path, inputStream.readAllBytes());
         } catch (IOException e) {
             throw new MojoExecutionException(e.getMessage(), e.getCause());

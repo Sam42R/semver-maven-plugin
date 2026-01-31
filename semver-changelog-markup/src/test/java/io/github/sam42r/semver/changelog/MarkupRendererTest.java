@@ -32,7 +32,7 @@ class MarkupRendererTest {
     void shouldCreateChangelogFull(@TempDir Path tempDir) throws IOException {
         var changelog = tempDir.resolve("Changelog.md");
 
-        try (var inputStream = uut.renderChangelog(changelog, release("v1.0.0"), analyzedCommits())) {
+        try (var inputStream = uut.renderChangelog(changelog, release("v1.0.0"), analyzedCommits(), this::generateIssueLink)) {
             var actual = inputStream.readAllBytes();
 
             assertThat(actual).asString(StandardCharsets.UTF_8)
@@ -50,21 +50,21 @@ class MarkupRendererTest {
                 changelog,
                 """
                         # Changelog
-                                                
+                        
                         header text
-                                                
+                        
                         <!-- DO NOT REMOVE - c871f32ed1b7a85b24a0f22e8e7d9e3ee285742c - DO NOT REMOVE -->
-                                                
+                        
                         ## v0.9.0 - 2024-01-01
-                                                
+                        
                         ## Disclaimer
-                                                
+                        
                         footer text
                         """,
                 StandardOpenOption.CREATE, StandardOpenOption.TRUNCATE_EXISTING
         );
 
-        try (var inputStream = uut.renderChangelog(changelog, release("v1.0.0"), List.of())) {
+        try (var inputStream = uut.renderChangelog(changelog, release("v1.0.0"), List.of(), this::generateIssueLink)) {
             var actual = inputStream.readAllBytes();
 
             assertThat(actual).asString(StandardCharsets.UTF_8)
@@ -89,7 +89,12 @@ class MarkupRendererTest {
                         .body("* added scope for commit messages")
                         .footer("refs #42")
                         .category(ChangeCategory.FIXED)
+                        .issues(List.of("42"))
                         .build()
         );
+    }
+
+    private String generateIssueLink(String string) {
+        return "[#%s](https://junit.org/issues/%s)".formatted(string, string);
     }
 }

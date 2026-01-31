@@ -15,6 +15,7 @@ import java.time.Instant;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.List;
+import java.util.function.Function;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
@@ -29,7 +30,7 @@ class HtmlRendererTest {
         var uut = new HtmlRenderer(template);
         var changelog = tempDir.resolve("Changelog.html");
 
-        try (var inputStream = uut.renderChangelog(changelog, release("v1.0.0"), analyzedCommits())) {
+        try (var inputStream = uut.renderChangelog(changelog, release("v1.0.0"), analyzedCommits(), Function.identity())) {
             var actual = inputStream.readAllBytes();
             Files.write(changelog, actual);
 
@@ -46,12 +47,12 @@ class HtmlRendererTest {
         var uut = new HtmlRenderer(template);
         var changelog = tempDir.resolve("Changelog.html");
 
-        try (var inputStream = uut.renderChangelog(changelog, release("v1.0.0"), analyzedCommits())) {
+        try (var inputStream = uut.renderChangelog(changelog, release("v1.0.0"), analyzedCommits(), Function.identity())) {
             var actual = inputStream.readAllBytes();
             Files.write(changelog, actual);
         }
 
-        try (var inputStream = uut.renderChangelog(changelog, release("v1.0.1"), analyzedCommits())) {
+        try (var inputStream = uut.renderChangelog(changelog, release("v1.0.1"), analyzedCommits(), Function.identity())) {
             var actual = inputStream.readAllBytes();
             Files.write(changelog, actual);
 
