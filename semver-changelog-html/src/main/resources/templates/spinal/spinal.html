@@ -54,9 +54,11 @@
                                 </span>
                             </p>
                         </th:block>
-                        <p class="text-gray-700"
-                           th:text="${commit.header}">
-                            Lorem ipsum
+                        <p class="text-gray-700">
+                            <span th:text="${commit.header}">Lorem ipsum</span>
+                            <th:block th:each="issue : ${commit.issues}">
+                                (<a th:href="${issue.url}" th:text="|#${issue.id}|"></a>)
+                            </th:block>
                         </p>
                     </th:block>
                 </div>

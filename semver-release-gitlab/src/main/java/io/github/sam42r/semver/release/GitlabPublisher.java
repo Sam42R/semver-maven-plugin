@@ -3,6 +3,7 @@ package io.github.sam42r.semver.release;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import io.github.sam24r.semver.release.ReleaseException;
 import io.github.sam24r.semver.release.ReleasePublisher;
+import io.github.sam42r.semver.model.release.ProviderSpec;
 import io.github.sam42r.semver.model.release.ReleaseInfo;
 import io.github.sam42r.semver.release.model.GitlabRelease;
 import lombok.NonNull;
@@ -73,5 +74,12 @@ public class GitlabPublisher implements ReleasePublisher {
                 .name(releaseInfo.name())
                 .description(releaseInfo.description())
                 .build();
+    }
+
+    @Override
+    public ProviderSpec providerSpec() {
+        return new ProviderSpec(
+                "%s://%s/%s/%s/-/issues/%s"
+        );
     }
 }

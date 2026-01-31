@@ -5,7 +5,9 @@ import io.github.sam42r.semver.model.analyze.AnalyzedCommit;
 import io.github.sam42r.semver.model.analyze.ChangeCategory;
 import io.github.sam42r.semver.model.analyze.Issue;
 import io.github.sam42r.semver.model.analyze.SemVerChangeLevel;
+import io.github.sam42r.semver.model.release.ProviderSpec;
 import io.github.sam42r.semver.model.scm.Commit;
+import io.github.sam42r.semver.model.scm.Remote;
 import lombok.AccessLevel;
 import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
@@ -27,16 +29,16 @@ public class GitMojiCommitAnalyzer implements CommitAnalyzer {
     private final Configuration configuration;
 
     @Override
-    public @NonNull List<AnalyzedCommit> analyzeCommits(@NonNull List<Commit> commits) {
-        return commits.stream().map(this::analyzeCommit).toList();
-    }
-
-    @Override
     public @NonNull String generateReleaseCommitMessage(@NonNull String version) {
         return "%s: bump version %s".formatted(configuration.getRelease(), version);
     }
 
-    private AnalyzedCommit analyzeCommit(@NonNull Commit commit) {
+    @Override
+    public @NonNull List<AnalyzedCommit> analyzeCommits(@NonNull List<Commit> commits, @NonNull Remote remote, ProviderSpec providerSpec) {
+        return commits.stream().map(commit -> analyzeCommit(commit, remote, providerSpec)).toList();
+    }
+
+    private AnalyzedCommit analyzeCommit(@NonNull Commit commit, @NonNull Remote remote, ProviderSpec providerSpec) {
         var pattern = Pattern.compile(COMMIT_MESSAGE_PATTERN);
         var matcher = pattern.matcher(commit.message());
 
@@ -52,7 +54,7 @@ public class GitMojiCommitAnalyzer implements CommitAnalyzer {
                 .map(String::trim)
                 .orElse(null);
         var message = matcher.group("MESSAGE").trim();
-        var ref = Optional.ofNullable(matcher.group("REF"))
+        var refs = Optional.ofNullable(matcher.group("REF"))
                 .map(v -> v.replace("#", ""))
                 .map(String::trim)
                 .map(List::of)
@@ -68,7 +70,9 @@ public class GitMojiCommitAnalyzer implements CommitAnalyzer {
                 scope,
                 message,
                 getLevel(intention),
-                ref.stream().map(v -> new Issue(v, "")).toList()
+                refs.stream()
+                        .map(ref -> new Issue(ref, providerSpec.issueUrl(remote, ref)))
+                        .toList()
         );
     }
 

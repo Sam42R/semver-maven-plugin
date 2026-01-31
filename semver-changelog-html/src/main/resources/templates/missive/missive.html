@@ -62,9 +62,11 @@
 							<td>
 								<table role="presentation">
 									<tr>
-										<td th:text="${commit.header}"
-											class="changelog-text">
-											Lorem ipsum
+										<td class="changelog-text">
+                                            <span th:text="${commit.header}">Lorem ipsum</span>
+                                            <th:block th:each="issue : ${commit.issues}">
+                                                (<a th:href="${issue.url}" th:text="|#${issue.id}|"></a>)
+                                            </th:block>
 										</td>
 									</tr>
 								</table>

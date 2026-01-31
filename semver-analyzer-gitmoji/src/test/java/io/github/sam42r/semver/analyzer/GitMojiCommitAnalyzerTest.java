@@ -4,7 +4,9 @@ import io.github.sam42r.semver.model.analyze.AnalyzedCommit;
 import io.github.sam42r.semver.model.analyze.ChangeCategory;
 import io.github.sam42r.semver.model.analyze.Issue;
 import io.github.sam42r.semver.model.analyze.SemVerChangeLevel;
+import io.github.sam42r.semver.model.release.ProviderSpec;
 import io.github.sam42r.semver.model.scm.Commit;
+import io.github.sam42r.semver.model.scm.Remote;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
@@ -25,9 +27,12 @@ class GitMojiCommitAnalyzerTest {
     @Test
     void shouldFindFixAndFeat() {
         var actual = uut.analyzeCommits(List.of(
-                new Commit("42.1", Instant.EPOCH, "JUnit", ":bug: (scm) set clean commit message #42"),
-                new Commit("42.2", Instant.EPOCH, "JUnit", ":sparkles: add awesome things")
-        ));
+                        new Commit("42.1", Instant.EPOCH, "JUnit", ":bug: (scm) set clean commit message #42"),
+                        new Commit("42.2", Instant.EPOCH, "JUnit", ":sparkles: add awesome things")
+                ),
+                Remote.of("git@github.com:Sam42R/semver-maven-plugin.git"),
+                new ProviderSpec("%s://%s/%s/%s/%s")
+        );
 
         assertThat(actual).containsExactlyInAnyOrder(
                 new AnalyzedCommit(
@@ -40,7 +45,7 @@ class GitMojiCommitAnalyzerTest {
                         "scm",
                         "set clean commit message",
                         SemVerChangeLevel.PATCH,
-                        List.of(new Issue("42", ""))),
+                        List.of(new Issue("42", "https://github.com/Sam42R/semver-maven-plugin/42"))),
                 new AnalyzedCommit(
                         new Commit("42.2", Instant.EPOCH, "JUnit", ":sparkles: add awesome things"),
                         ":sparkles: add awesome things",
@@ -51,15 +56,18 @@ class GitMojiCommitAnalyzerTest {
                         null,
                         "add awesome things",
                         SemVerChangeLevel.MINOR,
-                        null)
+                        List.of())
         );
     }
 
     @Test
     void shouldFindBreaking() {
         var actual = uut.analyzeCommits(List.of(
-                new Commit("42.3", Instant.EPOCH, "JUnit", ":boom: (void): break some glass #42")
-        ));
+                        new Commit("42.3", Instant.EPOCH, "JUnit", ":boom: (void): break some glass #42")
+                ),
+                Remote.of("git@github.com:Sam42R/semver-maven-plugin.git"),
+                new ProviderSpec("%s://%s/%s/%s/%s")
+        );
 
         assertThat(actual).containsExactly(
                 new AnalyzedCommit(
@@ -72,15 +80,18 @@ class GitMojiCommitAnalyzerTest {
                         "void",
                         "break some glass",
                         SemVerChangeLevel.MAJOR,
-                        List.of(new Issue("42","")))
+                        List.of(new Issue("42", "https://github.com/Sam42R/semver-maven-plugin/42")))
         );
     }
 
     @Test
     void shouldFindOther() {
         var actual = uut.analyzeCommits(List.of(
-                new Commit("42.4", Instant.EPOCH, "JUnit", ":white_check_mark: add test for something")
-        ));
+                        new Commit("42.4", Instant.EPOCH, "JUnit", ":white_check_mark: add test for something")
+                ),
+                Remote.of("git@github.com:Sam42R/semver-maven-plugin.git"),
+                new ProviderSpec("%s://%s/%s/%s/%s")
+        );
 
         assertThat(actual).containsExactly(
                 new AnalyzedCommit(
@@ -93,7 +104,7 @@ class GitMojiCommitAnalyzerTest {
                         null,
                         "add test for something",
                         SemVerChangeLevel.NONE,
-                        null)
+                        List.of())
         );
     }
 }

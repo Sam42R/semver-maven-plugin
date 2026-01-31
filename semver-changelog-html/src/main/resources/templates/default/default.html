@@ -47,8 +47,11 @@
                             </div>
                         </th:block>
                         <ul>
-                            <li th:text="${commit.header}">
-                                Lorem ipsum
+                            <li>
+                                <span th:text="${commit.header}">Lorem ipsum</span>
+                                <th:block th:each="issue : ${commit.issues}">
+                                    &nbsp;(<a th:href="${issue.url}" th:text="|#${issue.id}|"></a>)
+                                </th:block>
                             </li>
                         </ul>
                     </section>
