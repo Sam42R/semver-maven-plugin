@@ -131,7 +131,7 @@ public class SemanticReleaseMojo extends AbstractMojo {
                 .orElse(Version.of(0, 0, 0, tagFormat));
         getLog().debug("Actual version: '%s'".formatted(latestVersion.toString()));
 
-        var analyzedCommits = analyzeCommits(scmProvider, commitAnalyzer, latestCommit);
+        var analyzedCommits = analyzeCommits(scmProvider, commitAnalyzer, releasePublisher, latestCommit);
 
         var majorCount = analyzedCommits.stream().filter(AnalyzedCommit.isBreaking).count();
         var minorCount = analyzedCommits.stream().filter(AnalyzedCommit.isFeature).count();
@@ -251,11 +251,12 @@ public class SemanticReleaseMojo extends AbstractMojo {
     private List<AnalyzedCommit> analyzeCommits(
             SCMProvider scmProvider,
             CommitAnalyzer commitAnalyzer,
+            ReleasePublisher releasePublisher,
             String latestCommit
     ) throws MojoExecutionException {
         try {
             var commits = scmProvider.readCommits(latestCommit);
-            return commitAnalyzer.analyzeCommits(commits.toList());
+            return commitAnalyzer.analyzeCommits(commits.toList(), scmProvider.getRemote(), releasePublisher.providerSpec());
         } catch (SCMException e) {
             throw new MojoExecutionException(e.getMessage(), e.getCause());
         }

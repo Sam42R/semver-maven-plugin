@@ -2,6 +2,7 @@ package io.github.sam42r.semver.release;
 
 import io.github.sam24r.semver.release.ReleaseException;
 import io.github.sam24r.semver.release.ReleasePublisher;
+import io.github.sam42r.semver.model.release.ProviderSpec;
 import io.github.sam42r.semver.model.release.ReleaseInfo;
 import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
@@ -48,5 +49,12 @@ public class DefaultGithubPublisher implements ReleasePublisher {
         } catch (IOException e) {
             throw new ReleaseException(e);
         }
+    }
+
+    @Override
+    public ProviderSpec providerSpec() {
+        return new ProviderSpec(
+                "%s://%s/%s/%s/issues/%s"
+        );
     }
 }

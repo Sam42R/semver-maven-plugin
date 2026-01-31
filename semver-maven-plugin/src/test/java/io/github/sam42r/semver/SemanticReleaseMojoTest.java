@@ -12,12 +12,14 @@ import org.apache.maven.plugin.logging.SystemStreamLog;
 import org.apache.maven.project.MavenProject;
 import org.eclipse.jgit.api.Git;
 import org.eclipse.jgit.api.errors.GitAPIException;
+import org.eclipse.jgit.transport.URIish;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.io.TempDir;
 
 import java.io.IOException;
+import java.net.URISyntaxException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.HashMap;
@@ -72,7 +74,7 @@ class SemanticReleaseMojoTest {
 
     @Test
     @SuppressWarnings("unchecked")
-    void shouldFindNoLatestRelease() throws GitAPIException, MojoExecutionException, MojoFailureException {
+    void shouldFindNoLatestRelease() throws GitAPIException, MojoExecutionException, MojoFailureException, URISyntaxException {
         try (var git = initializeGitRepository(tmp)) {
             git.add().addFilepattern("pom.xml").call();
             git.commit().setMessage("Initial commit").call();
@@ -85,7 +87,7 @@ class SemanticReleaseMojoTest {
 
     @Test
     @SuppressWarnings("unchecked")
-    void shouldFindLatestRelease() throws IOException, GitAPIException, MojoExecutionException, MojoFailureException {
+    void shouldFindLatestRelease() throws IOException, GitAPIException, MojoExecutionException, MojoFailureException, URISyntaxException {
         try (var git = initializeGitRepository(tmp)) {
             git.add().addFilepattern("pom.xml").call();
             git.commit().setMessage("Initial commit").call();
@@ -102,7 +104,7 @@ class SemanticReleaseMojoTest {
     }
 
     @Test
-    void shouldThrowWithEmptyGitRepository() throws GitAPIException {
+    void shouldThrowWithEmptyGitRepository() throws GitAPIException, URISyntaxException {
         try (var ignored = initializeGitRepository(tmp)) {
             assertThatThrownBy(() -> uut.execute())
                     .isInstanceOf(MojoExecutionException.class)
@@ -117,8 +119,17 @@ class SemanticReleaseMojoTest {
                 .hasMessageStartingWith("Could not find git configuration");
     }
 
-    private Git initializeGitRepository(Path path) throws GitAPIException {
-        return Git.init().setDirectory(path.toFile()).call();
+    private Git initializeGitRepository(Path path) throws GitAPIException, URISyntaxException {
+        var git = Git.init()
+                .setDirectory(path.toFile())
+                .call();
+
+        git.remoteAdd()
+                .setName("origin")
+                .setUri(new URIish("https://junit.org/test/project"))
+                .call();
+
+        return git;
     }
 
     private Path createFile(Path path, String filename, String content) throws IOException {
