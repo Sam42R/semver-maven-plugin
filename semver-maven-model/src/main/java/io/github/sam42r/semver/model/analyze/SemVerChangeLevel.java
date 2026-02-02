@@ -1,4 +1,4 @@
-package io.github.sam42r.semver.analyzer.model;
+package io.github.sam42r.semver.model.analyze;
 
 /**
  * The semantic versioning change level.

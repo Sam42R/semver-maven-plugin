@@ -1,8 +1,11 @@
 package io.github.sam42r.semver.changelog;
 
-import io.github.sam42r.semver.analyzer.model.AnalyzedCommit;
-import io.github.sam42r.semver.analyzer.model.ChangeCategory;
-import io.github.sam42r.semver.changelog.model.VersionInfo;
+import io.github.sam42r.semver.model.analyze.AnalyzedCommit;
+import io.github.sam42r.semver.model.analyze.ChangeCategory;
+import io.github.sam42r.semver.model.analyze.Issue;
+import io.github.sam42r.semver.model.analyze.SemVerChangeLevel;
+import io.github.sam42r.semver.model.changelog.VersionInfo;
+import io.github.sam42r.semver.model.scm.Commit;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.io.TempDir;
@@ -50,15 +53,15 @@ class MarkupRendererTest {
                 changelog,
                 """
                         # Changelog
-                                                
+                        
                         header text
-                                                
+                        
                         <!-- DO NOT REMOVE - c871f32ed1b7a85b24a0f22e8e7d9e3ee285742c - DO NOT REMOVE -->
-                                                
+                        
                         ## v0.9.0 - 2024-01-01
-                                                
+                        
                         ## Disclaimer
-                                                
+                        
                         footer text
                         """,
                 StandardOpenOption.CREATE, StandardOpenOption.TRUNCATE_EXISTING
@@ -81,15 +84,25 @@ class MarkupRendererTest {
 
     private List<AnalyzedCommit> analyzedCommits() {
         return List.of(
-                AnalyzedCommit.builder()
-                        .id("42")
-                        .timestamp(Instant.EPOCH)
-                        .author("JUnit")
-                        .header("fix(scm): set clean commit message")
-                        .body("* added scope for commit messages")
-                        .footer("refs #42")
-                        .category(ChangeCategory.FIXED)
-                        .build()
+                new AnalyzedCommit(
+                        new Commit("42", Instant.EPOCH, "JUnit",
+                                """
+                                        fix(scm): set clean commit message
+                                        
+                                        * added scope for commit messages
+                                        
+                                        refs #42
+                                        """),
+                        "fix(scm): set clean commit message",
+                        "* added scope for commit messages",
+                        "refs #42",
+                        "fix",
+                        ChangeCategory.FIXED,
+                        "scm",
+                        "set clean commit message",
+                        SemVerChangeLevel.PATCH,
+                        List.of(new Issue("42", "https://junit.org/test/42"))
+                )
         );
     }
 }

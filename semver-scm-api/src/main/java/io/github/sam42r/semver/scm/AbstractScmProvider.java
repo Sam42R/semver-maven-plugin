@@ -1,9 +1,8 @@
 package io.github.sam42r.semver.scm;
 
-import io.github.sam42r.semver.scm.model.Commit;
-import io.github.sam42r.semver.scm.model.Remote;
-import io.github.sam42r.semver.scm.model.Tag;
-import io.github.sam42r.semver.scm.util.RemoteUtil;
+import io.github.sam42r.semver.model.scm.Commit;
+import io.github.sam42r.semver.model.scm.Remote;
+import io.github.sam42r.semver.model.scm.Tag;
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NonNull;
@@ -77,12 +76,11 @@ abstract class AbstractScmProvider implements SCMProvider {
             var changeLogScmResult = scmManager.changeLog(changeLogScmRequest);
 
             return changeLogScmResult.getChangeLog().getChangeSets().stream()
-                    .map(v -> Commit.builder()
-                            .id(v.getRevision())
-                            .timestamp(v.getDate().toInstant())
-                            .author(v.getAuthor())
-                            .message(v.getComment())
-                            .build());
+                    .map(v -> new Commit(
+                            v.getRevision(),
+                            v.getDate().toInstant(),
+                            v.getAuthor(),
+                            v.getComment()));
         } catch (ScmException e) {
             throw new SCMException(e);
         }
@@ -98,10 +96,9 @@ abstract class AbstractScmProvider implements SCMProvider {
 
             return changeLogScmResult.getChangeLog().getChangeSets().stream()
                     .filter(hasTag)
-                    .map(v -> Tag.builder()
-                            .name(v.getTags().get(0))
-                            .commitId(v.getRevision())
-                            .build());
+                    .map(v -> new Tag(
+                            v.getTags().get(0),
+                            v.getRevision()));
         } catch (ScmException e) {
             throw new SCMException(e);
         }
@@ -141,7 +138,7 @@ abstract class AbstractScmProvider implements SCMProvider {
             var tagScmResult = scmManager.tag(repository, new ScmFileSet(path.toFile()), name);
             assert tagScmResult.isSuccess();
 
-            return readTags().filter(v -> name.equals(v.getName())).findFirst().orElseThrow();
+            return readTags().filter(v -> name.equals(v.name())).findFirst().orElseThrow();
         } catch (ScmException e) {
             throw new SCMException(e);
         }
@@ -149,7 +146,7 @@ abstract class AbstractScmProvider implements SCMProvider {
 
     @Override
     public @NonNull Remote getRemote() throws SCMException {
-        return RemoteUtil.parseUrl(getRemoteUrl().orElseThrow());
+        return Remote.of(getRemoteUrl().orElseThrow());
     }
 
     protected ScmRepository getScmRepository() throws SCMException {

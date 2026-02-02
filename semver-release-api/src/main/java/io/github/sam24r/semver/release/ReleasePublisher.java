@@ -1,6 +1,6 @@
 package io.github.sam24r.semver.release;
 
-import io.github.sam24r.semver.release.model.ReleaseInfo;
+import io.github.sam42r.semver.model.release.ReleaseInfo;
 import lombok.NonNull;
 
 public interface ReleasePublisher {

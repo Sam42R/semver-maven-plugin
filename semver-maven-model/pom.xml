@@ -10,7 +10,7 @@
         <version>1.8.0</version>
     </parent>
 
-    <artifactId>semver-analyzer-api</artifactId>
+    <artifactId>semver-maven-model</artifactId>
     <name>${project.groupId}:${project.artifactId}</name>
 
     <properties>
@@ -21,20 +21,11 @@
 
     <dependencies>
         <dependency>
-            <groupId>io.github.sam42r</groupId>
-            <artifactId>semver-maven-model</artifactId>
-            <version>${project.version}</version>
-        </dependency>
-        <dependency>
             <groupId>org.projectlombok</groupId>
             <artifactId>lombok</artifactId>
             <scope>provided</scope>
         </dependency>
-        <dependency>
-            <groupId>com.fasterxml.jackson.dataformat</groupId>
-            <artifactId>jackson-dataformat-yaml</artifactId>
-            <version>2.17.2</version>
-        </dependency>
+
         <dependency>
             <groupId>org.junit.jupiter</groupId>
             <artifactId>junit-jupiter</artifactId>
@@ -46,4 +37,5 @@
             <scope>test</scope>
         </dependency>
     </dependencies>
+
 </project>

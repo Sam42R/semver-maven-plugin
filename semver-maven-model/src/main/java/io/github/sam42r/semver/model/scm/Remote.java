@@ -1,20 +1,14 @@
-package io.github.sam42r.semver.scm.util;
-
-import io.github.sam42r.semver.scm.model.Remote;
-import lombok.AccessLevel;
-import lombok.NoArgsConstructor;
-import lombok.NonNull;
+package io.github.sam42r.semver.model.scm;
 
 import java.net.URI;
 
-@NoArgsConstructor(access = AccessLevel.PRIVATE)
-public final class RemoteUtil {
+public record Remote(String url, String scheme, String host, String group, String project) {
 
-    public static @NonNull Remote parseUrl(@NonNull String url) {
-        return url.startsWith("http") ? parseHttpRemoteUrl(url) : parseSshRemoteUrl(url);
+    public static Remote of(String url) {
+        return url.startsWith("http") ? parseHttpUrl(url) : parseSshUrl(url);
     }
 
-    private static @NonNull Remote parseHttpRemoteUrl(@NonNull String url) {
+    private static Remote parseHttpUrl(String url) {
         var uri = URI.create(url);
 
         var lastSlashIndex = uri.getPath().lastIndexOf("/");
@@ -28,16 +22,10 @@ public final class RemoteUtil {
 
         var hostAndPort = uri.getHost().concat(uri.getPort() > 0 ? ":%d".formatted(uri.getPort()) : "");
 
-        return Remote.builder()
-                .url(url)
-                .scheme(uri.getScheme())
-                .host(hostAndPort)
-                .group(group)
-                .project(project)
-                .build();
+        return new Remote(url, uri.getScheme(), hostAndPort, group, project);
     }
 
-    private static @NonNull Remote parseSshRemoteUrl(@NonNull String url) {
+    private static Remote parseSshUrl(String url) {
         var startIndex = url.contains("@") ? url.indexOf("@") + 1 : 0;
         var lastColonIndex = url.lastIndexOf(":");
 
@@ -53,12 +41,6 @@ public final class RemoteUtil {
             project = project.substring(0, project.lastIndexOf("."));
         }
 
-        return Remote.builder()
-                .url(url)
-                .scheme("https")
-                .host(hostAndPort)
-                .group(group)
-                .project(project)
-                .build();
+        return new Remote(url, "https", hostAndPort, group, project);
     }
 }

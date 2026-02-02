@@ -3,7 +3,7 @@ package io.github.sam42r.semver.release;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import io.github.sam24r.semver.release.ReleaseException;
 import io.github.sam24r.semver.release.ReleasePublisher;
-import io.github.sam24r.semver.release.model.ReleaseInfo;
+import io.github.sam42r.semver.model.release.ReleaseInfo;
 import io.github.sam42r.semver.release.model.GitlabRelease;
 import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
@@ -69,9 +69,9 @@ public class GitlabPublisher implements ReleasePublisher {
 
     private GitlabRelease generatePayload(ReleaseInfo releaseInfo) {
         return GitlabRelease.builder()
-                .tagName(releaseInfo.getTagName())
-                .name(releaseInfo.getName())
-                .description(releaseInfo.getDescription())
+                .tagName(releaseInfo.tagName())
+                .name(releaseInfo.name())
+                .description(releaseInfo.description())
                 .build();
     }
 }

@@ -2,6 +2,7 @@ package io.github.sam42r.semver.analyzer.model;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.dataformat.yaml.YAMLFactory;
+import io.github.sam42r.semver.model.analyze.AnalyzedCommit;
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;

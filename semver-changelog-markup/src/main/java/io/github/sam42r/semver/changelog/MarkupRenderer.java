@@ -1,9 +1,9 @@
 package io.github.sam42r.semver.changelog;
 
 import com.github.mustachejava.DefaultMustacheFactory;
-import io.github.sam42r.semver.analyzer.model.AnalyzedCommit;
-import io.github.sam42r.semver.analyzer.model.ChangeCategory;
-import io.github.sam42r.semver.changelog.model.VersionInfo;
+import io.github.sam42r.semver.model.changelog.VersionInfo;
+import io.github.sam42r.semver.model.analyze.AnalyzedCommit;
+import io.github.sam42r.semver.model.analyze.ChangeCategory;
 import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
 import org.apache.commons.codec.digest.DigestUtils;
@@ -55,7 +55,7 @@ public class MarkupRenderer implements ChangelogRenderer {
         ) {
             var categorizedCommits = analyzedCommits.stream()
                     .collect(Collectors.toMap(
-                            AnalyzedCommit::getCategory,
+                            AnalyzedCommit::category,
                             List::of,
                             (v1, v2) -> Stream.of(v1, v2).flatMap(List::stream).toList()
                     ));

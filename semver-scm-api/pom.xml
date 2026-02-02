@@ -21,6 +21,12 @@
 
     <dependencies>
         <dependency>
+            <groupId>io.github.sam42r</groupId>
+            <artifactId>semver-maven-model</artifactId>
+            <version>${project.version}</version>
+        </dependency>
+
+        <dependency>
             <groupId>org.apache.maven.scm</groupId>
             <artifactId>maven-scm-api</artifactId>
             <version>2.1.0</version>

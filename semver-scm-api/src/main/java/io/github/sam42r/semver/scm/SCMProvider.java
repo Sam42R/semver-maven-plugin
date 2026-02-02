@@ -1,8 +1,8 @@
 package io.github.sam42r.semver.scm;
 
-import io.github.sam42r.semver.scm.model.Commit;
-import io.github.sam42r.semver.scm.model.Remote;
-import io.github.sam42r.semver.scm.model.Tag;
+import io.github.sam42r.semver.model.scm.Commit;
+import io.github.sam42r.semver.model.scm.Remote;
+import io.github.sam42r.semver.model.scm.Tag;
 import lombok.NonNull;
 
 import java.nio.file.Path;

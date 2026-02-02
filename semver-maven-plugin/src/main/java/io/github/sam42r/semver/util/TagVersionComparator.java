@@ -1,7 +1,7 @@
 package io.github.sam42r.semver.util;
 
 import io.github.sam42r.semver.model.Version;
-import io.github.sam42r.semver.scm.model.Tag;
+import io.github.sam42r.semver.model.scm.Tag;
 import lombok.RequiredArgsConstructor;
 
 import java.util.Comparator;
@@ -17,8 +17,8 @@ public class TagVersionComparator implements Comparator<Tag> {
                 .thenComparingInt(Version::getMinor)
                 .thenComparingInt(Version::getPatch)
                 .compare(
-                        Version.of(o1.getName(), tagFormat),
-                        Version.of(o2.getName(), tagFormat)
+                        Version.of(o1.name(), tagFormat),
+                        Version.of(o2.name(), tagFormat)
                 );
     }
 }
