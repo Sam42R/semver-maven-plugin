@@ -1,8 +1,11 @@
 package io.github.sam42r.semver.changelog;
 
-import io.github.sam42r.semver.analyzer.model.AnalyzedCommit;
-import io.github.sam42r.semver.analyzer.model.ChangeCategory;
-import io.github.sam42r.semver.changelog.model.VersionInfo;
+import io.github.sam42r.semver.model.analyze.Issue;
+import io.github.sam42r.semver.model.changelog.VersionInfo;
+import io.github.sam42r.semver.model.analyze.AnalyzedCommit;
+import io.github.sam42r.semver.model.analyze.ChangeCategory;
+import io.github.sam42r.semver.model.analyze.SemVerChangeLevel;
+import io.github.sam42r.semver.model.scm.Commit;
 import org.junit.jupiter.api.io.TempDir;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.CsvSource;
@@ -69,33 +72,63 @@ class HtmlRendererTest {
 
     private List<AnalyzedCommit> analyzedCommits() {
         return List.of(
-                AnalyzedCommit.builder()
-                        .id("42")
-                        .timestamp(Instant.EPOCH)
-                        .author("JUnit")
-                        .header("feat(scm): Lorem ipsum")
-                        .body("* Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam")
-                        .footer("refs #42")
-                        .category(ChangeCategory.ADDED)
-                        .build(),
-                AnalyzedCommit.builder()
-                        .id("42")
-                        .timestamp(Instant.EPOCH)
-                        .author("JUnit")
-                        .header("fix(scm): Lorem ipsum")
-                        .body("* Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam")
-                        .footer("refs #42")
-                        .category(ChangeCategory.FIXED)
-                        .build(),
-                AnalyzedCommit.builder()
-                        .id("42")
-                        .timestamp(Instant.EPOCH)
-                        .author("JUnit")
-                        .header("chore(scm): Lorem ipsum")
-                        .body("* Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam")
-                        .footer("refs #42")
-                        .category(ChangeCategory.CHANGED)
-                        .build()
+                new AnalyzedCommit(
+                        new Commit("42", Instant.EPOCH, "JUnit",
+                                """
+                                        feat(scm): Lorem ipsum
+                                        
+                                        * Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam
+                                        
+                                        refs #42
+                                        """),
+                        "feat(scm): Lorem ipsum",
+                        "* Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam",
+                        "refs #42",
+                        "feat",
+                        ChangeCategory.ADDED,
+                        "scm",
+                        "Lorem ipsum",
+                        SemVerChangeLevel.MINOR,
+                        null
+                ),
+                new AnalyzedCommit(
+                        new Commit("42", Instant.EPOCH, "JUnit",
+                                """
+                                        fix(scm): Lorem ipsum
+                                        
+                                        * Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam
+                                        
+                                        refs #42
+                                        """),
+                        "fix(scm): Lorem ipsum",
+                        "* Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam",
+                        "refs #42",
+                        "fix",
+                        ChangeCategory.FIXED,
+                        "scm",
+                        "Lorem ipsum",
+                        SemVerChangeLevel.PATCH,
+                        null
+                ),
+                new AnalyzedCommit(
+                        new Commit("42", Instant.EPOCH, "JUnit",
+                                """
+                                        chore(scm): Lorem ipsum
+                                        
+                                        * Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam
+                                        
+                                        refs #42
+                                        """),
+                        "chore(scm): Lorem ipsum",
+                        "* Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam",
+                        "refs #42",
+                        "chore",
+                        ChangeCategory.CHANGED,
+                        "scm",
+                        "Lorem ipsum",
+                        SemVerChangeLevel.NONE,
+                        List.of(new Issue("42", "https://junit.org/test/42"))
+                )
         );
     }
 }

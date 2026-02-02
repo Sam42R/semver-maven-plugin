@@ -1,9 +1,10 @@
 package io.github.sam42r.semver.analyzer;
 
-import io.github.sam42r.semver.analyzer.model.AnalyzedCommit;
-import io.github.sam42r.semver.analyzer.model.ChangeCategory;
-import io.github.sam42r.semver.analyzer.model.SemVerChangeLevel;
-import io.github.sam42r.semver.scm.model.Commit;
+import io.github.sam42r.semver.model.analyze.AnalyzedCommit;
+import io.github.sam42r.semver.model.analyze.ChangeCategory;
+import io.github.sam42r.semver.model.analyze.Issue;
+import io.github.sam42r.semver.model.analyze.SemVerChangeLevel;
+import io.github.sam42r.semver.model.scm.Commit;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
@@ -24,99 +25,75 @@ class GitMojiCommitAnalyzerTest {
     @Test
     void shouldFindFixAndFeat() {
         var actual = uut.analyzeCommits(List.of(
-                Commit.builder()
-                        .id("42.1")
-                        .timestamp(Instant.EPOCH)
-                        .author("JUnit")
-                        .message(":bug: (scm) set clean commit message #42")
-                        .build(),
-                Commit.builder()
-                        .id("42.2")
-                        .timestamp(Instant.EPOCH)
-                        .author("JUnit")
-                        .message(":sparkles: add awesome things")
-                        .build()
+                new Commit("42.1", Instant.EPOCH, "JUnit", ":bug: (scm) set clean commit message #42"),
+                new Commit("42.2", Instant.EPOCH, "JUnit", ":sparkles: add awesome things")
         ));
 
         assertThat(actual).containsExactlyInAnyOrder(
-                AnalyzedCommit.builder()
-                        .id("42.1")
-                        .timestamp(Instant.EPOCH)
-                        .author("JUnit")
-                        .header(":bug: (scm) set clean commit message #42")
-                        .message(":bug: (scm) set clean commit message #42")
-                        .type(":bug:")
-                        .scope("scm")
-                        .subject("set clean commit message")
-                        .issues(List.of("42"))
-                        .category(ChangeCategory.FIXED)
-                        .level(SemVerChangeLevel.PATCH)
-                        .build(),
-                AnalyzedCommit.builder()
-                        .id("42.2")
-                        .timestamp(Instant.EPOCH)
-                        .author("JUnit")
-                        .header(":sparkles: add awesome things")
-                        .message(":sparkles: add awesome things")
-                        .type(":sparkles:")
-                        .subject("add awesome things")
-                        .category(ChangeCategory.ADDED)
-                        .level(SemVerChangeLevel.MINOR)
-                        .build()
+                new AnalyzedCommit(
+                        new Commit("42.1", Instant.EPOCH, "JUnit", ":bug: (scm) set clean commit message #42"),
+                        ":bug: (scm) set clean commit message #42",
+                        null,
+                        null,
+                        ":bug:",
+                        ChangeCategory.FIXED,
+                        "scm",
+                        "set clean commit message",
+                        SemVerChangeLevel.PATCH,
+                        List.of(new Issue("42", ""))),
+                new AnalyzedCommit(
+                        new Commit("42.2", Instant.EPOCH, "JUnit", ":sparkles: add awesome things"),
+                        ":sparkles: add awesome things",
+                        null,
+                        null,
+                        ":sparkles:",
+                        ChangeCategory.ADDED,
+                        null,
+                        "add awesome things",
+                        SemVerChangeLevel.MINOR,
+                        null)
         );
     }
 
     @Test
     void shouldFindBreaking() {
         var actual = uut.analyzeCommits(List.of(
-                Commit.builder()
-                        .id("42.3")
-                        .timestamp(Instant.EPOCH)
-                        .author("JUnit")
-                        .message(":boom: (void): break some glass #42")
-                        .build()
+                new Commit("42.3", Instant.EPOCH, "JUnit", ":boom: (void): break some glass #42")
         ));
 
         assertThat(actual).containsExactly(
-                AnalyzedCommit.builder()
-                        .id("42.3")
-                        .timestamp(Instant.EPOCH)
-                        .author("JUnit")
-                        .header(":boom: (void): break some glass #42")
-                        .message(":boom: (void): break some glass #42")
-                        .type(":boom:")
-                        .scope("void")
-                        .subject("break some glass")
-                        .issues(List.of("42"))
-                        .category(ChangeCategory.ADDED)
-                        .level(SemVerChangeLevel.MAJOR)
-                        .build()
+                new AnalyzedCommit(
+                        new Commit("42.3", Instant.EPOCH, "JUnit", ":boom: (void): break some glass #42"),
+                        ":boom: (void): break some glass #42",
+                        null,
+                        null,
+                        ":boom:",
+                        ChangeCategory.ADDED,
+                        "void",
+                        "break some glass",
+                        SemVerChangeLevel.MAJOR,
+                        List.of(new Issue("42","")))
         );
     }
 
     @Test
     void shouldFindOther() {
         var actual = uut.analyzeCommits(List.of(
-                Commit.builder()
-                        .id("42.4")
-                        .timestamp(Instant.EPOCH)
-                        .author("JUnit")
-                        .message(":white_check_mark: add test for something")
-                        .build()
+                new Commit("42.4", Instant.EPOCH, "JUnit", ":white_check_mark: add test for something")
         ));
 
         assertThat(actual).containsExactly(
-                AnalyzedCommit.builder()
-                        .id("42.4")
-                        .timestamp(Instant.EPOCH)
-                        .author("JUnit")
-                        .header(":white_check_mark: add test for something")
-                        .message(":white_check_mark: add test for something")
-                        .type(":white_check_mark:")
-                        .subject("add test for something")
-                        .category(ChangeCategory.OTHER)
-                        .level(SemVerChangeLevel.NONE)
-                        .build()
+                new AnalyzedCommit(
+                        new Commit("42.4", Instant.EPOCH, "JUnit", ":white_check_mark: add test for something"),
+                        ":white_check_mark: add test for something",
+                        null,
+                        null,
+                        ":white_check_mark:",
+                        ChangeCategory.OTHER,
+                        null,
+                        "add test for something",
+                        SemVerChangeLevel.NONE,
+                        null)
         );
     }
 }

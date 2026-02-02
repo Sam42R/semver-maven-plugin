@@ -13,6 +13,7 @@ import java.nio.file.StandardOpenOption;
 public class BundleHelper {
 
     private static final String[] MODULES = new String[]{
+            "semver-maven-model",
             "semver-analyzer-api",
             "semver-analyzer-conventional",
             "semver-analyzer-gitmoji",

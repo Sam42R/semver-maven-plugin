@@ -15,6 +15,7 @@
     <url>https://github.com/Sam42R/semver-maven-plugin</url>
 
     <modules>
+        <module>semver-maven-model</module>
         <module>semver-scm-api</module>
         <module>semver-scm-git</module>
         <module>semver-scm-subversion</module>

@@ -1,14 +1,16 @@
 package io.github.sam42r.semver.analyzer;
 
-import io.github.sam42r.semver.analyzer.model.AnalyzedCommit;
-import io.github.sam42r.semver.analyzer.model.ChangeCategory;
 import io.github.sam42r.semver.analyzer.model.Configuration;
-import io.github.sam42r.semver.analyzer.model.SemVerChangeLevel;
-import io.github.sam42r.semver.scm.model.Commit;
+import io.github.sam42r.semver.model.analyze.AnalyzedCommit;
+import io.github.sam42r.semver.model.analyze.ChangeCategory;
+import io.github.sam42r.semver.model.analyze.Issue;
+import io.github.sam42r.semver.model.analyze.SemVerChangeLevel;
+import io.github.sam42r.semver.model.scm.Commit;
 import lombok.AccessLevel;
 import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
 
+import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 import java.util.regex.Pattern;
@@ -35,48 +37,47 @@ public class GitMojiCommitAnalyzer implements CommitAnalyzer {
     }
 
     private AnalyzedCommit analyzeCommit(@NonNull Commit commit) {
-        var analyzedCommitBuilder = AnalyzedCommit.builder()
-                .id(commit.getId())
-                .timestamp(commit.getTimestamp())
-                .author(commit.getAuthor())
-                .header(commit.getMessage().trim())
-                .message(commit.getMessage());
+        var pattern = Pattern.compile(COMMIT_MESSAGE_PATTERN);
+        var matcher = pattern.matcher(commit.message());
 
-        if (commit.getMessage().startsWith(":")) {
-            var pattern = Pattern.compile(COMMIT_MESSAGE_PATTERN);
-            var matcher = pattern.matcher(commit.getMessage());
-            if (matcher.find()) {
-                var intention = matcher.group("INTENTION");
-                var scope = Optional.ofNullable(matcher.group("SCOPE"))
-                        .map(v -> v.replace("(", ""))
-                        .map(v -> v.replace(")", ""))
-                        .map(v -> v.replace(":", ""))
-                        .map(String::trim)
-                        .orElse(null);
-                var message = matcher.group("MESSAGE").trim();
-                var ref = Optional.ofNullable(matcher.group("REF"))
-                        .map(v -> v.replace("#", ""))
-                        .map(String::trim)
-                        .map(List::of)
-                        .orElse(null);
-                analyzedCommitBuilder
-                        .type(intention)
-                        .scope(scope)
-                        .subject(message)
-                        .issues(ref)
-                        .category(getCategory(intention))
-                        .level(getLevel(intention));
-            }
+        if (!commit.message().startsWith(":") || !matcher.find()) {
+            return new AnalyzedCommit(commit, null, null, null, null, null, null, null, null, null);
         }
-        return analyzedCommitBuilder.build();
+
+        var intention = matcher.group("INTENTION");
+        var scope = Optional.ofNullable(matcher.group("SCOPE"))
+                .map(v -> v.replace("(", ""))
+                .map(v -> v.replace(")", ""))
+                .map(v -> v.replace(":", ""))
+                .map(String::trim)
+                .orElse(null);
+        var message = matcher.group("MESSAGE").trim();
+        var ref = Optional.ofNullable(matcher.group("REF"))
+                .map(v -> v.replace("#", ""))
+                .map(String::trim)
+                .map(List::of)
+                .orElse(Collections.emptyList());
+
+        return new AnalyzedCommit(
+                commit,
+                commit.message(),
+                null,
+                null,
+                intention,
+                getCategory(intention),
+                scope,
+                message,
+                getLevel(intention),
+                ref.stream().map(v -> new Issue(v, "")).toList()
+        );
     }
 
     private ChangeCategory getCategory(String intention) {
         if (intention != null) {
             return configuration.getItems().stream()
-                    .filter(v -> v.getType().equals(intention))
+                    .filter(v -> v.type().equals(intention))
                     .findAny()
-                    .map(AnalyzedCommit::getCategory)
+                    .map(AnalyzedCommit::category)
                     .orElse(ChangeCategory.OTHER);
         }
         return ChangeCategory.OTHER;
@@ -85,9 +86,9 @@ public class GitMojiCommitAnalyzer implements CommitAnalyzer {
     private SemVerChangeLevel getLevel(String intention) {
         if (intention != null) {
             return configuration.getItems().stream()
-                    .filter(v -> v.getType().equals(intention))
+                    .filter(v -> v.type().equals(intention))
                     .findAny()
-                    .map(AnalyzedCommit::getLevel)
+                    .map(AnalyzedCommit::level)
                     .orElse(SemVerChangeLevel.NONE);
         }
         return SemVerChangeLevel.NONE;

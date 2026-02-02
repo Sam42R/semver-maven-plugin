@@ -1,10 +1,10 @@
 package io.github.sam42r.semver.analyzer;
 
-import io.github.sam42r.semver.analyzer.model.AnalyzedCommit;
-import io.github.sam42r.semver.analyzer.model.ChangeCategory;
 import io.github.sam42r.semver.analyzer.model.Configuration;
-import io.github.sam42r.semver.analyzer.model.SemVerChangeLevel;
-import io.github.sam42r.semver.scm.model.Commit;
+import io.github.sam42r.semver.model.analyze.AnalyzedCommit;
+import io.github.sam42r.semver.model.analyze.ChangeCategory;
+import io.github.sam42r.semver.model.analyze.SemVerChangeLevel;
+import io.github.sam42r.semver.model.scm.Commit;
 import lombok.AccessLevel;
 import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
@@ -41,16 +41,10 @@ public class ConventionalCommitAnalyzer implements CommitAnalyzer {
 
     @SuppressWarnings("MismatchedQueryAndUpdateOfStringBuilder")
     private AnalyzedCommit analyzeCommit(@NonNull Commit commit) {
-        var analyzedCommitBuilder = AnalyzedCommit.builder()
-                .id(commit.getId())
-                .timestamp(commit.getTimestamp())
-                .author(commit.getAuthor())
-                .message(commit.getMessage());
-
         var headerBuilder = new StringBuilder();
         var bodyBuilder = new StringBuilder();
         var footerBuilder = new StringBuilder();
-        try (var reader = new BufferedReader(new StringReader(commit.getMessage()))) {
+        try (var reader = new BufferedReader(new StringReader(commit.message()))) {
             String line;
             int emptyLinesCounter = 0;
             while ((line = reader.readLine()) != null) {
@@ -74,47 +68,44 @@ public class ConventionalCommitAnalyzer implements CommitAnalyzer {
         var header = headerBuilder.toString().trim();
         var body = bodyBuilder.toString().trim();
         var footer = footerBuilder.toString().trim();
-        analyzedCommitBuilder
-                .header(header)
-                .body(body)
-                .footer(footer);
 
-        if (!header.isEmpty()) {
-            var pattern = Pattern.compile(COMMIT_HEADER_PATTERN);
-            var matcher = pattern.matcher(header);
-            if (matcher.find()) {
-                var type = matcher.group("TYPE");
-                var scope = Optional.ofNullable(matcher.group("SCOPE"))
-                        .map(v -> v.replace("(", ""))
-                        .map(v -> v.replace(")", ""))
-                        .orElse(null);
-                var breaking = Optional.ofNullable(matcher.group("BREAKING"));
-                var description = matcher.group("DESCRIPTION").replaceFirst(":", "").trim();
+        var pattern = Pattern.compile(COMMIT_HEADER_PATTERN);
+        var matcher = pattern.matcher(header);
 
-                analyzedCommitBuilder
-                        .type(type)
-                        .scope(scope)
-                        .subject(description)
-                        .category(getCategory(type))
-                        .level(breaking.isPresent() ? SemVerChangeLevel.MAJOR : getLevel(type));
-            }
+        if (header.isEmpty() || !matcher.find()) {
+            return new AnalyzedCommit(commit, null, null, null, null, null, null, null, null, null);
         }
 
-        if (footer.contains("BREAKING CHANGE")) {
-            analyzedCommitBuilder.level(SemVerChangeLevel.MAJOR);
-        }
+        var type = matcher.group("TYPE");
+        var scope = Optional.ofNullable(matcher.group("SCOPE"))
+                .map(v -> v.replace("(", ""))
+                .map(v -> v.replace(")", ""))
+                .orElse(null);
+        var breaking = Optional.ofNullable(matcher.group("BREAKING"));
+        var description = matcher.group("DESCRIPTION").replaceFirst(":", "").trim();
 
         // TODO search for issues in footer
 
-        return analyzedCommitBuilder.build();
+        return new AnalyzedCommit(
+                commit,
+                header,
+                body,
+                footer,
+                type,
+                getCategory(type),
+                scope,
+                description,
+                breaking.isPresent() || footer.contains("BREAKING CHANGE") ? SemVerChangeLevel.MAJOR : getLevel(type),
+                null
+        );
     }
 
     private ChangeCategory getCategory(String type) {
         if (type != null) {
             return configuration.getItems().stream()
-                    .filter(v -> v.getType().equals(type))
+                    .filter(v -> v.type().equals(type))
                     .findAny()
-                    .map(AnalyzedCommit::getCategory)
+                    .map(AnalyzedCommit::category)
                     .orElse(ChangeCategory.OTHER);
         }
         return ChangeCategory.OTHER;
@@ -123,9 +114,9 @@ public class ConventionalCommitAnalyzer implements CommitAnalyzer {
     private SemVerChangeLevel getLevel(String type) {
         if (type != null) {
             return configuration.getItems().stream()
-                    .filter(v -> v.getType().equals(type))
+                    .filter(v -> v.type().equals(type))
                     .findAny()
-                    .map(AnalyzedCommit::getLevel)
+                    .map(AnalyzedCommit::level)
                     .orElse(SemVerChangeLevel.NONE);
         }
         return SemVerChangeLevel.NONE;

@@ -1,7 +1,7 @@
 package io.github.sam42r.semver.changelog;
 
-import io.github.sam42r.semver.analyzer.model.AnalyzedCommit;
-import io.github.sam42r.semver.changelog.model.VersionInfo;
+import io.github.sam42r.semver.model.changelog.VersionInfo;
+import io.github.sam42r.semver.model.analyze.AnalyzedCommit;
 import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
 import org.apache.commons.codec.digest.DigestUtils;

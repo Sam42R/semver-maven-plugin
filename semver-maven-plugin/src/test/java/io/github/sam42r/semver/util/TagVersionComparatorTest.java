@@ -1,7 +1,7 @@
 package io.github.sam42r.semver.util;
 
 import io.github.sam42r.semver.model.Version;
-import io.github.sam42r.semver.scm.model.Tag;
+import io.github.sam42r.semver.model.scm.Tag;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
@@ -22,18 +22,18 @@ class TagVersionComparatorTest {
     @Test
     void shouldGetMax() {
         var tags = List.of(
-                Tag.builder().name("v0.10.0").build(),
-                Tag.builder().name("v0.9.0").build(),
-                Tag.builder().name("v0.1.0").build(),
-                Tag.builder().name("v0.0.10").build(),
-                Tag.builder().name("v0.0.9").build(),
-                Tag.builder().name("v0.0.1").build()
+                new Tag("v0.10.0", null),
+                new Tag("v0.9.0", null),
+                new Tag("v0.1.0", null),
+                new Tag("v0.0.10", null),
+                new Tag("v0.0.9", null),
+                new Tag("v0.0.1", null)
         );
 
-        var alphabeticMax = tags.stream().max(Comparator.comparing(Tag::getName));
-        assertThat(alphabeticMax).contains(Tag.builder().name("v0.9.0").build());
+        var alphabeticMax = tags.stream().max(Comparator.comparing(Tag::name));
+        assertThat(alphabeticMax).contains(new Tag("v0.9.0", null));
 
         var semanticVersionMax = tags.stream().max(uut);
-        assertThat(semanticVersionMax).contains(Tag.builder().name("v0.10.0").build());
+        assertThat(semanticVersionMax).contains(new Tag("v0.10.0", null));
     }
 }

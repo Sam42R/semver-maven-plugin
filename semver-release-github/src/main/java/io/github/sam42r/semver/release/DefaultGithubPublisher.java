@@ -2,7 +2,7 @@ package io.github.sam42r.semver.release;
 
 import io.github.sam24r.semver.release.ReleaseException;
 import io.github.sam24r.semver.release.ReleasePublisher;
-import io.github.sam24r.semver.release.model.ReleaseInfo;
+import io.github.sam42r.semver.model.release.ReleaseInfo;
 import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -39,9 +39,9 @@ public class DefaultGithubPublisher implements ReleasePublisher {
 
             var repository = gitHub.getRepository("%s/%s".formatted(group, project));
 
-            var release = repository.createRelease(releaseInfo.getTagName())
-                    .name(releaseInfo.getName())
-                    .body(releaseInfo.getDescription())
+            var release = repository.createRelease(releaseInfo.tagName())
+                    .name(releaseInfo.name())
+                    .body(releaseInfo.description())
                     .create();
 
             log.debug("Released {}", release.getHtmlUrl());

@@ -2,7 +2,7 @@ package io.github.sam42r.semver.release;
 
 import io.github.sam24r.semver.release.ReleaseException;
 import io.github.sam24r.semver.release.ReleasePublisher;
-import io.github.sam24r.semver.release.model.ReleaseInfo;
+import io.github.sam42r.semver.model.release.ReleaseInfo;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -84,12 +84,12 @@ class GithubPublisherTest {
                                 """)
                 );
 
-        var release = ReleaseInfo.builder()
-                .tagName("v1.0.0")
-                .name("v1.0.0")
-                .description("# Release v1.0.0")
-                .time(LocalDateTime.now())
-                .build();
+        var release = new ReleaseInfo(
+                "v1.0.0",
+                "v1.0.0",
+                "# Release v1.0.0",
+                LocalDateTime.now()
+        );
 
         uut.publish(
                 "http",
@@ -150,12 +150,12 @@ class GithubPublisherTest {
                         .withBody("endpoint has been spammed")
                 );
 
-        var release = ReleaseInfo.builder()
-                .tagName("v1.0.0")
-                .name("v1.0.0")
-                .description("# Release v1.0.0")
-                .time(LocalDateTime.now())
-                .build();
+        var release = new ReleaseInfo(
+                "v1.0.0",
+                "v1.0.0",
+                "# Release v1.0.0",
+                LocalDateTime.now()
+        );
 
         assertThatThrownBy(() -> uut.publish(
                 "http",
@@ -181,7 +181,7 @@ class GithubPublisherTest {
             "http,localhost:42,JUnit,,project"
     })
     void shouldThrowOnNullValue(String scheme, String instance, String group, String project, String field) {
-        var releaseInfo = ReleaseInfo.builder().build();
+        var releaseInfo = new ReleaseInfo(null,null,null,null);
         assertThatThrownBy(() -> uut.publish(scheme, instance, group, project, releaseInfo))
                 .isInstanceOf(NullPointerException.class)
                 .hasMessage("%s is marked non-null but is null".formatted(field));

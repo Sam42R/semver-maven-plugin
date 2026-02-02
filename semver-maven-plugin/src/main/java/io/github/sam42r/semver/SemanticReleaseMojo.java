@@ -3,19 +3,19 @@ package io.github.sam42r.semver;
 import io.github.sam24r.semver.release.ReleaseException;
 import io.github.sam24r.semver.release.ReleasePublisher;
 import io.github.sam24r.semver.release.ReleasePublisherFactory;
-import io.github.sam24r.semver.release.model.ReleaseInfo;
 import io.github.sam42r.semver.analyzer.CommitAnalyzer;
 import io.github.sam42r.semver.analyzer.CommitAnalyzerFactory;
-import io.github.sam42r.semver.analyzer.model.AnalyzedCommit;
 import io.github.sam42r.semver.changelog.ChangelogRenderer;
 import io.github.sam42r.semver.changelog.ChangelogRendererFactory;
-import io.github.sam42r.semver.changelog.model.VersionInfo;
 import io.github.sam42r.semver.model.Version;
+import io.github.sam42r.semver.model.analyze.AnalyzedCommit;
+import io.github.sam42r.semver.model.changelog.VersionInfo;
+import io.github.sam42r.semver.model.release.ReleaseInfo;
+import io.github.sam42r.semver.model.scm.Commit;
+import io.github.sam42r.semver.model.scm.Tag;
 import io.github.sam42r.semver.scm.SCMException;
 import io.github.sam42r.semver.scm.SCMProvider;
 import io.github.sam42r.semver.scm.SCMProviderFactory;
-import io.github.sam42r.semver.scm.model.Commit;
-import io.github.sam42r.semver.scm.model.Tag;
 import io.github.sam42r.semver.util.PomHelper;
 import io.github.sam42r.semver.util.TagVersionComparator;
 import lombok.NonNull;
@@ -236,11 +236,11 @@ public class SemanticReleaseMojo extends AbstractMojo {
             var commits = scmProvider.readCommits(null);
 
             var latestTagOpt = tags.max(new TagVersionComparator(tagFormat));
-            var latestCommitOpt = latestTagOpt.map(Tag::getCommitId)
-                    .or(() -> commits.min(Comparator.comparing(Commit::getTimestamp)).map(Commit::getId));
+            var latestCommitOpt = latestTagOpt.map(Tag::commitId)
+                    .or(() -> commits.min(Comparator.comparing(Commit::timestamp)).map(Commit::id));
 
             return new LatestReleaseInfo(
-                    latestTagOpt.map(Tag::getName),
+                    latestTagOpt.map(Tag::name),
                     latestCommitOpt
             );
         } catch (SCMException e) {
@@ -320,16 +320,16 @@ public class SemanticReleaseMojo extends AbstractMojo {
             var remote = scmProvider.getRemote();
 
             releasePublisher.publish(
-                    remote.getScheme(),
-                    remote.getHost(),
-                    remote.getGroup(),
-                    remote.getProject(),
-                    ReleaseInfo.builder()
-                            .time(LocalDateTime.now().truncatedTo(ChronoUnit.DAYS))
-                            .tagName(version.toTag())
-                            .name(version.toString())
-                            //.description("TODO")
-                            .build()
+                    remote.scheme(),
+                    remote.host(),
+                    remote.group(),
+                    remote.project(),
+                    new ReleaseInfo(
+                            version.toTag(),
+                            version.toString(),
+                            null, // TODO
+                            LocalDateTime.now().truncatedTo(ChronoUnit.DAYS)
+                    )
             );
         } catch (SCMException | ReleaseException e) {
             throw new MojoExecutionException(e.getMessage(), e.getCause());
