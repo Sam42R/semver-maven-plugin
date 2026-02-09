@@ -41,7 +41,7 @@ class MarkupRendererTest {
 
             assertThat(actual).asString(StandardCharsets.UTF_8)
                     .startsWith("# Changelog")
-                    .contains("## v1.0.0 - %s".formatted(LocalDateTime.now().format(DateTimeFormatter.ISO_DATE)))
+                    .contains("## [v1.0.0](https:///junit.org/test/v0.0.1...v1.0.0) - %s".formatted(LocalDateTime.now().format(DateTimeFormatter.ISO_DATE)))
                     .contains("- fix(scm): set clean commit message")
                     .contains("## Disclaimer");
         }
@@ -73,14 +73,19 @@ class MarkupRendererTest {
 
             assertThat(actual).asString(StandardCharsets.UTF_8)
                     .startsWith("# Changelog")
-                    .contains("## v1.0.0 - %s".formatted(LocalDateTime.now().format(DateTimeFormatter.ISO_DATE)))
+                    .contains("## [v1.0.0](https:///junit.org/test/v0.0.1...v1.0.0) - %s".formatted(LocalDateTime.now().format(DateTimeFormatter.ISO_DATE)))
                     .contains("## v0.9.0 - 2024-01-01")
                     .contains("## Disclaimer");
         }
     }
 
     private VersionInfo release(String version) {
-        return new VersionInfo(version, LocalDateTime.now().format(DateTimeFormatter.ISO_DATE), "");
+        return new VersionInfo(
+                version,
+                LocalDateTime.now().format(DateTimeFormatter.ISO_DATE),
+                "",
+                "https:///junit.org/test/v0.0.1...%s".formatted(version)
+        );
     }
 
     private List<AnalyzedCommit> analyzedCommits() {

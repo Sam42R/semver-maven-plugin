@@ -12,6 +12,7 @@ import io.github.sam42r.semver.model.analyze.AnalyzedCommit;
 import io.github.sam42r.semver.model.changelog.VersionInfo;
 import io.github.sam42r.semver.model.release.ReleaseInfo;
 import io.github.sam42r.semver.model.scm.Commit;
+import io.github.sam42r.semver.model.scm.Remote;
 import io.github.sam42r.semver.model.scm.Tag;
 import io.github.sam42r.semver.scm.SCMException;
 import io.github.sam42r.semver.scm.SCMProvider;
@@ -146,26 +147,40 @@ public class SemanticReleaseMojo extends AbstractMojo {
         } else {
             getLog().info("Continue with '%s' release".formatted(nextVersionType.name()));
 
-            latestVersion.increment(nextVersionType);
-            getLog().debug("Release version: '%s'".formatted(latestVersion.toString()));
+            var nextVersion = Version.of(latestVersion);
+            nextVersion.increment(nextVersionType);
 
-            getLog().debug("Writing release notes to 'Changelog.md' for version '%s'".formatted(latestVersion.toString()));
+            getLog().debug("Release version: '%s'".formatted(nextVersion.toString()));
+
+            getLog().debug("Writing release notes to 'Changelog.md' for version '%s'".formatted(nextVersion.toString()));
+            final Remote remote;
+            try {
+                remote = scmProvider.getRemote();
+            } catch (SCMException e) {
+                throw new MojoExecutionException(e);
+            }
+
             var versionInfo = new VersionInfo(
-                    latestVersion.toString(),
+                    nextVersion.toString(),
                     LocalDateTime.now().format(DateTimeFormatter.ISO_DATE),
-                    "" // TODO read docs(changelog) commits and add as release description
+                    "", // TODO read docs(changelog) commits and add as release description
+                    releasePublisher.providerSpec().compareUrl(
+                            remote,
+                            latestVersion.toTag(),
+                            nextVersion.toTag()
+                    )
             );
             var notes = generateNotes(projectBaseDirectory, changelogRenderer, versionInfo, analyzedCommits);
 
-            getLog().debug("Setting project version in '%s' to '%s'".formatted(POM, latestVersion.toString()));
+            getLog().debug("Setting project version in '%s' to '%s'".formatted(POM, nextVersion.toString()));
             var pomXml = projectBaseDirectory.resolve(POM);
-            PomHelper.changeVersion(pomXml, latestVersion.toString());
+            PomHelper.changeVersion(pomXml, nextVersion.toString());
 
             var modules = isModule(project) ? project.getParent().getModules() : project.getModules();
             var modulePomsXml = new ArrayList<Path>();
             for (var module : modules) {
                 var modulePomXml = projectBaseDirectory.resolve(module).resolve(POM);
-                PomHelper.changeParentVersion(modulePomXml, latestVersion.toString());
+                PomHelper.changeParentVersion(modulePomXml, nextVersion.toString());
 
                 modulePomsXml.add(modulePomXml);
             }
@@ -178,16 +193,16 @@ public class SemanticReleaseMojo extends AbstractMojo {
                     scmProvider.addFile(modulePomXml);
                 }
 
-                scmProvider.commit(commitAnalyzer.generateReleaseCommitMessage(latestVersion.toString()));
+                scmProvider.commit(commitAnalyzer.generateReleaseCommitMessage(nextVersion.toString()));
 
-                createTag(scmProvider, latestVersion);
+                createTag(scmProvider, nextVersion);
 
                 if (scm.isPush()) {
                     publish(scmProvider);
                 }
 
                 if (release.isPublish()) {
-                    notify(scmProvider, releasePublisher, latestVersion);
+                    notify(scmProvider, releasePublisher, nextVersion);
                 }
             } catch (SCMException e) {
                 throw new MojoExecutionException(e);

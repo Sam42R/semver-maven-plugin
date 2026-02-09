@@ -31,7 +31,7 @@ class GitMojiCommitAnalyzerTest {
                         new Commit("42.2", Instant.EPOCH, "JUnit", ":sparkles: add awesome things")
                 ),
                 Remote.of("git@github.com:Sam42R/semver-maven-plugin.git"),
-                new ProviderSpec("%s://%s/%s/%s/%s", "%s://%s/%s/%s/%s")
+                new ProviderSpec("%s://%s/%s/%s/%s", "%s://%s/%s/%s/%s", "%s://%s/%s/%s/%s...%s")
         );
 
         assertThat(actual).containsExactlyInAnyOrder(
@@ -68,7 +68,7 @@ class GitMojiCommitAnalyzerTest {
                         new Commit("42.3", Instant.EPOCH, "JUnit", ":boom: (void): break some glass #42")
                 ),
                 Remote.of("git@github.com:Sam42R/semver-maven-plugin.git"),
-                new ProviderSpec("%s://%s/%s/%s/%s", "%s://%s/%s/%s/%s")
+                new ProviderSpec("%s://%s/%s/%s/%s", "%s://%s/%s/%s/%s", "%s://%s/%s/%s/%s...%s")
         );
 
         assertThat(actual).containsExactly(
@@ -93,7 +93,7 @@ class GitMojiCommitAnalyzerTest {
                         new Commit("42.4", Instant.EPOCH, "JUnit", ":white_check_mark: add test for something")
                 ),
                 Remote.of("git@github.com:Sam42R/semver-maven-plugin.git"),
-                new ProviderSpec("%s://%s/%s/%s/%s", "%s://%s/%s/%s/%s")
+                new ProviderSpec("%s://%s/%s/%s/%s", "%s://%s/%s/%s/%s", "%s://%s/%s/%s/%s...%s")
         );
 
         assertThat(actual).containsExactly(

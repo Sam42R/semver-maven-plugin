@@ -74,6 +74,10 @@ public final class Version {
         return new Version(major, minor, patch, tagFormat);
     }
 
+    public static Version of(Version original) {
+        return Version.of(original.getMajor(), original.getMinor(), original.getPatch(), original.getTagFormat());
+    }
+
     public void increment(@NonNull Type type) {
         if (Type.MAJOR.equals(type)) {
             this.major++;

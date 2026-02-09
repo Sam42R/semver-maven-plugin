@@ -20,9 +20,8 @@
             <!-- DO NOT REMOVE - c871f32ed1b7a85b24a0f22e8e7d9e3ee285742c - DO NOT REMOVE -->
             <section class="version -planned">
                 <div class="header">
-                    <h2 class="version-num"
-                        th:text="${release.version}">
-                        v0.0.1
+                    <h2 class="version-num">
+                        <a th:text="${release.version}" th:href="${release.url}">v0.0.1</a>
                     </h2>
                     <time class="datetime"
                           th:datetime="${release.date}"
