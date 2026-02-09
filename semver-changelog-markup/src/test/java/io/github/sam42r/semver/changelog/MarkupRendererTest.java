@@ -6,6 +6,7 @@ import io.github.sam42r.semver.model.analyze.Issue;
 import io.github.sam42r.semver.model.analyze.SemVerChangeLevel;
 import io.github.sam42r.semver.model.changelog.VersionInfo;
 import io.github.sam42r.semver.model.scm.Commit;
+import org.apache.commons.codec.digest.DigestUtils;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.io.TempDir;
@@ -85,7 +86,7 @@ class MarkupRendererTest {
     private List<AnalyzedCommit> analyzedCommits() {
         return List.of(
                 new AnalyzedCommit(
-                        new Commit("42", Instant.EPOCH, "JUnit",
+                        new Commit(DigestUtils.sha256Hex("42"), Instant.EPOCH, "JUnit",
                                 """
                                         fix(scm): set clean commit message
                                         
@@ -93,6 +94,7 @@ class MarkupRendererTest {
                                         
                                         refs #42
                                         """),
+                        "https://junit.org/test/%s".formatted(DigestUtils.sha256Hex("42")),
                         "fix(scm): set clean commit message",
                         "* added scope for commit messages",
                         "refs #42",

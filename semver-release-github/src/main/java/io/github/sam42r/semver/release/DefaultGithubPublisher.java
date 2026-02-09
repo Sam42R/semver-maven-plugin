@@ -54,7 +54,8 @@ public class DefaultGithubPublisher implements ReleasePublisher {
     @Override
     public ProviderSpec providerSpec() {
         return new ProviderSpec(
-                "%s://%s/%s/%s/issues/%s"
+                "%s://%s/%s/%s/issues/%s",
+                "%s://%s/%s/%s/commit/%s"
         );
     }
 }

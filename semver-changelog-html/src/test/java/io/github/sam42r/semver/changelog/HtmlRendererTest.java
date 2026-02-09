@@ -6,6 +6,7 @@ import io.github.sam42r.semver.model.analyze.AnalyzedCommit;
 import io.github.sam42r.semver.model.analyze.ChangeCategory;
 import io.github.sam42r.semver.model.analyze.SemVerChangeLevel;
 import io.github.sam42r.semver.model.scm.Commit;
+import org.apache.commons.codec.digest.DigestUtils;
 import org.junit.jupiter.api.io.TempDir;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.CsvSource;
@@ -73,7 +74,7 @@ class HtmlRendererTest {
     private List<AnalyzedCommit> analyzedCommits() {
         return List.of(
                 new AnalyzedCommit(
-                        new Commit("42", Instant.EPOCH, "JUnit",
+                        new Commit(DigestUtils.sha256Hex("42.1"), Instant.EPOCH, "JUnit",
                                 """
                                         feat(scm): Lorem ipsum
                                         
@@ -81,6 +82,7 @@ class HtmlRendererTest {
                                         
                                         refs #42
                                         """),
+                        null,
                         "feat(scm): Lorem ipsum",
                         "* Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam",
                         "refs #42",
@@ -92,7 +94,7 @@ class HtmlRendererTest {
                         null
                 ),
                 new AnalyzedCommit(
-                        new Commit("42", Instant.EPOCH, "JUnit",
+                        new Commit(DigestUtils.sha256Hex("42.2"), Instant.EPOCH, "JUnit",
                                 """
                                         fix(scm): Lorem ipsum
                                         
@@ -100,6 +102,7 @@ class HtmlRendererTest {
                                         
                                         refs #42
                                         """),
+                        null,
                         "fix(scm): Lorem ipsum",
                         "* Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam",
                         "refs #42",
@@ -111,7 +114,7 @@ class HtmlRendererTest {
                         null
                 ),
                 new AnalyzedCommit(
-                        new Commit("42", Instant.EPOCH, "JUnit",
+                        new Commit(DigestUtils.sha256Hex("42.3"), Instant.EPOCH, "JUnit",
                                 """
                                         chore(scm): Lorem ipsum
                                         
@@ -119,6 +122,7 @@ class HtmlRendererTest {
                                         
                                         refs #42
                                         """),
+                        "https://junit.org/test/%s".formatted(DigestUtils.sha256Hex("42.3")),
                         "chore(scm): Lorem ipsum",
                         "* Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam",
                         "refs #42",

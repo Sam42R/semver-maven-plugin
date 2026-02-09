@@ -43,7 +43,7 @@ public class GitMojiCommitAnalyzer implements CommitAnalyzer {
         var matcher = pattern.matcher(commit.message());
 
         if (!commit.message().startsWith(":") || !matcher.find()) {
-            return new AnalyzedCommit(commit, null, null, null, null, null, null, null, null, null);
+            return new AnalyzedCommit(commit, null, null, null, null, null, null, null, null, null, null);
         }
 
         var intention = matcher.group("INTENTION");
@@ -62,6 +62,7 @@ public class GitMojiCommitAnalyzer implements CommitAnalyzer {
 
         return new AnalyzedCommit(
                 commit,
+                providerSpec.commitUrl(remote, commit.id()),
                 commit.message(),
                 null,
                 null,

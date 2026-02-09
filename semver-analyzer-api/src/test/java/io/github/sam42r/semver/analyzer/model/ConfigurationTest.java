@@ -20,13 +20,13 @@ class ConfigurationTest {
                         Configuration::getRelease, Configuration::getItems)
                 .containsExactly(
                         "R0", List.of(
-                                new AnalyzedCommit(null, null, null, null, "D1", ChangeCategory.DEPRECATED, null, null, SemVerChangeLevel.NONE, null),
-                                new AnalyzedCommit(null, null, null, null, "R1", ChangeCategory.REMOVED, null, null, SemVerChangeLevel.NONE, null),
-                                new AnalyzedCommit(null, null, null, null, "F1", ChangeCategory.FIXED, null, null, SemVerChangeLevel.PATCH, null),
-                                new AnalyzedCommit(null, null, null, null, "S1", ChangeCategory.SECURITY, null, null, SemVerChangeLevel.PATCH, null),
-                                new AnalyzedCommit(null, null, null, null, "A1", ChangeCategory.ADDED, null, null, SemVerChangeLevel.MINOR, null),
-                                new AnalyzedCommit(null, null, null, null, "C1", ChangeCategory.CHANGED, null, null, SemVerChangeLevel.MINOR, null),
-                                new AnalyzedCommit(null, null, null, null, "B1", ChangeCategory.OTHER, null, null, SemVerChangeLevel.MAJOR, null)
+                                new AnalyzedCommit(null, null, null, null, null, "D1", ChangeCategory.DEPRECATED, null, null, SemVerChangeLevel.NONE, null),
+                                new AnalyzedCommit(null, null, null, null, null, "R1", ChangeCategory.REMOVED, null, null, SemVerChangeLevel.NONE, null),
+                                new AnalyzedCommit(null, null, null, null, null, "F1", ChangeCategory.FIXED, null, null, SemVerChangeLevel.PATCH, null),
+                                new AnalyzedCommit(null, null, null, null, null, "S1", ChangeCategory.SECURITY, null, null, SemVerChangeLevel.PATCH, null),
+                                new AnalyzedCommit(null, null, null, null, null, "A1", ChangeCategory.ADDED, null, null, SemVerChangeLevel.MINOR, null),
+                                new AnalyzedCommit(null, null, null, null, null, "C1", ChangeCategory.CHANGED, null, null, SemVerChangeLevel.MINOR, null),
+                                new AnalyzedCommit(null, null, null, null, null, "B1", ChangeCategory.OTHER, null, null, SemVerChangeLevel.MAJOR, null)
                         )
                 );
     }
@@ -41,13 +41,13 @@ class ConfigurationTest {
                         Configuration::getRelease, Configuration::getItems)
                 .containsExactly(
                         "R0", List.of(
-                                new AnalyzedCommit(null, null, null, null, "D1", ChangeCategory.DEPRECATED, null, null, SemVerChangeLevel.NONE, null),
-                                new AnalyzedCommit(null, null, null, null, "R1", ChangeCategory.REMOVED, null, null, SemVerChangeLevel.NONE, null),
-                                new AnalyzedCommit(null, null, null, null, "F1", ChangeCategory.FIXED, null, null, SemVerChangeLevel.PATCH, null),
-                                new AnalyzedCommit(null, null, null, null, "S1", ChangeCategory.SECURITY, null, null, SemVerChangeLevel.PATCH, null),
-                                new AnalyzedCommit(null, null, null, null, "A1", ChangeCategory.ADDED, null, null, SemVerChangeLevel.MINOR, null),
-                                new AnalyzedCommit(null, null, null, null, "C1", ChangeCategory.CHANGED, null, null, SemVerChangeLevel.MINOR, null),
-                                new AnalyzedCommit(null, null, null, null, "B1", ChangeCategory.OTHER, null, null, SemVerChangeLevel.MAJOR, null)
+                                new AnalyzedCommit(null, null, null, null, null, "D1", ChangeCategory.DEPRECATED, null, null, SemVerChangeLevel.NONE, null),
+                                new AnalyzedCommit(null, null, null, null, null, "R1", ChangeCategory.REMOVED, null, null, SemVerChangeLevel.NONE, null),
+                                new AnalyzedCommit(null, null, null, null, null, "F1", ChangeCategory.FIXED, null, null, SemVerChangeLevel.PATCH, null),
+                                new AnalyzedCommit(null, null, null, null, null, "S1", ChangeCategory.SECURITY, null, null, SemVerChangeLevel.PATCH, null),
+                                new AnalyzedCommit(null, null, null, null, null, "A1", ChangeCategory.ADDED, null, null, SemVerChangeLevel.MINOR, null),
+                                new AnalyzedCommit(null, null, null, null, null, "C1", ChangeCategory.CHANGED, null, null, SemVerChangeLevel.MINOR, null),
+                                new AnalyzedCommit(null, null, null, null, null, "B1", ChangeCategory.OTHER, null, null, SemVerChangeLevel.MAJOR, null)
                         )
                 );
     }

@@ -1,17 +1,21 @@
 package io.github.sam42r.semver.changelog;
 
 import com.github.mustachejava.DefaultMustacheFactory;
-import io.github.sam42r.semver.model.changelog.VersionInfo;
+import io.github.sam42r.semver.changelog.model.Link;
+import io.github.sam42r.semver.changelog.model.RenderedCommit;
 import io.github.sam42r.semver.model.analyze.AnalyzedCommit;
 import io.github.sam42r.semver.model.analyze.ChangeCategory;
+import io.github.sam42r.semver.model.changelog.VersionInfo;
 import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
+import org.apache.commons.codec.binary.StringUtils;
 import org.apache.commons.codec.digest.DigestUtils;
 
 import java.io.*;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -65,25 +69,32 @@ public class MarkupRenderer implements ChangelogRenderer {
             context.put("release", versionInfo);
 
             context.put("hasAdded", categorizedCommits.containsKey(ChangeCategory.ADDED));
-            context.put("added", categorizedCommits.get(ChangeCategory.ADDED));
+            context.put("added", categorizedCommits.getOrDefault(ChangeCategory.ADDED, Collections.emptyList())
+                    .stream().map(this::renderedCommit).toList());
 
             context.put("hasChanges", categorizedCommits.containsKey(ChangeCategory.CHANGED));
-            context.put("changes", categorizedCommits.get(ChangeCategory.CHANGED));
+            context.put("changes", categorizedCommits.getOrDefault(ChangeCategory.CHANGED, Collections.emptyList())
+                    .stream().map(this::renderedCommit).toList());
 
             context.put("hasDeprecated", categorizedCommits.containsKey(ChangeCategory.DEPRECATED));
-            context.put("deprecated", categorizedCommits.get(ChangeCategory.DEPRECATED));
+            context.put("deprecated", categorizedCommits.getOrDefault(ChangeCategory.DEPRECATED, Collections.emptyList())
+                    .stream().map(this::renderedCommit).toList());
 
             context.put("hasRemoved", categorizedCommits.containsKey(ChangeCategory.REMOVED));
-            context.put("removed", categorizedCommits.get(ChangeCategory.REMOVED));
+            context.put("removed", categorizedCommits.getOrDefault(ChangeCategory.REMOVED, Collections.emptyList())
+                    .stream().map(this::renderedCommit).toList());
 
             context.put("hasPatches", categorizedCommits.containsKey(ChangeCategory.FIXED));
-            context.put("patches", categorizedCommits.get(ChangeCategory.FIXED));
+            context.put("patches", categorizedCommits.getOrDefault(ChangeCategory.FIXED, Collections.emptyList())
+                    .stream().map(this::renderedCommit).toList());
 
             context.put("hasSecurity", categorizedCommits.containsKey(ChangeCategory.SECURITY));
-            context.put("securities", categorizedCommits.get(ChangeCategory.SECURITY));
+            context.put("securities", categorizedCommits.getOrDefault(ChangeCategory.SECURITY, Collections.emptyList())
+                    .stream().map(this::renderedCommit).toList());
 
             context.put("hasOthers", categorizedCommits.containsKey(ChangeCategory.OTHER));
-            context.put("others", categorizedCommits.get(ChangeCategory.OTHER));
+            context.put("others", categorizedCommits.getOrDefault(ChangeCategory.OTHER, Collections.emptyList())
+                    .stream().map(this::renderedCommit).toList());
 
             context.put("renderHeader", !alreadyExists);
             context.put("renderFooter", !alreadyExists);
@@ -105,5 +116,34 @@ public class MarkupRenderer implements ChangelogRenderer {
         } catch (IOException e) {
             throw new UncheckedIOException(e);
         }
+    }
+
+    /**
+     * Transform {@link AnalyzedCommit} to Mustache compliant {@link RenderedCommit}.<br/>
+     * (Since Mustache is more or less logic less we have to use rendering optimized model)
+     *
+     * @param analyzedCommit the {@link AnalyzedCommit} to transform
+     * @return Mustache compliant {@link RenderedCommit}
+     */
+    private RenderedCommit renderedCommit(AnalyzedCommit analyzedCommit) {
+        return new RenderedCommit(
+                analyzedCommit.header(),
+                analyzedCommit.url() == null || analyzedCommit.url().isBlank() ?
+                        null :
+                        new Link(trimToLength(analyzedCommit.commit().id(), 7), analyzedCommit.url()),
+                analyzedCommit.issues() == null || analyzedCommit.issues().isEmpty() ?
+                        Collections.emptyList() :
+                        analyzedCommit.issues().stream()
+                                .filter(v -> v.url() != null && !v.url().isBlank())
+                                .map(v -> new Link(v.id(), v.url()))
+                                .toList()
+        );
+    }
+
+    private String trimToLength(String string, int length) {
+        if (string != null && string.length() > length) {
+            return string.substring(0, length);
+        }
+        return string;
     }
 }
