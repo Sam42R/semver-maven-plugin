@@ -7,6 +7,18 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 <!-- DO NOT REMOVE - c871f32ed1b7a85b24a0f22e8e7d9e3ee285742c - DO NOT REMOVE -->
 
+## [1.9.0](https://github.com/Sam42R/semver-maven-plugin/compare/v1.8.0...v1.9.0) - 2026-02-09
+
+
+### Added
+- :sparkles: generate tag-compare links #41&#10; ([#41](https://github.com/Sam42R/semver-maven-plugin/issues/41)) [e4c27a7](https://github.com/Sam42R/semver-maven-plugin/commit/e4c27a7ac692cf9d9c539de173ce0b3776b12855)
+- :sparkles: generate commit links #41&#10; ([#41](https://github.com/Sam42R/semver-maven-plugin/issues/41)) [38a4a8f](https://github.com/Sam42R/semver-maven-plugin/commit/38a4a8f51deb25246b090d0527dedd899b747cc8)
+- :sparkles: generate issue links #41&#10; ([#41](https://github.com/Sam42R/semver-maven-plugin/issues/41)) [fa18a0f](https://github.com/Sam42R/semver-maven-plugin/commit/fa18a0faaede722ede32b0df3d2f18d98c299bda)
+### Changed
+- :recycle: refactor model to records in addtional project&#10;  [33dfe63](https://github.com/Sam42R/semver-maven-plugin/commit/33dfe631eb1358e4553cdd7a97376216b4bbf314)
+- :art: fix some sonar issues&#10;  [8c96c18](https://github.com/Sam42R/semver-maven-plugin/commit/8c96c18121726513f2880af871e1061e374d0361)
+
+
 ## 1.8.0 - 2026-01-29
 
 
