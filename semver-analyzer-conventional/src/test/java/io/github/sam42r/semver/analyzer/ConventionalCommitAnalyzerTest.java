@@ -37,7 +37,7 @@ class ConventionalCommitAnalyzerTest {
                                         """)
                 ),
                 Remote.of("git@github.com:Sam42R/semver-maven-plugin.git"),
-                new ProviderSpec("%s://%s/%s/%s/%s")
+                new ProviderSpec("%s://%s/%s/%s/%s", "%s://%s/%s/%s/%s")
         );
 
         assertThat(actual).containsExactly(
@@ -50,6 +50,7 @@ class ConventionalCommitAnalyzerTest {
                                         
                                         refs #42
                                         """),
+                        "https://github.com/Sam42R/semver-maven-plugin/42",
                         "fix(scm): set clean commit message",
                         "* added scope for commit messages",
                         "refs #42",
@@ -78,7 +79,7 @@ class ConventionalCommitAnalyzerTest {
                                 "fix(scm)!: set clean commit message")
                 ),
                 Remote.of("git@github.com:Sam42R/semver-maven-plugin.git"),
-                new ProviderSpec("%s://%s/%s/%s/%s")
+                new ProviderSpec("%s://%s/%s/%s/%s", "%s://%s/%s/%s/%s")
         );
 
         assertThat(actual).containsExactly(
@@ -92,6 +93,7 @@ class ConventionalCommitAnalyzerTest {
                                         BREAKING CHANGE: breaks everything
                                         refs #42
                                         """),
+                        "https://github.com/Sam42R/semver-maven-plugin/42",
                         "fix(scm): set clean commit message",
                         "* added scope for commit messages",
                         "BREAKING CHANGE: breaks everything%srefs #42".formatted(System.lineSeparator()),
@@ -103,6 +105,7 @@ class ConventionalCommitAnalyzerTest {
                         List.of(new Issue("42", "https://github.com/Sam42R/semver-maven-plugin/42"))),
                 new AnalyzedCommit(
                         new Commit("42", Instant.EPOCH, "JUnit", "fix(scm)!: set clean commit message"),
+                        "https://github.com/Sam42R/semver-maven-plugin/42",
                         "fix(scm)!: set clean commit message",
                         "",
                         "",

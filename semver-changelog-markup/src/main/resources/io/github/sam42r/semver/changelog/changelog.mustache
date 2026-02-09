@@ -9,43 +9,43 @@
 ### Added
 {{/hasAdded}}
 {{#added}}
-- {{header}} {{#issues}}([#{{id}}]({{url}})){{/issues}}
+- {{message}} {{#issues}}([#{{name}}]({{href}})){{/issues}} {{#reference}}[{{name}}]({{href}}){{/reference}}
 {{/added}}
 {{#hasChanges}}
 ### Changed
 {{/hasChanges}}
 {{#changes}}
-- {{header}} {{#issues}}([#{{id}}]({{url}})){{/issues}}
+- {{message}} {{#issues}}([#{{name}}]({{href}})){{/issues}} {{#reference}}[{{name}}]({{href}}){{/reference}}
 {{/changes}}
 {{#hasDeprecated}}
 ### Deprecated
 {{/hasDeprecated}}
 {{#deprecated}}
-- {{header}} {{#issues}}([#{{id}}]({{url}})){{/issues}}
+- {{message}} {{#issues}}([#{{name}}]({{href}})){{/issues}} {{#reference}}[{{name}}]({{href}}){{/reference}}
 {{/deprecated}}
 {{#hasRemoved}}
 ### Removed
 {{/hasRemoved}}
 {{#removed}}
-- {{header}} {{#issues}}([#{{id}}]({{url}})){{/issues}}
+- {{message}} {{#issues}}([#{{name}}]({{href}})){{/issues}} {{#reference}}[{{name}}]({{href}}){{/reference}}
 {{/removed}}
 {{#hasPatches}}
 ### Fixed
 {{/hasPatches}}
 {{#patches}}
-- {{header}} {{#issues}}([#{{id}}]({{url}})){{/issues}}
+- {{message}} {{#issues}}([#{{name}}]({{href}})){{/issues}} {{#reference}}[{{name}}]({{href}}){{/reference}}
 {{/patches}}
 {{#hasSecurity}}
 ### Security
 {{/hasSecurity}}
 {{#securities}}
-- {{header}} {{#issues}}([#{{id}}]({{url}})){{/issues}}
+- {{message}} {{#issues}}([#{{name}}]({{href}})){{/issues}} {{#reference}}[{{name}}]({{href}}){{/reference}}
 {{/securities}}
 {{#hasOthers}}
 ### Others
 {{/hasOthers}}
 {{#others}}
-- {{header}} {{#issues}}([#{{id}}]({{url}})){{/issues}}
+- {{message}} {{#issues}}([#{{name}}]({{href}})){{/issues}} {{#reference}}[{{name}}]({{href}}){{/reference}}
 {{/others}}
 
 {{#renderFooter}}

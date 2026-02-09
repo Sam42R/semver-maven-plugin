@@ -76,7 +76,7 @@ public class ConventionalCommitAnalyzer implements CommitAnalyzer {
         var headerMatcher = Pattern.compile(COMMIT_HEADER_PATTERN).matcher(header);
 
         if (header.isEmpty() || !headerMatcher.find()) {
-            return new AnalyzedCommit(commit, null, null, null, null, null, null, null, null, null);
+            return new AnalyzedCommit(commit, null, null, null, null, null, null, null, null, null, null);
         }
 
         var type = headerMatcher.group("TYPE");
@@ -99,6 +99,7 @@ public class ConventionalCommitAnalyzer implements CommitAnalyzer {
 
         return new AnalyzedCommit(
                 commit,
+                providerSpec.issueUrl(remote, commit.id()),
                 header,
                 body,
                 footer,
