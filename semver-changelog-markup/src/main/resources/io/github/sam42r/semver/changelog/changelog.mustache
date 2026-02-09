@@ -2,7 +2,7 @@
 {{> header}}
 {{/renderHeader}}
 
-## {{release.version}} - {{release.date}}
+## {{#release.url}}[{{/release.url}}{{release.version}}{{#release.url}}]({{.}}){{/release.url}} - {{release.date}}
 {{release.message}}
 
 {{#hasAdded}}

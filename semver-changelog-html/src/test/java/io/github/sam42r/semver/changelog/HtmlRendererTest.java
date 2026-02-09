@@ -68,7 +68,12 @@ class HtmlRendererTest {
     }
 
     private VersionInfo release(String version) {
-        return new VersionInfo(version, LocalDateTime.now().format(DateTimeFormatter.ISO_DATE), "");
+        return new VersionInfo(
+                version,
+                LocalDateTime.now().format(DateTimeFormatter.ISO_DATE),
+                "",
+                "https:///junit.org/test/v0.0.1...%s".formatted(version)
+        );
     }
 
     private List<AnalyzedCommit> analyzedCommits() {

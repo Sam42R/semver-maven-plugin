@@ -8,7 +8,6 @@ import io.github.sam42r.semver.model.analyze.ChangeCategory;
 import io.github.sam42r.semver.model.changelog.VersionInfo;
 import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
-import org.apache.commons.codec.binary.StringUtils;
 import org.apache.commons.codec.digest.DigestUtils;
 
 import java.io.*;

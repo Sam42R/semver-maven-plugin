@@ -25,9 +25,7 @@
 					    <tr>
 							<td class="label-container"></td>
 					        <td class="changelog-date">
-								<th:block th:text="${release.version}">
-									v0.0.1
-								</th:block>
+								<a th:text="${release.version}" th:href="${release.url}">v0.0.1</a>
 								<span class="app-version"
 									  th:text="${'(' + release.date + ')'}">
 									(1970-01-01)

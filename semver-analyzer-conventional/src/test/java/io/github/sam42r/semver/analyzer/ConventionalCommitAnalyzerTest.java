@@ -37,7 +37,7 @@ class ConventionalCommitAnalyzerTest {
                                         """)
                 ),
                 Remote.of("git@github.com:Sam42R/semver-maven-plugin.git"),
-                new ProviderSpec("%s://%s/%s/%s/%s", "%s://%s/%s/%s/%s")
+                new ProviderSpec("%s://%s/%s/%s/%s", "%s://%s/%s/%s/%s", "%s://%s/%s/%s/%s...%s")
         );
 
         assertThat(actual).containsExactly(
@@ -79,7 +79,7 @@ class ConventionalCommitAnalyzerTest {
                                 "fix(scm)!: set clean commit message")
                 ),
                 Remote.of("git@github.com:Sam42R/semver-maven-plugin.git"),
-                new ProviderSpec("%s://%s/%s/%s/%s", "%s://%s/%s/%s/%s")
+                new ProviderSpec("%s://%s/%s/%s/%s", "%s://%s/%s/%s/%s", "%s://%s/%s/%s/%s...%s")
         );
 
         assertThat(actual).containsExactly(
