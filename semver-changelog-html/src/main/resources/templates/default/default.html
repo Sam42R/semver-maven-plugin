@@ -21,7 +21,8 @@
             <section class="version -planned">
                 <div class="header">
                     <h2 class="version-num">
-                        <a th:text="${release.version}" th:href="${release.url}">v0.0.1</a>
+                        <a th:if="${renderReleaseLinks}" th:text="${release.version}" th:href="${release.url}">v0.0.1</a>
+                        <span th:unless="${renderReleaseLinks}" th:text="${release.version}">v0.0.1</span>
                     </h2>
                     <time class="datetime"
                           th:datetime="${release.date}"
@@ -47,14 +48,17 @@
                         </th:block>
                         <ul>
                             <li>
-                                <span th:text="${commit.header}">Lorem ipsum</span>
+                                <span th:text="|${commit.type}${commit.scope != null and !#strings.isEmpty(commit.scope) ? '(' + commit.scope + ')' : ''}: ${commit.subject}|">Lorem ipsum</span>
                                 <th:block th:each="issue : ${commit.issues}">
-                                    &nbsp;(<a th:href="${issue.url}" th:text="|#${issue.id}|"></a>)
+                                    &nbsp;<a th:if="${renderIssueLinks}" th:href="${issue.url}" th:text="|(#${issue.id})|"></a>
                                 </th:block>
-                                <th:block th:if="${commit.url}">
+                                <th:block th:if="${renderCommitLinks && commit.url}">
                                     &nbsp;<a th:text="${#strings.length(commit.commit.id) > 7 ? #strings.substring(commit.commit.id, 0, 7) : commit.commit.id}"
                                              th:href="${commit.url}"></a>
                                 </th:block>
+                            </li>
+                            <li th:if="${renderBody && commit.body}">
+                                <span style="padding-left: 16px; white-space: pre-wrap;" th:text="${commit.body}">Lorem ipsum</span>
                             </li>
                         </ul>
                     </section>

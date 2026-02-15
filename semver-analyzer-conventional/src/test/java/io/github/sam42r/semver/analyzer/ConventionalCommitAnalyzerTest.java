@@ -117,4 +117,43 @@ class ConventionalCommitAnalyzerTest {
                         List.of())
         );
     }
+
+    @Test
+    void shouldSecurityFindFix() {
+        var actual = uut.analyzeCommits(List.of(
+                        new Commit("42", Instant.EPOCH, "JUnit",
+                                """
+                                        fix(security): use string encryption
+                                        
+                                        * replaced weak encryption
+                                        
+                                        refs #42
+                                        """)
+                ),
+                Remote.of("git@github.com:Sam42R/semver-maven-plugin.git"),
+                new ProviderSpec("%s://%s/%s/%s/%s", "%s://%s/%s/%s/%s", "%s://%s/%s/%s/%s...%s")
+        );
+
+        assertThat(actual).containsExactly(
+                new AnalyzedCommit(
+                        new Commit("42", Instant.EPOCH, "JUnit",
+                                """
+                                        fix(security): use string encryption
+                                        
+                                        * replaced weak encryption
+                                        
+                                        refs #42
+                                        """),
+                        "https://github.com/Sam42R/semver-maven-plugin/42",
+                        "fix(security): use string encryption",
+                        "* replaced weak encryption",
+                        "refs #42",
+                        "fix",
+                        ChangeCategory.SECURITY,
+                        "security",
+                        "use string encryption",
+                        SemVerChangeLevel.PATCH,
+                        List.of(new Issue("42", "https://github.com/Sam42R/semver-maven-plugin/42")))
+        );
+    }
 }

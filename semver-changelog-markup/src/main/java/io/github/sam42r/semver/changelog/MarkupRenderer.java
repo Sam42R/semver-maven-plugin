@@ -14,6 +14,7 @@ import java.io.*;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
@@ -26,6 +27,10 @@ public class MarkupRenderer implements ChangelogRenderer {
     private static final String CHANGELOG_TEMPLATE = "%s.mustache";
 
     private final String template;
+    private final boolean renderIssueLinks;
+    private final boolean renderCommitLinks;
+    private final boolean renderReleaseLinks;
+    private final boolean renderBody;
 
     @Override
     public @NonNull InputStream renderChangelog(
@@ -36,17 +41,6 @@ public class MarkupRenderer implements ChangelogRenderer {
         var marker = DigestUtils.sha1Hex("Sam42R");
 
         var alreadyExists = Files.exists(path);
-
-        // TODO
-        // Changelog -> docs(changelog): ...
-
-        // Added -> feat
-        // Changed -> refactor
-        // Deprecated -> DEPRECATED footer
-        // Removed -> ???
-        // Fixed -> fix
-        // Security -> fix(security): ... OR feat(security): ...
-        // Other -> all others
 
         var mustacheFactory = new DefaultMustacheFactory("io/github/sam42r/semver/changelog");
         try (
@@ -65,6 +59,8 @@ public class MarkupRenderer implements ChangelogRenderer {
 
             var mustache = mustacheFactory.compile(reader, CHANGELOG_TEMPLATE.formatted(template));
             var context = new HashMap<String, Object>();
+
+            context.put("renderReleaseLink", renderReleaseLinks);
             context.put("release", versionInfo);
 
             context.put("hasAdded", categorizedCommits.containsKey(ChangeCategory.ADDED));
@@ -125,12 +121,19 @@ public class MarkupRenderer implements ChangelogRenderer {
      * @return Mustache compliant {@link RenderedCommit}
      */
     private RenderedCommit renderedCommit(AnalyzedCommit analyzedCommit) {
+        var messageBuilder = new StringBuilder(analyzedCommit.type());
+        if (analyzedCommit.scope() != null && !analyzedCommit.scope().isBlank()) {
+            messageBuilder.append("(%s)".formatted(analyzedCommit.scope()));
+        }
+        messageBuilder.append(": %s".formatted(analyzedCommit.subject()));
+
         return new RenderedCommit(
-                analyzedCommit.header(),
-                analyzedCommit.url() == null || analyzedCommit.url().isBlank() ?
+                messageBuilder.toString(),
+                !renderBody ? null : Arrays.asList(analyzedCommit.body().trim().split("\n")),
+                !renderCommitLinks || analyzedCommit.url() == null || analyzedCommit.url().isBlank() ?
                         null :
                         new Link(trimToLength(analyzedCommit.commit().id(), 7), analyzedCommit.url()),
-                analyzedCommit.issues() == null || analyzedCommit.issues().isEmpty() ?
+                !renderIssueLinks || analyzedCommit.issues() == null || analyzedCommit.issues().isEmpty() ?
                         Collections.emptyList() :
                         analyzedCommit.issues().stream()
                                 .filter(v -> v.url() != null && !v.url().isBlank())

@@ -1,10 +1,10 @@
 package io.github.sam42r.semver.changelog;
 
-import io.github.sam42r.semver.model.analyze.Issue;
-import io.github.sam42r.semver.model.changelog.VersionInfo;
 import io.github.sam42r.semver.model.analyze.AnalyzedCommit;
 import io.github.sam42r.semver.model.analyze.ChangeCategory;
+import io.github.sam42r.semver.model.analyze.Issue;
 import io.github.sam42r.semver.model.analyze.SemVerChangeLevel;
+import io.github.sam42r.semver.model.changelog.VersionInfo;
 import io.github.sam42r.semver.model.scm.Commit;
 import org.apache.commons.codec.digest.DigestUtils;
 import org.junit.jupiter.api.io.TempDir;
@@ -30,7 +30,7 @@ class HtmlRendererTest {
     @ParameterizedTest
     @CsvSource({"default", "missive", "spinal"})
     void shouldCreateChangelogFull(String template) throws IOException {
-        var uut = new HtmlRenderer(template);
+        var uut = new HtmlRendererFactory().getInstance(template, true, true, true, true);
         var changelog = tempDir.resolve("Changelog.html");
 
         try (var inputStream = uut.renderChangelog(changelog, release("v1.0.0"), analyzedCommits())) {
@@ -47,7 +47,7 @@ class HtmlRendererTest {
     @ParameterizedTest
     @CsvSource({"default", "missive", "spinal"})
     void shouldUpdateChangelog(String template) throws IOException {
-        var uut = new HtmlRenderer(template);
+        var uut = new HtmlRendererFactory().getInstance(template, false, false, false, false);
         var changelog = tempDir.resolve("Changelog.html");
 
         try (var inputStream = uut.renderChangelog(changelog, release("v1.0.0"), analyzedCommits())) {
@@ -84,12 +84,16 @@ class HtmlRendererTest {
                                         feat(scm): Lorem ipsum
                                         
                                         * Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam
+                                        * Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam
                                         
                                         refs #42
                                         """),
                         null,
                         "feat(scm): Lorem ipsum",
-                        "* Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam",
+                        """
+                                * Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam
+                                * Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam
+                                """,
                         "refs #42",
                         "feat",
                         ChangeCategory.ADDED,

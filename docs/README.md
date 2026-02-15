@@ -213,6 +213,10 @@ or by setting corresponding system property.
 | analyzer  | specification-name |          | `Conventional` | [Conventional&vert;Gitmoji]          | Commit message analyzer specification |
 | changelog | renderer-name      |          | `Markup`       | [Markup&vert;Html]                   | Changelog renderer                    |
 |           | template           |          | `changelog`    |                                      | Changelog template                    |
+|           | renderIssueLinks   |          | `true`         | [true&vert;false]                    | Generate issue links                  |
+|           | renderCommitLinks  |          | `true`         | [true&vert;false]                    | Generate commit links                 |
+|           | renderReleaseLinks |          | `true`         | [true&vert;false]                    | Generate release links                |
+|           | renderBody         |          | `false`        | [true&vert;false]                    | Include commit message body           |
 | release   | publisher-name     |          | `GitHub`       | [Github&vert;Gitlab]                 | Release publisher                     |
 |           | publish            |          | `false`        | [true&vert;false]                    | publish release to remote             |
 |           | username           |          |                |                                      |                                       |

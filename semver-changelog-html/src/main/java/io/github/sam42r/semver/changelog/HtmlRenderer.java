@@ -1,7 +1,7 @@
 package io.github.sam42r.semver.changelog;
 
-import io.github.sam42r.semver.model.changelog.VersionInfo;
 import io.github.sam42r.semver.model.analyze.AnalyzedCommit;
+import io.github.sam42r.semver.model.changelog.VersionInfo;
 import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
 import org.apache.commons.codec.digest.DigestUtils;
@@ -19,6 +19,10 @@ import java.util.List;
 public class HtmlRenderer implements ChangelogRenderer {
 
     private final String template;
+    private final boolean renderIssueLinks;
+    private final boolean renderCommitLinks;
+    private final boolean renderReleaseLinks;
+    private final boolean renderBody;
 
     @Override
     public @NonNull InputStream renderChangelog(
@@ -43,6 +47,11 @@ public class HtmlRenderer implements ChangelogRenderer {
                 var finalWriter = new BufferedWriter(new OutputStreamWriter(finalOutputStream))
         ) {
             var context = new Context();
+
+            context.setVariable("renderIssueLinks", renderIssueLinks);
+            context.setVariable("renderCommitLinks", renderCommitLinks);
+            context.setVariable("renderReleaseLinks", renderReleaseLinks);
+            context.setVariable("renderBody", renderBody);
 
             context.setVariable("release", versionInfo);
             context.setVariable("commits", analyzedCommits);

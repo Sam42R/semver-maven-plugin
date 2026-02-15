@@ -2,50 +2,71 @@
 {{> header}}
 {{/renderHeader}}
 
-## {{#release.url}}[{{/release.url}}{{release.version}}{{#release.url}}]({{.}}){{/release.url}} - {{release.date}}
+## {{#renderReleaseLink}}{{#release.url}}[{{/release.url}}{{/renderReleaseLink}}{{release.version}}{{#renderReleaseLink}}{{#release.url}}]({{.}}){{/release.url}}{{/renderReleaseLink}} - {{release.date}}
 {{release.message}}
 
 {{#hasAdded}}
 ### Added
 {{/hasAdded}}
 {{#added}}
-- {{message}} {{#issues}}([#{{name}}]({{href}})){{/issues}} {{#reference}}[{{name}}]({{href}}){{/reference}}
+- {{message}} {{#issues}}[(#{{name}})]({{href}}){{/issues}} {{#reference}}[{{name}}]({{href}}){{/reference}}
+{{#body}}
+  {{{.}}}
+{{/body}}
 {{/added}}
 {{#hasChanges}}
 ### Changed
 {{/hasChanges}}
 {{#changes}}
-- {{message}} {{#issues}}([#{{name}}]({{href}})){{/issues}} {{#reference}}[{{name}}]({{href}}){{/reference}}
+- {{message}} {{#issues}}[(#{{name}})]({{href}}){{/issues}} {{#reference}}[{{name}}]({{href}}){{/reference}}
+{{#body}}
+  {{{.}}}
+{{/body}}
 {{/changes}}
 {{#hasDeprecated}}
 ### Deprecated
 {{/hasDeprecated}}
 {{#deprecated}}
-- {{message}} {{#issues}}([#{{name}}]({{href}})){{/issues}} {{#reference}}[{{name}}]({{href}}){{/reference}}
+- {{message}} {{#issues}}[(#{{name}})]({{href}}){{/issues}} {{#reference}}[{{name}}]({{href}}){{/reference}}
+{{#body}}
+  {{{.}}}
+{{/body}}
 {{/deprecated}}
 {{#hasRemoved}}
 ### Removed
 {{/hasRemoved}}
 {{#removed}}
-- {{message}} {{#issues}}([#{{name}}]({{href}})){{/issues}} {{#reference}}[{{name}}]({{href}}){{/reference}}
+- {{message}} {{#issues}}[(#{{name}})]({{href}}){{/issues}} {{#reference}}[{{name}}]({{href}}){{/reference}}
+{{#body}}
+  {{{.}}}
+{{/body}}
 {{/removed}}
 {{#hasPatches}}
 ### Fixed
 {{/hasPatches}}
 {{#patches}}
-- {{message}} {{#issues}}([#{{name}}]({{href}})){{/issues}} {{#reference}}[{{name}}]({{href}}){{/reference}}
+- {{message}} {{#issues}}[(#{{name}})]({{href}}){{/issues}} {{#reference}}[{{name}}]({{href}}){{/reference}}
+{{#body}}
+  {{{.}}}
+{{/body}}
 {{/patches}}
 {{#hasSecurity}}
 ### Security
 {{/hasSecurity}}
 {{#securities}}
-- {{message}} {{#issues}}([#{{name}}]({{href}})){{/issues}} {{#reference}}[{{name}}]({{href}}){{/reference}}
+- {{message}} {{#issues}}[(#{{name}})]({{href}}){{/issues}} {{#reference}}[{{name}}]({{href}}){{/reference}}
+{{#body}}
+  {{{.}}}
+{{/body}}
 {{/securities}}
 {{#hasOthers}}
 ### Others
 {{/hasOthers}}
 {{#others}}
-- {{message}} {{#issues}}([#{{name}}]({{href}})){{/issues}} {{#reference}}[{{name}}]({{href}}){{/reference}}
+- {{message}} {{#issues}}[(#{{name}})]({{href}}){{/issues}} {{#reference}}[{{name}}]({{href}}){{/reference}}
+{{#body}}
+  {{{.}}}
+{{/body}}
 {{/others}}
 
 {{#renderFooter}}

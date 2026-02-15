@@ -7,7 +7,6 @@ import io.github.sam42r.semver.model.analyze.SemVerChangeLevel;
 import io.github.sam42r.semver.model.changelog.VersionInfo;
 import io.github.sam42r.semver.model.scm.Commit;
 import org.apache.commons.codec.digest.DigestUtils;
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.io.TempDir;
 
@@ -25,30 +24,29 @@ import static org.assertj.core.api.Assertions.assertThat;
 
 class MarkupRendererTest {
 
-    private ChangelogRenderer uut;
-
-    @BeforeEach
-    void setup() {
-        uut = new MarkupRenderer("changelog");
-    }
-
     @Test
     void shouldCreateChangelogFull(@TempDir Path tempDir) throws IOException {
+        var uut = new MarkupRendererFactory().getInstance("changelog", true, true, true, true);
+
         var changelog = tempDir.resolve("Changelog.md");
 
-        try (var inputStream = uut.renderChangelog(changelog, release("v1.0.0"), analyzedCommits())) {
+        try (var inputStream = uut.renderChangelog(changelog, release("v1.0.0"), analyzedCommitsConventional())) {
             var actual = inputStream.readAllBytes();
 
             assertThat(actual).asString(StandardCharsets.UTF_8)
                     .startsWith("# Changelog")
                     .contains("## [v1.0.0](https:///junit.org/test/v0.0.1...v1.0.0) - %s".formatted(LocalDateTime.now().format(DateTimeFormatter.ISO_DATE)))
-                    .contains("- fix(scm): set clean commit message")
+                    .contains("- fix(scm): set clean commit message [(#42)](https://junit.org/test/42)")
+                    .contains("* added scope for commit messages")
+                    .doesNotContain("refs #42")
                     .contains("## Disclaimer");
         }
     }
 
     @Test
     void shouldUpdateChangelog(@TempDir Path tempDir) throws IOException {
+        var uut = new MarkupRendererFactory().getInstance("changelog", false, false, false, false);
+
         var changelog = tempDir.resolve("Changelog.md");
         Files.writeString(
                 changelog,
@@ -68,12 +66,14 @@ class MarkupRendererTest {
                 StandardOpenOption.CREATE, StandardOpenOption.TRUNCATE_EXISTING
         );
 
-        try (var inputStream = uut.renderChangelog(changelog, release("v1.0.0"), List.of())) {
+        try (var inputStream = uut.renderChangelog(changelog, release("v1.0.0"), analyzedCommitsGitmoji())) {
             var actual = inputStream.readAllBytes();
 
             assertThat(actual).asString(StandardCharsets.UTF_8)
                     .startsWith("# Changelog")
-                    .contains("## [v1.0.0](https:///junit.org/test/v0.0.1...v1.0.0) - %s".formatted(LocalDateTime.now().format(DateTimeFormatter.ISO_DATE)))
+                    .contains("## v1.0.0 - %s".formatted(LocalDateTime.now().format(DateTimeFormatter.ISO_DATE)))
+                    .contains("- fix(scm): set clean commit message")
+                    .doesNotContain("#42")
                     .contains("## v0.9.0 - 2024-01-01")
                     .contains("## Disclaimer");
         }
@@ -88,7 +88,7 @@ class MarkupRendererTest {
         );
     }
 
-    private List<AnalyzedCommit> analyzedCommits() {
+    private List<AnalyzedCommit> analyzedCommitsConventional() {
         return List.of(
                 new AnalyzedCommit(
                         new Commit(DigestUtils.sha256Hex("42"), Instant.EPOCH, "JUnit",
@@ -96,13 +96,36 @@ class MarkupRendererTest {
                                         fix(scm): set clean commit message
                                         
                                         * added scope for commit messages
+                                        * some more changes done
                                         
                                         refs #42
                                         """),
                         "https://junit.org/test/%s".formatted(DigestUtils.sha256Hex("42")),
                         "fix(scm): set clean commit message",
-                        "* added scope for commit messages",
+                        """
+                                * added scope for commit messages
+                                * some more changes done
+                                """,
                         "refs #42",
+                        "fix",
+                        ChangeCategory.FIXED,
+                        "scm",
+                        "set clean commit message",
+                        SemVerChangeLevel.PATCH,
+                        List.of(new Issue("42", "https://junit.org/test/42"))
+                )
+        );
+    }
+
+    private List<AnalyzedCommit> analyzedCommitsGitmoji() {
+        return List.of(
+                new AnalyzedCommit(
+                        new Commit(DigestUtils.sha256Hex("42"), Instant.EPOCH, "JUnit",
+                                "fix(scm): set clean commit message #42"),
+                        "https://junit.org/test/%s".formatted(DigestUtils.sha256Hex("42")),
+                        "fix(scm): set clean commit message #42",
+                        null,
+                        null,
                         "fix",
                         ChangeCategory.FIXED,
                         "scm",

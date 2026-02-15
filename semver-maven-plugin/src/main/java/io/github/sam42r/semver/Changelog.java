@@ -15,4 +15,12 @@ public class Changelog {
     private String rendererName = "Markup";
     @Builder.Default
     private String template = "changelog";
+    @Builder.Default
+    private boolean renderIssueLinks = true;
+    @Builder.Default
+    private boolean renderCommitLinks = true;
+    @Builder.Default
+    private boolean renderReleaseLinks = true;
+    @Builder.Default
+    private boolean renderBody = false;
 }
