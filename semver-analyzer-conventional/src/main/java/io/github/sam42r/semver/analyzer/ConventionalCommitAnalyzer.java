@@ -104,7 +104,7 @@ public class ConventionalCommitAnalyzer implements CommitAnalyzer {
                 body,
                 footer,
                 type,
-                getCategory(type),
+                getCategory(type, scope),
                 scope,
                 description,
                 breaking.isPresent() || footer.contains("BREAKING CHANGE") ? SemVerChangeLevel.MAJOR : getLevel(type),
@@ -114,7 +114,11 @@ public class ConventionalCommitAnalyzer implements CommitAnalyzer {
         );
     }
 
-    private ChangeCategory getCategory(String type) {
+    private ChangeCategory getCategory(String type, String scope) {
+        if ("security".equalsIgnoreCase(scope)) {
+            return ChangeCategory.SECURITY;
+        }
+
         if (type != null) {
             return configuration.getItems().stream()
                     .filter(v -> v.type().equals(type))

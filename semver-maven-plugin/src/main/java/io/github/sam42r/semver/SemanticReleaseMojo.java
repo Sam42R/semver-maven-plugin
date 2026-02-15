@@ -235,7 +235,13 @@ public class SemanticReleaseMojo extends AbstractMojo {
                 changelogRendererFactories.entrySet().stream()
                         .filter(v -> v.getKey().equalsIgnoreCase(changelog.getRendererName()))
                         .map(Map.Entry::getValue)
-                        .map(v -> v.getInstance(changelog.getTemplate()))
+                        .map(v -> v.getInstance(
+                                changelog.getTemplate(),
+                                changelog.isRenderIssueLinks(),
+                                changelog.isRenderCommitLinks(),
+                                changelog.isRenderReleaseLinks(),
+                                changelog.isRenderBody()
+                        ))
                         .findAny(),
                 releasePublisherFactories.entrySet().stream()
                         .filter(v -> v.getKey().equalsIgnoreCase(release.getPublisherName()))

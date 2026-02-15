@@ -4,5 +4,11 @@ import lombok.NonNull;
 
 public interface ChangelogRendererFactory<R extends ChangelogRenderer> {
 
-    @NonNull R getInstance(@NonNull String template);
+    @NonNull R getInstance(
+            @NonNull String template,
+            boolean renderIssueLinks,
+            boolean renderCommitLinks,
+            boolean renderReleaseLinks,
+            boolean renderBody
+    );
 }
