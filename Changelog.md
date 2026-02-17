@@ -7,6 +7,13 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 <!-- DO NOT REMOVE - c871f32ed1b7a85b24a0f22e8e7d9e3ee285742c - DO NOT REMOVE -->
 
+## [1.9.1](https://github.com/Sam42R/semver-maven-plugin/compare/v1.9.0...v1.9.1) - 2026-02-17
+
+
+### Fixed
+- :bug:: (changelog): fix link rendering [(#62)](https://github.com/Sam42R/semver-maven-plugin/issues/62) [fa9d8d1](https://github.com/Sam42R/semver-maven-plugin/commit/fa9d8d1dfd153bb9f8316253bea2191eb5e8980b)
+
+
 ## [1.9.0](https://github.com/Sam42R/semver-maven-plugin/compare/v1.8.0...v1.9.0) - 2026-02-09
 
 
