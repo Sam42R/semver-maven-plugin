@@ -1,0 +1,17 @@
+when:
+  - event: [push, pull_request]
+    branch: main
+
+steps:
+  - name: compile
+    image: maven:3.9.12-eclipse-temurin-21
+    commands:
+      - mvn clean compile
+  - name: test
+    image: maven:3.9.12-eclipse-temurin-21
+    commands:
+      - mvn verify sonar:sonar
+        -Dsonar.branch.name=$CI_COMMIT_SOURCE_BRANCH
+    environment:
+      SONAR_TOKEN:
+        from_secret: SONAR_TOKEN
