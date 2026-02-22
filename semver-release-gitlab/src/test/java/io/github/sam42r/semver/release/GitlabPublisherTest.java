@@ -6,14 +6,22 @@ import io.github.sam42r.semver.model.release.ReleaseInfo;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.Arguments;
+import org.junit.jupiter.params.provider.MethodSource;
+import org.mockito.Mockito;
 import org.mockserver.client.MockServerClient;
 import org.mockserver.junit.jupiter.MockServerExtension;
 import org.mockserver.matchers.Times;
 import org.mockserver.verify.VerificationTimes;
 
+import java.io.IOException;
+import java.net.http.HttpClient;
 import java.time.LocalDateTime;
+import java.util.stream.Stream;
 
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
+import static org.mockito.Mockito.*;
 import static org.mockserver.model.HttpRequest.request;
 import static org.mockserver.model.HttpResponse.response;
 
@@ -24,11 +32,7 @@ class GitlabPublisherTest {
 
     @BeforeEach
     void setup(MockServerClient client) {
-        uut = new GitlabPublisherFactory().getInstance(
-                "%s://%s/api/v4/projects/%s/releases",
-                null,
-                "token"
-        );
+        uut = new GitlabPublisherFactory().getInstance(null, "token");
         client.reset();
     }
 
@@ -69,7 +73,7 @@ class GitlabPublisherTest {
     }
 
     @Test
-    void shouldThrowOnHttp500(MockServerClient client) {
+    void shouldThrowOnHttpError(MockServerClient client) {
         client.when(request(), Times.exactly(1))
                 .respond(response()
                         .withStatusCode(500)
@@ -97,5 +101,39 @@ class GitlabPublisherTest {
                         .withHeader("Content-Type", "application/json")
                         .withHeader("PRIVATE-TOKEN", "token"),
                 VerificationTimes.exactly(1));
+    }
+
+    @ParameterizedTest
+    @MethodSource("thrownExceptions")
+    void shouldThrowOnException(Exception thrownException, String expectedMessage, MockServerClient client) throws IOException, InterruptedException {
+        try (var httpClientStatic = mockStatic(HttpClient.class)) {
+            var httpClient = mock(HttpClient.class);
+            when(httpClient.send(Mockito.any(), Mockito.any())).thenThrow(thrownException);
+
+            httpClientStatic.when(HttpClient::newHttpClient).thenReturn(httpClient);
+
+            var release = new ReleaseInfo(
+                    "v1.0.0",
+                    "v1.0.0",
+                    "# Release v1.0.0",
+                    LocalDateTime.now()
+            );
+
+            assertThatThrownBy(() -> uut.publish(
+                    "http",
+                    "localhost:%d".formatted(client.getPort()),
+                    "JUnit",
+                    "Test",
+                    release))
+                    .isInstanceOf(ReleaseException.class)
+                    .hasMessage(expectedMessage);
+        }
+    }
+
+    private static Stream<Arguments> thrownExceptions() {
+        return Stream.of(
+                Arguments.of(new IOException("JUnit"), "java.io.IOException: JUnit"),
+                Arguments.of(new InterruptedException("JUnit"), "java.lang.InterruptedException: JUnit")
+        );
     }
 }

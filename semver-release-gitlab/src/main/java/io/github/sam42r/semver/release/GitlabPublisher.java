@@ -46,7 +46,7 @@ public class GitlabPublisher implements ReleasePublisher {
         var uri = URI.create(baseUrl.formatted(scheme, instance, encodedProjectPath));
         var payload = generatePayload(releaseInfo);
 
-        try {
+        try (var httpClient = HttpClient.newHttpClient()) {
             var json = objectMapper.writeValueAsString(payload);
 
             var httpRequest = HttpRequest.newBuilder()
@@ -56,14 +56,16 @@ public class GitlabPublisher implements ReleasePublisher {
                     .POST(HttpRequest.BodyPublishers.ofString(json))
                     .build();
 
-            var response = HttpClient.newHttpClient()
-                    .send(httpRequest, HttpResponse.BodyHandlers.ofString());
+            var response = httpClient.send(httpRequest, HttpResponse.BodyHandlers.ofString());
 
             if (response.statusCode() != 201) {
                 throw new ReleaseException("Release API does return with HTTP-%d - %s".formatted(
                         response.statusCode(), response.body()));
             }
-        } catch (IOException | InterruptedException e) {
+        } catch (IOException e) {
+            throw new ReleaseException(e);
+        } catch (InterruptedException e) {
+            Thread.currentThread().interrupt();
             throw new ReleaseException(e);
         }
     }
