@@ -27,7 +27,8 @@ public class BundleHelper {
             "semver-scm-subversion",
             "semver-release-api",
             "semver-release-github",
-            "semver-release-gitlab"
+            "semver-release-gitlab",
+            "semver-release-codeberg"
     };
 
     public static void main(String[] args) {

@@ -217,7 +217,7 @@ or by setting corresponding system property.
 |           | renderCommitLinks  |          | `true`         | [true&vert;false]                    | Generate commit links                 |
 |           | renderReleaseLinks |          | `true`         | [true&vert;false]                    | Generate release links                |
 |           | renderBody         |          | `false`        | [true&vert;false]                    | Include commit message body           |
-| release   | publisher-name     |          | `GitHub`       | [Github&vert;Gitlab]                 | Release publisher                     |
+| release   | publisher-name     |          | `GitHub`       | [Github&vert;Gitlab&vert;Codeberg]   | Release publisher                     |
 |           | publish            |          | `false`        | [true&vert;false]                    | publish release to remote             |
 |           | username           |          |                |                                      |                                       |
 |           | password           |          |                |                                      |                                       |

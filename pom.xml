@@ -29,6 +29,7 @@
         <module>semver-release-api</module>
         <module>semver-release-github</module>
         <module>semver-release-gitlab</module>
+        <module>semver-release-codeberg</module>
         <module>semver-maven-plugin</module>
         <module>coverage</module>
     </modules>

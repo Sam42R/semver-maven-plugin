@@ -92,6 +92,11 @@
             <artifactId>semver-release-gitlab</artifactId>
             <version>${project.version}</version>
         </dependency>
+        <dependency>
+            <groupId>io.github.sam42r</groupId>
+            <artifactId>semver-release-codeberg</artifactId>
+            <version>${project.version}</version>
+        </dependency>
 
         <dependency>
             <groupId>io.github.sam42r</groupId>
